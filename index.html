@@ -506,6 +506,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .pr{display:flex;justify-content:space-around;gap:2px}.pp{display:flex;flex-direction:column;align-items:center;width:62px;min-width:0;text-align:center}
 .pp b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#222;font-size:12px;box-shadow:0 1px 3px #0005}.ph.oly .pp b{background:var(--red);color:#fff;border:2px solid #fff}
 .pp span{color:#fff;font-size:10.5px;line-height:1.1;margin-top:2px;text-shadow:0 1px 2px #000a;overflow-wrap:anywhere}
+.ph-img{width:84px;height:84px;object-fit:cover;border-radius:50%;border:3px solid #fff;display:block}.ph-add{margin-top:6px;border:0;border-radius:10px;padding:5px 10px;background:#fff3;color:#fff;font:700 12px inherit;font-family:inherit}
 </style>
 </head><body>
 
@@ -777,6 +778,13 @@ function openPlayer(p,sport){
   ht.append(el("h3",null,p.name),el("p",null,[p.latin,p.pos].filter(Boolean).join(" · ")));
   if(p.status)ht.append(el("p",null,"⚠ "+(p.statusText||"")+(p.statusNote?" — "+p.statusNote:"")));
   const x=el("button","sh-close","×");x.type="button";x.setAttribute("aria-label","Κλείσιμο");
+  const pk="thr_ph_"+p.name;let ph=null;try{ph=localStorage.getItem(pk)}catch(e){}
+  const setPh=u=>{art.innerHTML="";if(u){const im=el("img","ph-img");im.src=u;im.alt=p.name;art.append(im)}else art.innerHTML=jersey(sport,p.no)};
+  if(ph)setPh(ph);
+  const cam=el("button","ph-add",ph?"Αλλαγή φωτογραφίας":"📷 Φωτογραφία");cam.type="button";const fi=el("input");fi.type="file";fi.accept="image/*";fi.hidden=true;
+  cam.onclick=()=>fi.click();
+  fi.onchange=()=>{const f=fi.files[0];if(!f)return;const im=new Image();im.onload=()=>{const c=document.createElement("canvas");const sc=Math.min(1,240/Math.min(im.width,im.height));c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext("2d").drawImage(im,0,0,c.width,c.height);const u=c.toDataURL("image/jpeg",.8);try{localStorage.setItem(pk,u)}catch(e){}setPh(u);cam.textContent="Αλλαγή φωτογραφίας"};im.src=URL.createObjectURL(f)};
+  ht.append(cam,fi);
   hero.append(art,ht,x);sh.append(hero);
   const body=el("div","sh-body");const b=p.bio||{};
   const facts=[["Αριθμός",p.no],["Θέση",p.pos],["Ηλικία",p.age],["Γέννηση",[b.born,b.birthplace].filter(Boolean).join(", ")],["Εθνικότητα",p.nat],["Ύψος",p.height?p.height+" εκ.":""],["Πόδι / χέρι",b.foot],["Συμβόλαιο έως",b.contract],["Αξία",b.value],["Στην ομάδα από",b.joined],["Εθνική ομάδα",b.national]].filter(([,v])=>v!=null&&v!=="");
