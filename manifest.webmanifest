@@ -1,0 +1,1 @@
+{"name": "Θρύλος Daily", "short_name": "Θρύλος", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#8E0A1F", "theme_color": "#C8102E", "lang": "el", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"}, {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
