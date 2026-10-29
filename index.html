@@ -402,7 +402,7 @@ button.pl:hover{background:var(--soft)}
 .hub-btn[aria-pressed="true"]{background:#fff;color:var(--red)}
 .top-r{display:flex;gap:6px;align-items:center}
 @media (max-width:430px){.word span{display:none}.word{font-size:clamp(13px,4.3vw,17px)!important;letter-spacing:0!important;white-space:nowrap}.date-btn svg{display:none}.logo{gap:7px;min-width:0}.crest{width:36px!important;height:36px!important}.date-btn{padding:6px 9px!important;font-size:12px!important}.hub-btn:not(#themeBtn){font-size:0;gap:0;width:34px;height:34px;padding:0;justify-content:center}.hub-btn:not(#themeBtn) svg{width:18px;height:18px}}
-.bar-in{max-width:560px!important;grid-template-columns:repeat(7,1fr)!important}
+.bar-in{max-width:560px!important;grid-template-columns:repeat(5,1fr)!important}
 .bar button{font-size:10px!important;letter-spacing:-.1px}
 /* tables */
 .tbl{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
@@ -517,6 +517,16 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .nm-teams .crest2{width:38px;height:38px;font-size:12px}.nm-teams .crest2.img{width:38px;height:38px}
 .fx-meta{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .fx-match{overflow-wrap:anywhere}
+/* Phase 2.3 — 5-tab bar + «Κι άλλα» menu */
+.bar button{font-size:11px!important}.bar-in{max-width:460px!important}
+.mm{margin:0}.mm-h{margin:0 4px 8px;font-size:12px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.mm-l{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.mm-i{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 14px;background:none;border:0;border-top:1px solid var(--line);text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.mm-i:first-child{border-top:0}.mm-i:active{background:var(--pill)}
+.mm-ic{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--pill);color:var(--red)}.mm-ic svg{width:22px;height:22px}
+.mm-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.mm-t b{font-size:15px;font-weight:800}.mm-t small{font-size:12.5px;color:var(--muted);line-height:1.3}
+.mm-go{color:var(--muted);font-size:22px;line-height:1}.mm-dot{background:var(--red);color:#fff;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800}
+.mm-back{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font:800 13px var(--body);color:var(--red);cursor:pointer;min-height:36px}
 </style>
 </head><body>
 
@@ -556,11 +566,9 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 <nav class="bar" aria-label="Ενότητες"><div class="bar-in">
   <button type="button" data-v="news" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>Νέα</button>
   <button type="button" data-v="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15.5" r="2" fill="currentColor"/></svg>Αγώνες</button>
-  <button type="button" data-v="vs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 18V9M9 18V5M15 18v-7M20 18V8" stroke-linecap="round"/></svg>Αντίπαλοι</button>
-  <button type="button" data-v="bet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg>Στοίχημα</button>
   <button type="button" data-v="live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M6.3 6.3a8 8 0 000 11.4M17.7 6.3a8 8 0 010 11.4M3.5 3.5a12 12 0 000 17M20.5 3.5a12 12 0 010 17" stroke-linecap="round"/></svg>Live</button>
-  <button type="button" data-v="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5h16a1 1 0 011 1v10a1 1 0 01-1 1h-8l-5 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke-linejoin="round"/></svg>Chat</button>
   <button type="button" data-v="roster"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3l-5 3 2 4 2-1v12h10V9l2 1 2-4-5-3c-.5 1.7-2 3-4 3S8.5 4.7 8 3z" stroke-linejoin="round"/></svg>Ρόστερ</button>
+  <button type="button" data-v="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button>
 </div></nav>
 
 <script>
@@ -585,9 +593,28 @@ function when(f,year){const d=/(\d{1,2})\/(\d{1,2})/.exec(f.day||"");const t=/(\
 
 const RTABS=[["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["polo-men","Πόλο Ανδρών"],["polo-women","Πόλο Γυναικών"]];
 const HASHV={"#roster":"roster","#games":"games","#vs":"vs","#live":"live","#bet":"bet","#more":"more","#chat":"chat"};let opps=null,vsel=null,live=null,ltimer=null;
-let view=HASHV[location.hash]||"news",rosters={},rsport="football",rq="",season=null,gfilter="all",gmode="next";
+let mmenu=true,view=HASHV[location.hash]||"news",rosters={},rsport="football",rq="",season=null,gfilter="all",gmode="next";
 try{gfilter=localStorage.getItem("thr_g")||"all"}catch(e){}
 try{rsport=localStorage.getItem("thr_r")||"football"}catch(e){}
+
+/* Phase 2.3 — «Κι άλλα» menu (grouped entry points to the secondary sections) */
+const MI={vs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 18V9M9 18V5M15 18v-7M20 18V8" stroke-linecap="round"/></svg>',bet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg>',chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5h16a1 1 0 011 1v10a1 1 0 01-1 1h-8l-5 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke-linejoin="round"/></svg>',
+ standings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 20h16M6 20v-6h4v6M10 20V8h4v12M14 20v-9h4v9" stroke-linejoin="round"/></svg>',
+ scorers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>',
+ discipline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="7" y="3.5" width="10" height="17" rx="2"/></svg>',
+ rumors:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 12h13M13 7l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ quotes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2H11l-5 4v-4H5a2 2 0 01-2-2V7a2 2 0 012-2z" stroke-linejoin="round"/></svg>',
+ amateur:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6" stroke-linecap="round"/></svg>',
+ archive:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10h14V9M10 13h4" stroke-linecap="round"/></svg>'};
+const MENU=[["Αγώνες & ομάδα",[["vs","Αντίπαλοι","Σύγκριση με τους επόμενους αντιπάλους","v"],["standings","Βαθμολογίες","Super League, Euroleague, Europa League","m"],["scorers","Σκόρερ & στατιστικά","Ο Ολυμπιακός και οι διοργανώσεις","m"],["discipline","Τιμωρίες & κάρτες","Απουσίες, κίτρινες, τραυματίες","m"]]],
+ ["Στοίχημα & κοινότητα",[["bet","Στοίχημα","Εκτιμήσεις και bet builders","v"],["chat","Chat","Live chat με τους φίλους του Θρύλου","v"]]],
+ ["Ειδήσεις & αρχείο",[["rumors","Μεταγραφές","Φήμες και επίσημες κινήσεις","m"],["quotes","Δηλώσεις","Προπονητές, παίκτες, διοίκηση","m"],["amateur","Ερασιτέχνης","Βόλεϊ, μπάσκετ γυναικών και άλλα","m"],["archive","Αρχείο","Παλαιότερες εκδόσεις","m"]]]];
+function renderMoreMenu(){const box=$("#more");box.replaceChildren();const unread=!!document.querySelector('.bar button[data-v="more"] .badge');
+  MENU.forEach(([title,items])=>{const sec=el("section","mm");sec.append(el("h3","mm-h",title));const l=el("div","mm-l");
+    items.forEach(([k,label,sub,kind])=>{const b=el("button","mm-i");b.type="button";b.dataset.go=k;const ic2=el("span","mm-ic");ic2.innerHTML=MI[k];const tx=el("span","mm-t");tx.append(el("b",null,label),el("small",null,sub));
+      b.append(ic2,tx);if(k==="chat"&&unread)b.append(el("span","mm-dot","νέα"));b.append(el("span","mm-go","›"));
+      b.addEventListener("click",()=>{if(kind==="v"){setView(k)}else{mmenu=false;mtab=k;try{localStorage.setItem("thr_m",mtab)}catch(_){}setView("more")}});l.append(b)});
+    sec.append(l);box.append(sec)})}
 function upcomingOpps(){const t=todayStr();return ((opps&&opps.list)||[]).filter(o=>o.d>=t).sort((a,b)=>(a.d+(a.t||"")).localeCompare(b.d+(b.t||"")))}
 function renderTabs(){const box=$("#tabs");box.replaceChildren();
   if(view==="more"){MORE.forEach(([k,label])=>{const b=el("button","tab");b.dataset.mt=k;b.setAttribute("aria-pressed",k===mtab?"true":"false");b.append(label);box.append(b)});return}
@@ -984,19 +1011,19 @@ function crest(name,cls,sport){name=String(name||"?");const oly=/ολυμπια�
   addEventListener("touchend",()=>{if(y0!=null&&pull>70){ind.textContent="Ανανέωση…";location.reload()}else ind.classList.remove("on");y0=null},{passive:true})})();
 async function chatBadge(){try{if(view==="chat"||!lsGet("thr_code")||document.visibilityState!=="visible")return;
   const r=await fetch(SB.url+"/rest/v1/messages?select=id&order=id.desc&limit=1",{headers:sbH(),cache:"no-store"});if(!r.ok)return;const a=await r.json();const id=a[0]?a[0].id:0;
-  const b=document.querySelector('.bar button[data-v="chat"]');if(!b)return;let dot=b.querySelector(".badge");
+  const b=document.querySelector('.bar button[data-v="more"]');if(!b)return;let dot=b.querySelector(".badge");
   if(id>(+lsGet("thr_seen")||0)){if(!dot){dot=el("span","badge");b.append(dot)}}else if(dot)dot.remove()}catch(e){}}
 setInterval(chatBadge,20000);setTimeout(chatBadge,3000);
 
 function setView(v){view=v;
-  document.querySelectorAll(".bar button").forEach(b=>{if(b.dataset.v===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
-  $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;if(v==="chat"){const bb=document.querySelector('.bar button[data-v="chat"] .badge');if(bb)bb.remove()}
+  document.querySelectorAll(".bar button").forEach(b=>{if(b.dataset.v===v||(b.dataset.v==="more"&&(v==="vs"||v==="bet"||v==="chat")))b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;if(v==="chat"){const bb=document.querySelector('.bar button[data-v="more"] .badge');if(bb)bb.remove()}
   $("#hubBtn").setAttribute("aria-pressed",v==="more"?"true":"false");
   render();
   try{history.replaceState(null,"",v==="news"?location.pathname+location.search:"#"+v)}catch(_){}
   window.scrollTo({top:0})}
-document.querySelector(".bar").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setView(b.dataset.v)});
-$("#hubBtn").addEventListener("click",()=>setView("more"));
+document.querySelector(".bar").addEventListener("click",e=>{const b=e.target.closest("button");if(b){if(b.dataset.v==="more")mmenu=true;setView(b.dataset.v)}});
+$("#hubBtn").addEventListener("click",()=>{mmenu=true;setView("more")});
 window.addEventListener("hashchange",()=>setView(HASHV[location.hash]||"news"));
 
 function renderNext(){const box=$("#next");box.replaceChildren();clearInterval(timer);
@@ -1026,7 +1053,8 @@ function render(){
   if(view==="chat"){$("#next").hidden=true;$("#headline").textContent="Live chat για τους φίλους του Θρύλου";$("#tabs").replaceChildren();if(!chatBuilt)renderChat();return}
   if(view==="live"){$("#next").hidden=true;$("#headline").textContent="Live score";$("#tabs").replaceChildren();renderLive();return}
   if(view==="bet"){$("#next").hidden=true;$("#headline").textContent="Στοίχημα · εκτιμήσεις επόμενων αγώνων";renderTabs();renderBet();return}
-  if(view==="more"){$("#next").hidden=true;$("#headline").textContent="Βαθμολογίες, στατιστικά, τιμωρίες και αρχείο";renderTabs();renderMore();return}
+  if(view==="more"&&mmenu){$("#next").hidden=true;$("#headline").textContent="Όλες οι υπόλοιπες ενότητες";$("#tabs").replaceChildren();renderMoreMenu();return}
+  if(view==="more"){$("#next").hidden=true;$("#headline").textContent="Βαθμολογίες, στατιστικά, τιμωρίες και αρχείο";renderTabs();renderMore();const bk=el("button","mm-back","‹ Κι άλλα");bk.type="button";bk.onclick=()=>{mmenu=true;render();window.scrollTo({top:0})};$("#more").prepend(bk);return}
   if(view==="vs"){$("#next").hidden=true;$("#headline").textContent="Σύγκριση με τους επόμενους αντιπάλους";renderTabs();renderVs();return}
   if(view==="games"){$("#next").hidden=true;$("#headline").textContent="Ημερολόγιο αγώνων 2026-27";renderTabs();renderGames();return}
   if(view==="roster"){$("#next").hidden=true;$("#headline").textContent="Ρόστερ & στοιχεία παικτών";renderTabs();renderRoster();return}
