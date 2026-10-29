@@ -508,6 +508,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .pp span{color:#fff;font-size:10.5px;line-height:1.1;margin-top:2px;text-shadow:0 1px 2px #000a;overflow-wrap:anywhere}
 .crest2.img{padding:0;overflow:hidden}.crest2.img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .nmlive .sc,.lv-row .sc{white-space:nowrap;font-size:clamp(28px,9vw,38px)}
+.badge.img{background:#fff;overflow:hidden;padding:0}.badge.img img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 </style>
 </head><body>
 
@@ -652,7 +653,7 @@ function renderVs(){
   if(!o){box.append(el("div","none","Δεν υπάρχουν επόμενοι αντίπαλοι για σύγκριση ακόμα."));return}
   const dt=new Date(o.d+"T12:00:00");
   const v=el("section","vs");const top=el("div","vs-top");
-  const oly=el("div","team");oly.append(el("div","badge oly","ΘΡ"),el("b",null,"Ολυμπιακός"),el("small",null,o.home?"Εντός έδρας":"Εκτός έδρας"));
+  const oly=el("div","team");oly.append(olyBadge(o.sport),el("b",null,"Ολυμπιακός"),el("small",null,o.home?"Εντός έδρας":"Εκτός έδρας"));
   const ini=o.opp.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
   const op=el("div","team");op.append(el("div","badge",ini),el("b",null,o.opp),el("small",null,o.meta||""));
   const mid=el("div","vs-mid");mid.append(el("span","gtime",o.t||"—"),el("small",null,WD[dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1)));
@@ -733,7 +734,7 @@ function renderLive(){
   ms.forEach(m=>{
     const c=el("section","lv");const h=el("div","lv-h");h.append(ic(m.sport),el("span",null,m.comp||""));
     const lab={live:"LIVE",ht:"ΗΜΙΧΡΟΝΟ",ft:"ΤΕΛΙΚΟ",pre:"ΣΕ ΛΙΓΟ"}[m.status]||m.status;h.append(el("span","st-badge"+(m.status==="live"?" live":""),lab));c.append(h);
-    const oly=el("div","team");oly.append(el("div","badge oly","ΘΡ"),el("b",null,"Ολυμπιακός"));
+    const oly=el("div","team");oly.append(olyBadge(m.sport),el("b",null,"Ολυμπιακός"));
     const ini=(m.opp||"").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();const op=el("div","team");op.append(el("div","badge",ini),el("b",null,m.opp));
     const sc=el("div","sc");const pre=m.status==="pre";
     const a=pre?"–":String(m.olyScore??0),b=pre?"–":String(m.oppScore??0);
@@ -960,6 +961,7 @@ function renderChat(){
 
 
 /* ---- crests, theme, pull-to-refresh, chat badge ---- */
+function olyBadge(sport){const d=el("div","badge oly img");const im=el("img");im.src="assets/"+(sport==="football"?"oly-football.jpg":sport==="basketball"?"oly-basketball.jpg":"oly-amateur.png");im.alt="";d.append(im);return d}
 function crest(name,cls,sport){name=String(name||"?");const oly=/ολυμπιακ|θρ[υύ]λ/i.test(name);
   const w=name.replace(/[^\p{L}\s]/gu,"").trim().split(/\s+/).filter(Boolean);const ini=oly?"ΟΣ":((w.length>1?w[0][0]+w[1][0]:(w[0]||"?").slice(0,2))).toUpperCase();
   let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))%360;
