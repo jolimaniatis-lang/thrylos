@@ -55,7 +55,7 @@ svg{display:block}
 
 
 /* calm redesign */
-.wrap section{margin-top:26px}
+#app section{margin-top:26px}
 .brief{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
 .brief h2{margin:0 0 10px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--red);font-weight:800}
 .brief ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
@@ -117,6 +117,35 @@ svg{display:block}
 .msg img{cursor:zoom-in}
 .chat-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:60px 0;color:var(--muted)}.chat-empty .big{font-size:42px}.chat-empty b{color:var(--ink)}
 .lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:12px}.lb img{max-width:100%;max-height:100%;border-radius:8px}
+
+
+/* v3 polish */
+.crest2{flex:none;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#fff;font:800 11px var(--body);letter-spacing:.3px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 1px 3px rgba(0,0,0,.2)}
+#themeBtn{width:34px;height:34px;padding:0!important;justify-content:center;font-size:15px}
+.word{font-size:24px!important}.top{gap:8px}.top-r{display:flex;gap:6px;align-items:center}
+.crest2.sm{width:24px;height:24px;font-size:9.5px}
+.nm-teams{display:flex;align-items:center;gap:8px;margin:6px 0 2px}.nm-teams i{font-style:normal;color:var(--muted);font-weight:800}
+.nm.nmlive{background:linear-gradient(160deg,var(--red),var(--red-2));color:#fff;cursor:pointer;grid-template-columns:1fr}
+.nm.nmlive .nm-label{color:#fff;display:flex;align-items:center;gap:6px}
+.nm.nmlive .nm-label::before{content:"";width:8px;height:8px;border-radius:50%;background:#7CF0A8;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.lv-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-top:6px}
+.lv-row .tm{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-weight:800;font-size:14px}
+.lv-row .sc{font:700 44px/1 var(--display);font-variant-numeric:tabular-nums}
+.nm.nmlive .nm-meta{color:rgba(255,255,255,.8);text-align:center}
+.gopp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.gm:not(.open) .gnote{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.gm{cursor:pointer}
+.bm-det{display:flex;flex-direction:column;gap:10px;animation:fadein .2s ease}
+.bm-det[hidden]{display:none}
+.bm-tg{all:unset;display:block;width:100%;box-sizing:border-box;cursor:pointer;text-align:center;font-weight:800;font-size:13.5px;color:var(--red);padding:10px;border-top:1px solid var(--line);margin-top:4px}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.row .det{animation:fadein .2s ease}
+button:active,.tab:active,.gm:active{transform:scale(.97)}
+.bar button{position:relative}
+.bar .badge{position:absolute;top:3px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--card)}
+.ptr{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-60px);z-index:30;background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;box-shadow:var(--shadow);transition:transform .15s}
+.ptr.on{transform:translate(-50%,0)}
 
 /* next match */
 .next{margin-top:16px}
@@ -370,7 +399,8 @@ button.pl:hover{background:var(--soft)}
 .hub-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 12px;font:700 13px var(--body);color:#fff;cursor:pointer}
 .hub-btn svg{width:15px;height:15px}
 .hub-btn[aria-pressed="true"]{background:#fff;color:var(--red)}
-.top-r{display:flex;gap:8px;align-items:center}
+.top-r{display:flex;gap:6px;align-items:center}
+@media (max-width:430px){.word span{display:none}.word{font-size:16px!important;letter-spacing:0!important;white-space:nowrap}.date-btn svg{display:none}.logo{gap:7px;min-width:0}.crest{width:30px!important;height:30px!important}.date-btn{padding:6px 9px!important;font-size:12px!important}.hub-btn:not(#themeBtn){font-size:0;gap:0;width:34px;height:34px;padding:0;justify-content:center}.hub-btn:not(#themeBtn) svg{width:18px;height:18px}}
 .bar-in{max-width:560px!important;grid-template-columns:repeat(7,1fr)!important}
 .bar button{font-size:10px!important;letter-spacing:-.1px}
 /* tables */
@@ -438,7 +468,7 @@ button.pl:hover{background:var(--soft)}
         <div class="crest" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.3 6.2 19.8l1.6-6.6L2.6 8.8l6.8-.5z" fill="#C8102E"/></svg></div>
         <div class="word">Θρύλος Daily<span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
       </div>
-      <div class="top-r"><button type="button" class="hub-btn" id="hubBtn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button>
+      <div class="top-r"><button type="button" class="hub-btn" id="hubBtn" aria-label="Κι άλλα" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">◑</button>
       <label class="date-btn" id="dateBtn"><span id="edDate">Σήμερα</span>
         <svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         <select id="edition" aria-label="Επιλογή ημέρας"></select></label></div>
@@ -556,11 +586,11 @@ function renderGames(){
     cnt++;hdr.lastChild.textContent=cnt+(cnt===1?" αγώνας":" αγώνες");
     const row=el("div","gm"+(x.d===t?" today":""));
     const gd=el("div","gd");gd.append(el("b",null,String(dt.getDate())),el("small",null,WD[dt.getDay()]));
-    const mid=el("div","gmid");const op=el("div","gopp");op.append(el("span","ha"+(x.home?" h":""),x.home?"ΕΝΤΟΣ":"ΕΚΤΟΣ"),x.opp);if(x.d===t)op.append(el("span","tag-today","ΣΗΜΕΡΑ"));
+    const mid=el("div","gmid");const op=el("div","gopp");op.className="gopp";op.append(el("span","ha"+(x.home?" h":""),x.home?"ΕΝΤΟΣ":"ΕΚΤΟΣ"),crest(x.opp,"sm"),x.opp);if(x.d===t)op.append(el("span","tag-today","ΣΗΜΕΡΑ"));
     const cp=el("div","gcomp");cp.append(ic(x.sport),el("span",null,x.comp));mid.append(op,cp);if(x.note)mid.append(el("div","gnote",x.note));
     const r=el("div","gr");
     if(x.score){r.append(el("span","score "+x.res,x.score))}else{r.append(el("span","gtime",x.t||"—"));if(x.tv)r.append(el("span","gtv",x.tv))}
-    row.append(gd,mid,r);sec.append(row)});
+    row.append(gd,mid,r);row.onclick=e=>{if(e.target.closest("a"))return;row.classList.toggle("open")};sec.append(row)});
   if(season.note)box.append(el("p","foot",season.note));
   if((season.sources||[]).length){const d=el("div","chips");season.sources.forEach(x=>{const a=el("a",null,x.title);a.href=x.url;a.target="_blank";a.rel="noopener";d.append(a)});box.append(d)}
 }
@@ -779,9 +809,12 @@ function renderBet(){const box=$("#bet");box.replaceChildren();const d=X.betting
     if(m.odds&&(m.odds.items||[]).length){const o=el("div","odds");m.odds.items.forEach(x=>{const q=el("div");q.append(el("small",null,x.l),el("b",null,typeof x.v==="number"?x.v.toFixed(2):String(x.v)));o.append(q)});c.append(o);
       c.append(el("div","odds-n",["Πηγή: "+(m.odds.src||"—"),m.odds.asOf?"("+m.odds.asOf+")":"","· οι αποδόσεις αλλάζουν, έλεγξε στο site"].join(" ")))}
     else c.append(el("div","odds-n","Αποδόσεις: "+(m.oddsNote||"δεν βρέθηκαν δημόσια, δες Stoiximan / Novibet.")));
-    (m.markets||[]).forEach(k=>{const r=el("div","mk");const t=el("div","mk-t");const cf=CONF[k.conf]||CONF.med;const sp2=el("span","st "+cf[1],cf[0]);sp2.title="Εμπιστοσύνη στην εκτίμηση";t.append(el("b",null,k.market+": "+k.pick),sp2);r.append(t);if(k.why)r.append(el("p",null,k.why));c.append(r)});
-    if(m.builder&&(m.builder.legs||[]).length){const b=el("div","bld");b.append(el("h5",null,"Πρόταση bet builder"));const ul=el("ul");m.builder.legs.forEach(x=>ul.append(el("li",null,x)));b.append(ul);if(m.builder.why)b.append(el("p",null,m.builder.why));c.append(b)}
-    if(m.risk)c.append(el("div","risk","⚠ "+m.risk));box.append(c)});
+    const det=el("div","bm-det");det.hidden=true;
+    (m.markets||[]).forEach(k=>{const r=el("div","mk");const t=el("div","mk-t");const cf=CONF[k.conf]||CONF.med;const sp2=el("span","st "+cf[1],cf[0]);sp2.title="Εμπιστοσύνη στην εκτίμηση";t.append(el("b",null,k.market+": "+k.pick),sp2);r.append(t);if(k.why)r.append(el("p",null,k.why));det.append(r)});
+    if(m.builder&&(m.builder.legs||[]).length){const b=el("div","bld");b.append(el("h5",null,"Πρόταση bet builder"));const ul=el("ul");m.builder.legs.forEach(x=>ul.append(el("li",null,x)));b.append(ul);if(m.builder.why)b.append(el("p",null,m.builder.why));det.append(b)}
+    if(m.risk)det.append(el("div","risk","⚠ "+m.risk));
+    if(det.childNodes.length){const n=(m.markets||[]).length;const tg=el("button","bm-tg","Δες εκτιμήσεις"+(n?" ("+n+")":"")+" ▾");tg.type="button";tg.onclick=()=>{det.hidden=!det.hidden;tg.textContent=det.hidden?"Δες εκτιμήσεις"+(n?" ("+n+")":"")+" ▾":"Κλείσιμο ▴"};c.append(tg,det)}
+    box.append(c)});
   const sl=el("div","slip-f");sl.style.borderRadius="14px";sl.textContent="Ενδεικτικές εκτιμήσεις από δημόσια στοιχεία, όχι σίγουρες επιλογές. Η ένδειξη δίπλα σε κάθε αγορά (Υψηλή, Μέτρια, Χαμηλή) δείχνει πόσο εμπιστεύομαι την εκτίμηση. Παίξε μόνο ό,τι αντέχεις να χάσεις.";box.append(sl);
   const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+d.updatedAt))}
 
@@ -834,7 +867,7 @@ function renderChat(){
   const hue=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%360;return h};
   const dayLbl=d=>{const t=new Date(),y=new Date(Date.now()-864e5),f=x=>x.toDateString();return f(d)===f(t)?"Σήμερα":f(d)===f(y)?"Χθες":d.toLocaleDateString("el-GR",{weekday:"long",day:"numeric",month:"long"})};
   const lightbox=src=>{const o=el("div","lb");const im=el("img");im.src=src;o.append(im);o.onclick=()=>o.remove();document.body.append(o)};
-  const draw=(ms,force)=>{const sig=ms.map(m=>m.id).join(",");if(sig===last&&!force)return;last=sig;
+  const draw=(ms,force)=>{if(ms.length)lsSet("thr_seen",String(ms[ms.length-1].id));const sig=ms.map(m=>m.id).join(",");if(sig===last&&!force)return;last=sig;
     const near=window.innerHeight+window.scrollY>document.body.scrollHeight-220;
     list.replaceChildren();
     if(!ms.length){const e=el("div","chat-empty");e.append(el("div","big","💬"),el("b",null,"Το chat είναι άδειο"),el("span",null,"Γράψε το πρώτο μήνυμα!"));list.append(e)}
@@ -856,9 +889,28 @@ function renderChat(){
   load(true);chatTimer=setInterval(()=>{if(document.visibilityState==="visible"&&view==="chat")load()},3000);
 }
 
+
+/* ---- crests, theme, pull-to-refresh, chat badge ---- */
+function crest(name,cls){name=String(name||"?");const oly=/ολυμπιακ|θρ[υύ]λ/i.test(name);
+  const w=name.replace(/[^\p{L}\s]/gu,"").trim().split(/\s+/).filter(Boolean);const ini=oly?"ΟΣ":((w.length>1?w[0][0]+w[1][0]:(w[0]||"?").slice(0,2))).toUpperCase();
+  let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))%360;
+  const d=el("span","crest2"+(cls?" "+cls:""),ini);d.style.background=oly?"linear-gradient(160deg,#E3263F,#8E0A1F)":"linear-gradient(160deg,hsl("+h+",50%,48%),hsl("+((h+25)%360)+",55%,32%))";d.setAttribute("aria-hidden","true");return d}
+(function(){const T=lsGet("thr_theme");if(T==="dark"||T==="light")document.documentElement.dataset.theme=T;
+  const b=document.getElementById("themeBtn");if(b){const lab=()=>{const t=document.documentElement.dataset.theme;b.textContent=t==="dark"?"🌙":t==="light"?"☀️":"◐"};lab();
+    b.onclick=()=>{const t=document.documentElement.dataset.theme;const n=!t?"dark":t==="dark"?"light":"";if(n)document.documentElement.dataset.theme=n;else delete document.documentElement.dataset.theme;lsSet("thr_theme",n);lab()}}})();
+(function(){let y0=null,pull=0;const ind=el("div","ptr","↓ Τράβα για ανανέωση");document.body.append(ind);
+  addEventListener("touchstart",e=>{y0=(window.scrollY<=0&&!e.target.closest("textarea,input,.rail,.seg"))?e.touches[0].clientY:null;pull=0},{passive:true});
+  addEventListener("touchmove",e=>{if(y0==null)return;pull=e.touches[0].clientY-y0;if(pull>70){ind.classList.add("on");ind.textContent="Άφησε για ανανέωση"}else{ind.classList.toggle("on",pull>30);ind.textContent="↓ Τράβα για ανανέωση"}},{passive:true});
+  addEventListener("touchend",()=>{if(y0!=null&&pull>70){ind.textContent="Ανανέωση…";location.reload()}else ind.classList.remove("on");y0=null},{passive:true})})();
+async function chatBadge(){try{if(view==="chat"||!lsGet("thr_code")||document.visibilityState!=="visible")return;
+  const r=await fetch(SB.url+"/rest/v1/messages?select=id&order=id.desc&limit=1",{headers:sbH(),cache:"no-store"});if(!r.ok)return;const a=await r.json();const id=a[0]?a[0].id:0;
+  const b=document.querySelector('.bar button[data-v="chat"]');if(!b)return;let dot=b.querySelector(".badge");
+  if(id>(+lsGet("thr_seen")||0)){if(!dot){dot=el("span","badge");b.append(dot)}}else if(dot)dot.remove()}catch(e){}}
+setInterval(chatBadge,20000);setTimeout(chatBadge,3000);
+
 function setView(v){view=v;
   document.querySelectorAll(".bar button").forEach(b=>{if(b.dataset.v===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
-  $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;
+  $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;if(v==="chat"){const bb=document.querySelector('.bar button[data-v="chat"] .badge');if(bb)bb.remove()}
   $("#hubBtn").setAttribute("aria-pressed",v==="more"?"true":"false");
   render();
   try{history.replaceState(null,"",v==="news"?location.pathname+location.search:"#"+v)}catch(_){}
@@ -868,13 +920,20 @@ $("#hubBtn").addEventListener("click",()=>setView("more"));
 window.addEventListener("hashchange",()=>setView(HASHV[location.hash]||"news"));
 
 function renderNext(){const box=$("#next");box.replaceChildren();clearInterval(timer);
+  const lm=((live&&live.matches)||[]).find(m=>(m.status==="live"||m.status==="ht")&&ok({sport:m.sport}));
+  if(lm){box.hidden=false;const c=el("div","nm nmlive");c.setAttribute("role","button");c.tabIndex=0;c.onclick=()=>setView("live");
+    c.append(el("div","nm-label",(lm.status==="ht"?"Ημίχρονο":"Live · "+(lm.clock||""))+" · "+(lm.comp||"")));
+    const row=el("div","lv-row");const A={n:"Ολυμπιακός",s:lm.olyScore},B={n:lm.opp,s:lm.oppScore};const [L,R]=lm.home===false?[B,A]:[A,B];
+    const tm=(t)=>{const d=el("div","tm");d.append(crest(t.n),el("span",null,t.n));return d};
+    row.append(tm(L),el("div","sc",(L.s??0)+" – "+(R.s??0)),tm(R));c.append(row,el("div","nm-meta","Πάτα για λεπτομέρειες"));box.append(c);return}
   if(!cur){box.hidden=true;return}box.hidden=false;
   const y=+(cur.date||"").slice(0,4)||new Date().getFullYear(),now=Date.now();
   const list=(cur.fixtures||[]).filter(ok).map(f=>({f,t:when(f,y)})).filter(x=>x.t&&x.t.getTime()>now-2*3600e3).sort((a,b)=>a.t-b.t);
   if(!list.length){box.hidden=true;return}
   const {f,t}=list[0];const c=el("div","nm");const l=el("div");
   const lab=el("div","nm-label","Επόμενος αγώνας · "+(SPORT[f.sport]||""));
-  l.append(lab,el("div","nm-match",f.match),el("div","nm-meta",[f.day+" "+(f.time||""),f.comp,f.tv].filter(Boolean).join(" · ")));
+  const pr=String(f.match).split(/\s+[–-]\s+/);const tms=el("div","nm-teams");if(pr.length===2)tms.append(crest(pr[0]),el("i",null,"vs"),crest(pr[1]));
+  l.append(lab,tms,el("div","nm-match",f.match),el("div","nm-meta",[f.day+" "+(f.time||""),f.comp,f.tv].filter(Boolean).join(" · ")));
   const cd=el("div","cd");c.append(l,cd);box.append(c);
   const tick=()=>{let s=Math.max(0,Math.floor((t-Date.now())/1000));
     if(s===0){cd.replaceChildren(el("div",null,"LIVE"));return}
@@ -982,7 +1041,7 @@ setView(view);fixCaps();
     cur=editions.find(x=>x.date===keep)||editions[0]||null;
     fillSelect();render();
   },()=>{});
-  db.doc("live/now").onSnapshot(s=>{live=s.exists===false?null:(s.data()||null);if(view==="live")render()},()=>{});
+  db.doc("live/now").onSnapshot(s=>{live=s.exists===false?null:(s.data()||null);if(view==="live")render();else if(view==="news")renderNext()},()=>{});
   db.doc("schedule/opponents").onSnapshot(s=>{opps=s.exists===false?null:(s.data()||null);if(view==="vs")render()},()=>{});
   db.doc("schedule/season").onSnapshot(s=>{season=s.exists===false?null:(s.data()||null);if(view==="games")render()},()=>{});
   XD.forEach(k=>db.doc("schedule/"+k).onSnapshot(sn=>{X[k]=sn.exists===false?null:(sn.data()||null);if(view==="bet"&&k==="betting"||view==="more")render()},()=>{}));
