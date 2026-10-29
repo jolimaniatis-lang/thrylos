@@ -556,7 +556,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
         <div class="crest g7" aria-hidden="true"><img src="assets/gate7.jpg" alt=""></div>
         <div class="word">Θρύλος Daily<span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
       </div>
-      <div class="top-r"><button type="button" class="hub-btn" id="hubBtn" aria-label="Κι άλλα" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">🌓</button>
+      <div class="top-r"><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">🌓</button>
       <label class="date-btn" id="dateBtn"><span id="edDate">Σήμερα</span>
         <svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         <select id="edition" aria-label="Επιλογή ημέρας"></select></label></div>
@@ -1043,12 +1043,10 @@ setInterval(chatBadge,20000);setTimeout(chatBadge,3000);
 function setView(v){view=v;
   document.querySelectorAll(".bar button").forEach(b=>{if(b.dataset.v===v||(b.dataset.v==="more"&&(v==="vs"||v==="bet"||v==="chat")))b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;if(v==="chat"){const bb=document.querySelector('.bar button[data-v="more"] .badge');if(bb)bb.remove()}
-  $("#hubBtn").setAttribute("aria-pressed",v==="more"?"true":"false");
   render();
   try{history.replaceState(null,"",v==="news"?location.pathname+location.search:"#"+v)}catch(_){}
   window.scrollTo({top:0})}
 document.querySelector(".bar").addEventListener("click",e=>{const b=e.target.closest("button");if(b){if(b.dataset.v==="more")mmenu=true;setView(b.dataset.v)}});
-$("#hubBtn").addEventListener("click",()=>{mmenu=true;setView("more")});
 window.addEventListener("hashchange",()=>setView(HASHV[location.hash]||"news"));
 
 function renderNext(){const box=$("#next");box.replaceChildren();clearInterval(timer);

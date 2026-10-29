@@ -16,7 +16,7 @@ for(const [w,h] of SIZES){console.log('== '+w+'px');const ctx=await b.newContext
  // 5-tab bar + Κι άλλα menu
  ok(await p.locator('.bar button').count()===5,'η κάτω μπάρα πρέπει να έχει 5 καρτέλες');
  const bb=await p.evaluate(()=>{const r=document.querySelector('.bar').getBoundingClientRect();return [r.left,r.right,r.bottom,innerWidth,innerHeight]});ok(bb[0]>=0&&bb[1]<=bb[3]+0.5&&bb[2]<=bb[4]+0.5,'η μπάρα βγαίνει εκτός οθόνης '+bb);
- for(const g of MENU_VIEWS){await p.click('#hubBtn');await p.waitForTimeout(300);ok(await p.evaluate(()=>!document.getElementById('more').hidden&&!!document.querySelector('.mm-i')),'το μενού δεν άνοιξε');
+ for(const g of MENU_VIEWS){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(300);ok(await p.evaluate(()=>!document.getElementById('more').hidden&&!!document.querySelector('.mm-i')),'το μενού δεν άνοιξε');
   await p.click('.mm-i[data-go="'+g+'"]');await p.waitForTimeout(500);const st=await p.evaluate(v=>{const e=document.getElementById(v);return !!e&&!e.hidden&&e.innerText.trim().length},g);ok(st>0,'μενού→'+g+' άδεια/κρυμμένη');
   ok(await p.evaluate(()=>document.querySelector('.bar button[data-v="more"]').getAttribute('aria-current')==='page'),'το «Κι άλλα» δεν είναι ενεργό στο '+g);await ovf('menu→'+g)}
  for(const k of MT){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===10,'το μενού πρέπει να έχει 10 ενότητες');
@@ -81,7 +81,7 @@ const AUDIT=()=>{
  await p.evaluate(()=>setView('news'));await p.waitForTimeout(500);
  if(await p.locator('.sec-h[role="button"]').count()){await p.focus('.sec-h[role="button"]');await p.keyboard.press('Enter');ok(await p.evaluate(()=>document.querySelector('.sec-h[role="button"]').getAttribute('aria-expanded')==='true'),'πηγές: Enter δεν άνοιξε')}
  // focus visible on header button (white ring on red) and on bar button
- await p.focus('#hubBtn');await p.keyboard.press('Shift+Tab');await p.keyboard.press('Tab');ok(await p.evaluate(()=>{const cs=getComputedStyle(document.activeElement);return cs.outlineStyle!=='none'&&parseFloat(cs.outlineWidth)>=2}),'focus ring λείπει στο header');
+ await p.focus('#themeBtn');await p.keyboard.press('Shift+Tab');await p.keyboard.press('Tab');ok(await p.evaluate(()=>{const cs=getComputedStyle(document.activeElement);return cs.outlineStyle!=='none'&&parseFloat(cs.outlineWidth)>=2}),'focus ring λείπει στο header');
  // player sheet: focus trap + return focus
  await p.evaluate(()=>setView('roster'));await p.waitForTimeout(500);const pl=p.locator('#roster .pl').first();await pl.focus();await pl.press('Enter');await p.waitForTimeout(300);
  for(let i=0;i<25;i++)await p.keyboard.press('Tab');ok(await p.evaluate(()=>!!document.activeElement.closest('.sheet')),'player sheet: το focus ξέφυγε από το modal');
