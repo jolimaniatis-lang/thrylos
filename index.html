@@ -459,6 +459,44 @@ button.pl:hover{background:var(--soft)}
 .arc b{display:block;font-size:14px;color:var(--red)}
 .arc span{display:block;font-size:14.5px;margin-top:2px}
 .arc small{display:block;font-size:12.5px;color:var(--muted);margin-top:4px}
+
+/* ===== v4: lively & modern ===== */
+:root{--shadow:0 1px 2px rgba(60,10,20,.05),0 14px 34px -10px rgba(60,10,20,.20)}
+body{background:radial-gradient(130% 50% at 50% 0,color-mix(in srgb,var(--red) 9%,transparent),transparent 70%) no-repeat,var(--bg)}
+.hero{border-radius:0 0 30px 30px;box-shadow:0 14px 30px -14px color-mix(in srgb,var(--red) 70%,transparent);animation:drift 14s linear infinite}
+@keyframes drift{to{background-position:56px 0,0 0,0 0}}
+.crest{box-shadow:0 0 0 4px rgba(255,255,255,.18),0 4px 14px rgba(0,0,0,.28)}
+main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+.bar{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border:1px solid var(--line);border-radius:28px;padding:6px;box-shadow:0 16px 40px -8px rgba(40,6,14,.38);background:color-mix(in srgb,var(--card) 86%,transparent)}
+.bar-in{max-width:520px!important}
+.bar button{border-radius:20px;transition:background .2s,color .2s,transform .12s}
+.bar button[aria-current="page"]{background:linear-gradient(160deg,var(--red),var(--red-2));color:#fff;box-shadow:0 6px 14px -4px color-mix(in srgb,var(--red) 60%,transparent)}
+.switch{background:color-mix(in srgb,var(--bg) 40%,transparent)!important}
+.composer{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+.tab[aria-pressed="true"]{background:linear-gradient(160deg,var(--red),var(--red-2));box-shadow:0 8px 18px -6px color-mix(in srgb,var(--red) 60%,transparent)}
+.tab{box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.nm{border:1px solid color-mix(in srgb,var(--red) 16%,var(--line));background:linear-gradient(170deg,var(--card),color-mix(in srgb,var(--red) 5%,var(--card)));border-radius:22px}
+.nm.nmlive{border:0;background:linear-gradient(160deg,var(--red),var(--red-2))}
+.cd div{background:color-mix(in srgb,var(--red) 7%,var(--card));border:1px solid color-mix(in srgb,var(--red) 12%,transparent)}
+.cd b{color:var(--red)}
+.brief{border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb,var(--red) 8%,var(--card)),var(--card) 65%);border:1px solid color-mix(in srgb,var(--red) 14%,var(--line))}
+.grp-h h2,.sec-h h2{letter-spacing:-.2px}
+.grp-h .cnt{background:color-mix(in srgb,var(--acc,var(--red)) 14%,transparent);color:var(--acc,var(--red))}
+.list{border-radius:20px;border-left:4px solid var(--acc,var(--red))}
+.row>button:active{background:var(--soft)}
+.row.open{background:color-mix(in srgb,var(--acc,var(--red)) 5%,transparent)}
+.fx,.bm,.month,.slip,.box{border-radius:20px}
+.fx{box-shadow:var(--shadow);border:0}
+.card,.gate,.msg{border-radius:20px}
+.month-h{color:var(--red)}
+.gm:active{background:var(--soft)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#app>section,#games>.toggle,#games>.month,#bet>.bm,#bet>.rec,#vs>*,#roster>*,#more>*,#live>*{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+#app>section:nth-child(2),#games>.month:nth-child(2),#bet>.bm:nth-child(2),#vs>*:nth-child(2),#roster>*:nth-child(2),#more>*:nth-child(2),#live>*:nth-child(2){animation-delay:.05s}
+#app>section:nth-child(3),#games>.month:nth-child(3),#bet>.bm:nth-child(3),#vs>*:nth-child(3),#roster>*:nth-child(3),#more>*:nth-child(3),#live>*:nth-child(3){animation-delay:.1s}
+#app>section:nth-child(4),#games>.month:nth-child(4),#bet>.bm:nth-child(4),#vs>*:nth-child(4),#roster>*:nth-child(4),#more>*:nth-child(4),#live>*:nth-child(4){animation-delay:.15s}
+#app>section:nth-child(n+5),#games>.month:nth-child(n+5),#bet>.bm:nth-child(n+5),#vs>*:nth-child(n+5),#roster>*:nth-child(n+5),#more>*:nth-child(n+5),#live>*:nth-child(n+5){animation-delay:.2s}
+@media (prefers-reduced-motion:reduce){.hero,#app>section,#games>*,#bet>*,#vs>*,#roster>*,#more>*,#live>*{animation:none!important}}
 </style>
 </head><body>
 
@@ -469,7 +507,7 @@ button.pl:hover{background:var(--soft)}
         <div class="crest" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.3 6.2 19.8l1.6-6.6L2.6 8.8l6.8-.5z" fill="#C8102E"/></svg></div>
         <div class="word">Θρύλος Daily<span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
       </div>
-      <div class="top-r"><button type="button" class="hub-btn" id="hubBtn" aria-label="Κι άλλα" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">◑</button>
+      <div class="top-r"><button type="button" class="hub-btn" id="hubBtn" aria-label="Κι άλλα" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">🌓</button>
       <label class="date-btn" id="dateBtn"><span id="edDate">Σήμερα</span>
         <svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         <select id="edition" aria-label="Επιλογή ημέρας"></select></label></div>
@@ -897,7 +935,7 @@ function crest(name,cls){name=String(name||"?");const oly=/ολυμπιακ|θρ
   let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))%360;
   const d=el("span","crest2"+(cls?" "+cls:""),ini);d.style.background=oly?"linear-gradient(160deg,#E3263F,#8E0A1F)":"linear-gradient(160deg,hsl("+h+",50%,48%),hsl("+((h+25)%360)+",55%,32%))";d.setAttribute("aria-hidden","true");return d}
 (function(){const T=lsGet("thr_theme");if(T==="dark"||T==="light")document.documentElement.dataset.theme=T;
-  const b=document.getElementById("themeBtn");if(b){const lab=()=>{const t=document.documentElement.dataset.theme;b.textContent=t==="dark"?"🌙":t==="light"?"☀️":"◐"};lab();
+  const b=document.getElementById("themeBtn");if(b){const lab=()=>{const t=document.documentElement.dataset.theme;b.textContent=t==="dark"?"🌙":t==="light"?"☀️":"🌓"};lab();
     b.onclick=()=>{const t=document.documentElement.dataset.theme;const n=!t?"dark":t==="dark"?"light":"";if(n)document.documentElement.dataset.theme=n;else delete document.documentElement.dataset.theme;lsSet("thr_theme",n);lab()}}})();
 (function(){let y0=null,pull=0;const ind=el("div","ptr","↓ Τράβα για ανανέωση");document.body.append(ind);
   addEventListener("touchstart",e=>{y0=(window.scrollY<=0&&!e.target.closest("textarea,input,.rail,.seg"))?e.touches[0].clientY:null;pull=0},{passive:true});
@@ -980,7 +1018,7 @@ function render(){
     if(i.url){const a=el("a",null,(i.source||"Πηγή")+" ↗");a.href=i.url;a.target="_blank";a.rel="noopener";det.append(a)}
     bt.onclick=()=>{const o=det.hidden;det.hidden=!o;row.classList.toggle("open",o);bt.setAttribute("aria-expanded",o)};
     row.append(bt,det);return row};
-  const mkGroup=(title,arr,icon)=>{const sec=el("section");const h=el("div","grp-h");if(icon)h.append(ic(icon));h.append(el("h2",null,title),el("span","cnt",arr.length+""));
+  const mkGroup=(title,arr,icon)=>{const sec=el("section");sec.style.setProperty("--acc",({football:"#E3263F",basketball:"#F28C28",polo:"#2B7BE3",amateur:"#2FA36B"})[icon]||"var(--red)");const h=el("div","grp-h");if(icon)h.append(ic(icon));h.append(el("h2",null,title),el("span","cnt",arr.length+""));
     const L=el("div","list");const N=4;arr.slice(0,N).forEach(i=>L.append(mkRow(i)));
     if(arr.length>N){const mb=el("button","moreb","Δες άλλα "+(arr.length-N));mb.type="button";mb.onclick=()=>{arr.slice(N).forEach(i=>L.insertBefore(mkRow(i),mb));mb.remove()};L.append(mb)}
     sec.append(h,L);return sec};
