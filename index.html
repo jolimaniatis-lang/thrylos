@@ -740,7 +740,7 @@ const EVI={goal:"●",yellow:"",red:"",sub:"⇄",var:"V",period:"‖",info:"i",f
 function ago(iso){const t=Date.parse(iso);if(!t)return"";const m=Math.round((Date.now()-t)/60000);return m<1?"μόλις τώρα":m<60?"πριν "+m+"′":"πριν "+Math.floor(m/60)+" ώρ."}
 
 // ---- Απευθείας live από το δημόσιο API της Euroleague (μόνο μπάσκετ Euroleague· διαβάζεται από το iPhone, χωρίς tasks) ----
-const EL={};const elCodes={};let elBusy=false;
+const EL={};const elCodes={};let elBusy=false,elFail=0,elNext=0;
 const elSeason=()=>{const d=new Date();return "E"+(d.getMonth()>=7?d.getFullYear():d.getFullYear()-1)};
 const elNum=v=>{const n=parseInt(v,10);return isNaN(n)?null:n};
 async function elFind(m){
@@ -755,12 +755,12 @@ async function elFind(m){
     const c=g.gameCode??g.code??g.game_code??g.number??null;const n=elNum(c!=null?String(c).replace(/^.*?(\d+)$/,"$1"):null);if(n){code=n;break}}
   elCodes[m.id]=code;return code}
 async function elPoll(){
-  if(elBusy||document.visibilityState!=="visible")return;
+  if(elBusy||document.visibilityState!=="visible"||Date.now()<elNext)return;
   const t=todayStr();const ms=((live&&live.matches)||[]).filter(m=>m.d===t&&m.sport==="basketball"&&/euroleague|ευρωλίγκα/i.test(m.comp||"")&&m.status!=="ft"&&EL[m.id+"_ft"]!==1);
   if(!ms.length)return;elBusy=true;
   try{for(const m of ms){
     const code=await elFind(m);if(!code)continue;
-    const r=await fetch("https://live.euroleague.net/api/Header?gamecode="+code+"&seasoncode="+elSeason());if(!r.ok)continue;
+    const r=await fetch("https://live.euroleague.net/api/Header?gamecode="+code+"&seasoncode="+elSeason());if(!r.ok){elFail++;continue}elFail=0;
     const h=await r.json();window.__elHeader=h;
     const aOly=/OLY/i.test(h.CodeTeamA||"")||/olympiacos/i.test(h.TeamA||"");
     const sa=elNum(h.ScoreA),sb=elNum(h.ScoreB);if(sa==null||sb==null)continue;
@@ -775,7 +775,8 @@ async function elPoll(){
     const prev=JSON.stringify(EL[m.id]||{},(k,v)=>k==="elSrc"?undefined:v);
     EL[m.id]=nx;if(status==="ft")EL[m.id+"_ft"]=1;
     if(prev!==JSON.stringify(nx,(k,v)=>k==="elSrc"?undefined:v)&&view==="live")render();
-  }}catch(e){window.__elErr=String(e)}
+  }}catch(e){window.__elErr=String(e);elFail++}
+  if(elFail>=3){elNext=Date.now()+60000;elFail=0}
   elBusy=false}
 setInterval(elPoll,12000);setTimeout(elPoll,2500);
 function renderLive(){
@@ -973,14 +974,15 @@ function renderChat(){
   const fi=el("input");fi.type="file";fi.accept="image/*,video/*";fi.hidden=true;
   const ab=el("button","ib","📎");ab.type="button";ab.setAttribute("aria-label","Εικόνα ή βίντεο");ab.onclick=()=>fi.click();
   const ta=el("textarea");ta.rows=1;ta.placeholder="Γράψε μήνυμα…";ta.maxLength=1000;
+  const dr=lsGet("thr_draft");if(dr){ta.value=dr.slice(0,1000);setTimeout(()=>{ta.style.height="auto";ta.style.height=Math.min(110,ta.scrollHeight)+"px"},0)}
   const sb=el("button","ib send","➤");sb.type="button";sb.setAttribute("aria-label","Αποστολή");
   row.append(ab,ta,sb);cp.append(st,row,fi);document.body.append(cp);
   const note=t=>{st.hidden=!t;st.textContent=t||""};
   const post=async(body,url,type)=>{const r=await sbRpc("post_message",{c:code,n:name,b:body||"",u:url||null,t:type||null});if(!r.ok)throw new Error("post "+r.status)};
   let busy=false;
-  const send=async()=>{const t=ta.value.trim();if(!t||busy)return;busy=true;try{await post(t);ta.value="";ta.style.height="";await load(true)}catch(e){note("Δεν στάλθηκε. Δοκίμασε ξανά.")}busy=false};
+  const send=async()=>{const t=ta.value.trim();if(!t||busy)return;busy=true;try{await post(t);ta.value="";lsSet("thr_draft","");ta.style.height="";await load(true)}catch(e){note("Δεν στάλθηκε. Δοκίμασε ξανά.")}busy=false};
   sb.onclick=send;ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
-  ta.addEventListener("input",()=>{ta.style.height="auto";ta.style.height=Math.min(110,ta.scrollHeight)+"px"});
+  ta.addEventListener("input",()=>{lsSet("thr_draft",ta.value.slice(0,1000));ta.style.height="auto";ta.style.height=Math.min(110,ta.scrollHeight)+"px"});
   fi.onchange=async()=>{const f=fi.files[0];fi.value="";if(!f||busy)return;
     const isV=f.type.startsWith("video/"),isI=f.type.startsWith("image/");if(!isV&&!isI){note("Μόνο εικόνες ή βίντεο.");return}
     if(f.size>50*1024*1024){note("Το αρχείο είναι πάνω από 50MB.");return}
@@ -989,7 +991,7 @@ function renderChat(){
       const path=code+"/"+Date.now()+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
       const r=await fetch(SB.url+"/storage/v1/object/chat/"+encodeURIComponent(code)+"/"+path.split("/")[1],{method:"POST",headers:sbH({"Content-Type":f.type,"x-upsert":"false"}),body:f});
       if(!r.ok)throw new Error("up "+r.status);
-      await post(ta.value.trim(),SB.url+"/storage/v1/object/public/chat/"+encodeURIComponent(code)+"/"+path.split("/")[1],isV?"video":"image");ta.value="";ta.style.height="";note("");await load(true)}
+      await post(ta.value.trim(),SB.url+"/storage/v1/object/public/chat/"+encodeURIComponent(code)+"/"+path.split("/")[1],isV?"video":"image");ta.value="";lsSet("thr_draft","");ta.style.height="";note("");await load(true)}
     catch(e){note("Δεν ανέβηκε. Δοκίμασε ξανά.")}busy=false};
   let last="";
   const hue=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%360;return h};
@@ -1148,11 +1150,12 @@ setView(view);fixCaps();
 (async()=>{
   const db=(()=>{
   const B="data/";let idx=null,idxTxt="";
-  const j=async p=>{const r=await fetch(B+p+".json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(p+" "+r.status);return r.text()};
+  const j=async p=>{const r=await fetch(B+p+".json?t="+Date.now(),{cache:"no-store"});if(!r.ok){const e=new Error(p+" "+r.status);e.status=r.status;throw e}return r.text()};
   const subs=[];
   function poll(fn,ms){let last=null,busy=false;const run=async()=>{if(busy)return;busy=true;try{const t=await fn(last);if(t!==undefined)last=t}catch(e){}busy=false};run();subs.push(run);setInterval(()=>{if(document.visibilityState==="visible")run()},ms||45000);return run}
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")subs.forEach(f=>f())});
-  const getIdx=async()=>{const t=await j("index");idx=JSON.parse(t);return t};
+  let ip=null,ipT=0;
+  const getIdx=()=>{if(ip&&Date.now()-ipT<3000)return ip;ipT=Date.now();ip=j("index").then(t=>{const o=JSON.parse(t);if(!o||typeof o!=="object"||Array.isArray(o))throw new Error("bad index");idx=o;return t});ip.catch(()=>{ip=null});return ip};
   const docSnap=(id,o)=>({id,exists:o!=null,data:()=>o});
   return{
     collection(name){const q={lim:1000};const api={
@@ -1162,7 +1165,7 @@ setView(view);fixCaps();
         const txts=await Promise.all(ids.map(i=>j(name+"/"+i)));const all=ids.join(",")+"|"+txts.join("");
         if(all===last)return;
         cb({docs:ids.map((id,k)=>docSnap(id,JSON.parse(txts[k])))});return all});}};return api},
-    doc(path){return{onSnapshot(cb,eb){poll(async last=>{let t;try{t=await j(path)}catch(e){if(last===null||last==="")return;t=""}
+    doc(path){return{onSnapshot(cb,eb){poll(async last=>{let t;try{t=await j(path)}catch(e){if(e.status!==404||last===null||last==="")return;t=""}
       if(t===last)return;cb(t===""?docSnap(path,null):docSnap(path,JSON.parse(t)));return t},path==="live/now"?15000:45000)}}}
   }})();
 

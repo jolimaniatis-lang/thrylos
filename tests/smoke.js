@@ -87,4 +87,53 @@ const AUDIT=()=>{
  for(let i=0;i<25;i++)await p.keyboard.press('Tab');ok(await p.evaluate(()=>!!document.activeElement.closest('.sheet')),'player sheet: το focus ξέφυγε από το modal');
  await p.keyboard.press('Escape');await p.waitForTimeout(200);ok(await p.evaluate(()=>!!document.activeElement.closest('#roster .pl')),'player sheet: το focus δεν επέστρεψε στο κουμπί');
  await ctx.close()}
+// Phase 1: reliability / resilience
+{console.log('== phase1');
+ const fake=r=>r.fulfill({status:200,contentType:'application/json',body:'[]'});
+ // 1) polling stops while hidden, resumes once without duplicate timers
+ {const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();let live=0,data=0;const errs=[];p.on('pageerror',e=>errs.push(e.message));
+  await ctx.route(/supabase\.co|euroleague\.net|incrowdsports/,fake);
+  await ctx.route(/\/data\//,r=>{data++;if(/live\/now/.test(r.request().url()))live++;r.continue()});
+  await p.clock.install();await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(1200);
+  const vis=async v=>{await p.evaluate(v=>{Object.defineProperty(document,'visibilityState',{configurable:true,get:()=>v});document.dispatchEvent(new Event('visibilitychange'))},v);await p.waitForTimeout(300)};
+  await vis('hidden');const d0=data;await p.clock.runFor(120000);await p.waitForTimeout(400);ok(data===d0,'polling συνεχίστηκε ενώ η σελίδα ήταν κρυφή ('+(data-d0)+' αιτήματα)');
+  await vis('visible');ok(data>d0,'δεν έγινε άμεση ανανέωση μετά την επιστροφή');
+  const l0=live;await p.clock.runFor(30000);await p.waitForTimeout(500);ok(live-l0>=1&&live-l0<=3,'live/now: '+(live-l0)+' αιτήματα σε 30s (αναμενόμενα 2, διπλά timers;)');
+  ok(errs.length===0,'pageerror: '+errs.join('|'));await ctx.close()}
+ // 2) failing / invalid JSON must not blank existing content or throw
+ {const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+  await ctx.route(/supabase\.co|euroleague\.net|incrowdsports/,fake);let mode='ok';
+  await ctx.route(/\/data\//,r=>{if(mode==='500')return r.fulfill({status:500,body:'x'});if(mode==='bad')return r.fulfill({status:200,contentType:'application/json',body:'<html>oops'});if(mode==='arr')return r.fulfill({status:200,contentType:'application/json',body:'[]'});if(mode==='abort')return r.abort();r.continue()});
+  await p.clock.install();await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(1500);
+  const snap=()=>p.evaluate(()=>document.querySelectorAll('#news .card, #news article, #news .nw').length+'|'+document.body.innerText.length);const s0=await snap();ok(parseInt(s0)>0||s0.split('|')[1]>500,'δεν φορτώθηκε περιεχόμενο πριν τα σφάλματα');
+  for(const m of ['500','bad','arr','abort']){mode=m;await p.clock.runFor(60000);await p.waitForTimeout(600);const s=await snap();ok(s.split('|')[1]>=s0.split('|')[1]*0.8,'περιεχόμενο χάθηκε με απάντηση '+m+': '+s0+' → '+s)}
+  mode='ok';await p.clock.runFor(60000);await p.waitForTimeout(600);ok(errs.length===0,'pageerror σε σφάλματα JSON: '+errs.join('|'));await ctx.close()}
+ // 3) offline: shell loads from SW cache; live data and Supabase are never cached
+ {const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();
+  await ctx.route(/supabase\.co|euroleague\.net|incrowdsports/,fake);
+  await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(1500);
+  await p.evaluate(()=>navigator.serviceWorker.ready);await p.reload();await p.waitForTimeout(1500);
+  ok(await p.evaluate(()=>!!navigator.serviceWorker.controller),'ο service worker δεν ελέγχει τη σελίδα');
+  const keys=await p.evaluate(async()=>{const o=[];for(const n of await caches.keys()){const c=await caches.open(n);for(const r of await c.keys())o.push(new URL(r.url).pathname+(new URL(r.url).host.includes('localhost')?'':'@ext'))}return o});
+  ok(!keys.some(k=>k.includes('/data/live/')),'live δεδομένα στην cache: '+keys.filter(k=>k.includes('/data/live/')));ok(!keys.some(k=>k.includes('@ext')||/supabase/.test(k)),'εξωτερικά/Supabase στην cache');
+  ok(['/manifest.webmanifest','/icons/icon-192.png','/assets/gate7.jpg','/assets/oly-football.jpg'].every(x=>keys.includes(x)),'λείπουν αρχεία από το precache: '+keys.length);
+  await ctx.setOffline(true);await p.reload();await p.waitForTimeout(1500);
+  ok(await p.evaluate(()=>!!document.querySelector('.bar')&&document.body.innerText.length>200),'offline: η εφαρμογή δεν φόρτωσε');
+  ok(await p.evaluate(()=>document.documentElement.scrollWidth-innerWidth<=1),'offline: overflow');
+  await ctx.setOffline(false);await ctx.close()}
+ // 4) chat draft persists across reload, no credentials stored, cleared after successful send only
+ {const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();let fail=false;const posts=[];
+  await ctx.route(/supabase\.co/,r=>{const u=r.request().url();if(/rpc\/valid_code/.test(u))return r.fulfill({status:200,contentType:'application/json',body:'true'});if(/rpc\/post_message/.test(u)){posts.push(1);return fail?r.fulfill({status:500,body:'{}'}):r.fulfill({status:200,contentType:'application/json',body:'null'})}fake(r)});
+  await ctx.route(/euroleague\.net|incrowdsports/,fake);
+  await ctx.addInitScript(()=>{try{if(!localStorage.getItem('thr_code')){localStorage.setItem('thr_code','TESTCODE');localStorage.setItem('thr_name','Test')}}catch(e){}});
+  await p.goto('http://localhost:'+port+'/#chat');await p.waitForTimeout(1500);
+  const ta='.composer textarea';ok(await p.locator(ta).count()>0,'chat: δεν βρέθηκε textarea');
+  await p.fill(ta,'πρόχειρο μήνυμα');await p.reload();await p.waitForTimeout(1500);
+  ok(await p.inputValue(ta)==='πρόχειρο μήνυμα','chat: το πρόχειρο χάθηκε μετά το reload');
+  const ls=await p.evaluate(()=>JSON.stringify(Object.assign({},localStorage)));ok(!/TESTCODE/.test(ls.replace(/"thr_code":"TESTCODE"/,'')),'chat: ο κωδικός αποθηκεύτηκε εκτός thr_code');
+  fail=true;await p.click('.composer .ib.send');await p.waitForTimeout(800);
+  ok((await p.evaluate(()=>localStorage.getItem('thr_draft')))==='πρόχειρο μήνυμα','chat: το πρόχειρο σβήστηκε μετά από αποτυχημένη αποστολή');
+  fail=false;await p.click('.composer .ib.send');await p.waitForTimeout(900);
+  ok(!(await p.evaluate(()=>localStorage.getItem('thr_draft'))),'chat: το πρόχειρο δεν καθαρίστηκε μετά την επιτυχή αποστολή');await ctx.close()}
+}
 await b.close();srv.close();console.log(fails?'\nFAILED: '+fails:'\nALL PASSED');process.exit(fails?1:0)})();
