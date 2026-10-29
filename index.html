@@ -29,7 +29,7 @@
   --red:#E3263F; --red-2:#6E0716; --bg:#0F0B0C; --card:#1B1617; --ink:#F5EEEF; --muted:#A3969A; --line:#2C2426; --soft:#231C1E;
   --pill:#2B2124; --good:#3DCB82; --warn:#F0A93A; --info:#7EA2FF; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+html,body{overflow-x:hidden;max-width:100%}body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--red-2)}
 .wrap{max-width:680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 svg{display:block}
@@ -40,7 +40,7 @@ svg{display:block}
     repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 28px,transparent 28px 56px),
     radial-gradient(120% 90% at 100% 0%,#E8344B 0%,transparent 60%),
     linear-gradient(170deg,var(--red) 0%,var(--red-2) 100%)}
-.hero .wrap{padding-block:16px 18px;display:flex;flex-direction:column;gap:14px}
+.hero .wrap{padding-block:calc(16px + env(safe-area-inset-top,0px)) 18px;display:flex;flex-direction:column;gap:14px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:10px}
 .crest{width:38px;height:38px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.2)}
@@ -876,6 +876,6 @@ setView(view);fixCaps();
   db.collection("rosters").onSnapshot(snap=>{rosters={};snap.docs.forEach(d=>{const x=d.data();if(x)rosters[d.id]=x});if(view==="roster")render();else renderTabs()},()=>{});
 })();
 
-if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had)location.reload()});navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{})}
 </script>
 </body></html>
