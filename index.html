@@ -401,7 +401,7 @@ button.pl:hover{background:var(--soft)}
 .hub-btn svg{width:15px;height:15px}
 .hub-btn[aria-pressed="true"]{background:#fff;color:var(--red)}
 .top-r{display:flex;gap:6px;align-items:center}
-@media (max-width:430px){.word span{display:none}.word{font-size:16px!important;letter-spacing:0!important;white-space:nowrap}.date-btn svg{display:none}.logo{gap:7px;min-width:0}.crest{width:30px!important;height:30px!important}.date-btn{padding:6px 9px!important;font-size:12px!important}.hub-btn:not(#themeBtn){font-size:0;gap:0;width:34px;height:34px;padding:0;justify-content:center}.hub-btn:not(#themeBtn) svg{width:18px;height:18px}}
+@media (max-width:430px){.word span{display:none}.word{font-size:clamp(13px,4.3vw,17px)!important;letter-spacing:0!important;white-space:nowrap}.date-btn svg{display:none}.logo{gap:7px;min-width:0}.crest{width:36px!important;height:36px!important}.date-btn{padding:6px 9px!important;font-size:12px!important}.hub-btn:not(#themeBtn){font-size:0;gap:0;width:34px;height:34px;padding:0;justify-content:center}.hub-btn:not(#themeBtn) svg{width:18px;height:18px}}
 .bar-in{max-width:560px!important;grid-template-columns:repeat(7,1fr)!important}
 .bar button{font-size:10px!important;letter-spacing:-.1px}
 /* tables */
@@ -509,6 +509,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .crest2.img{padding:0;overflow:hidden}.crest2.img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .nmlive .sc,.lv-row .sc{white-space:nowrap;font-size:clamp(28px,9vw,38px)}
 .badge.img{background:#fff;overflow:hidden;padding:0}.badge.img img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.crest.g7{padding:0;overflow:hidden;background:#fff}.crest.g7 img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 </style>
 </head><body>
 
@@ -516,7 +517,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
   <div class="wrap">
     <div class="top">
       <div class="logo">
-        <div class="crest" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.3 6.2 19.8l1.6-6.6L2.6 8.8l6.8-.5z" fill="#C8102E"/></svg></div>
+        <div class="crest g7" aria-hidden="true"><img src="assets/gate7.jpg" alt=""></div>
         <div class="word">Θρύλος Daily<span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
       </div>
       <div class="top-r"><button type="button" class="hub-btn" id="hubBtn" aria-label="Κι άλλα" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>Κι άλλα</button><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">🌓</button>
