@@ -102,6 +102,22 @@ svg{display:block}
 .gate button{font:800 15px var(--body);background:var(--red);color:#fff;border:0;border-radius:12px;padding:12px;cursor:pointer}
 .gate .err{color:var(--red);font-size:13px;font-weight:700}
 
+
+.day{align-self:center;font-size:12px;font-weight:700;color:var(--muted);background:var(--pill);border-radius:999px;padding:3px 12px;margin:8px 0 2px}
+.mrow{display:flex;gap:8px;align-items:flex-end;max-width:92%;align-self:flex-start}
+.mrow.me{align-self:flex-end;flex-direction:row-reverse}
+.mrow.grp{margin-top:-6px}
+.av{flex:none;width:30px;height:30px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+.mrow .msg{max-width:none;min-width:0;align-self:auto}
+.mrow.grp:not(.me) .msg{border-top-left-radius:6px}.mrow.grp.me .msg{border-top-right-radius:6px}
+.msg .mh span{margin-left:auto;font-size:11px}.msg.me .mh span,.mrow.me .mh span{color:#fff}
+.mrow.me .msg{background:linear-gradient(160deg,var(--red),var(--red-2));color:#fff}
+.mrow:not(.me) .mh button{margin-left:4px}
+.msg video,.msg img{width:min(260px,64vw);object-fit:cover}
+.msg img{cursor:zoom-in}
+.chat-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:60px 0;color:var(--muted)}.chat-empty .big{font-size:42px}.chat-empty b{color:var(--ink)}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:12px}.lb img{max-width:100%;max-height:100%;border-radius:8px}
+
 /* next match */
 .next{margin-top:16px}
 .nm{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
@@ -815,14 +831,26 @@ function renderChat(){
       await post(ta.value.trim(),SB.url+"/storage/v1/object/public/chat/"+encodeURIComponent(code)+"/"+path.split("/")[1],isV?"video":"image");ta.value="";ta.style.height="";note("");await load(true)}
     catch(e){note("Δεν ανέβηκε. Δοκίμασε ξανά.")}busy=false};
   let last="";
+  const hue=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%360;return h};
+  const dayLbl=d=>{const t=new Date(),y=new Date(Date.now()-864e5),f=x=>x.toDateString();return f(d)===f(t)?"Σήμερα":f(d)===f(y)?"Χθες":d.toLocaleDateString("el-GR",{weekday:"long",day:"numeric",month:"long"})};
+  const lightbox=src=>{const o=el("div","lb");const im=el("img");im.src=src;o.append(im);o.onclick=()=>o.remove();document.body.append(o)};
   const draw=(ms,force)=>{const sig=ms.map(m=>m.id).join(",");if(sig===last&&!force)return;last=sig;
     const near=window.innerHeight+window.scrollY>document.body.scrollHeight-220;
     list.replaceChildren();
-    if(!ms.length)list.append(el("p","foot","Κανένα μήνυμα ακόμα. Γράψε το πρώτο!"));
-    ms.forEach(m=>{const d=el("div","msg"+(m.name===name?" me":""));const h=el("div","mh");h.append(el("b",null,m.name),el("span",null,new Date(m.created_at).toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit"})));
-      const rb=el("button",null,"⚑");rb.type="button";rb.setAttribute("aria-label","Αναφορά");rb.onclick=async()=>{if(confirm("Να αναφερθεί αυτό το μήνυμα;")){try{await sbRpc("report_message",{c:code,mid:m.id});rb.textContent="✓"}catch(e){}}};h.append(rb);d.append(h);
-      if(m.media_url&&m.media_url.startsWith(SB.url+"/storage/")){if(m.media_type==="video"){const v=el("video");v.src=m.media_url;v.controls=true;v.playsInline=true;v.preload="metadata";d.append(v)}else{const im=el("img");im.src=m.media_url;im.loading="lazy";im.alt="";d.append(im)}}
-      if(m.body)d.append(el("p",null,m.body));list.append(d)});
+    if(!ms.length){const e=el("div","chat-empty");e.append(el("div","big","💬"),el("b",null,"Το chat είναι άδειο"),el("span",null,"Γράψε το πρώτο μήνυμα!"));list.append(e)}
+    let pv=null,pd="";
+    ms.forEach(m=>{const dt=new Date(m.created_at),dl=dayLbl(dt);
+      if(dl!==pd){list.append(el("div","day",dl));pd=dl;pv=null}
+      const mine=m.name===name,grp=pv&&pv.name===m.name&&dt-new Date(pv.created_at)<180000;
+      const row=el("div","mrow"+(mine?" me":"")+(grp?" grp":""));
+      const av=el("div","av",grp?"":(m.name[0]||"?").toUpperCase());av.style.background="hsl("+hue(m.name)+",55%,45%)";if(grp)av.style.visibility="hidden";
+      const d=el("div","msg");
+      if(!grp||true){const h=el("div","mh");if(!mine&&!grp){const nb=el("b",null,m.name);nb.style.color="hsl("+hue(m.name)+",60%,55%)";h.append(nb)}
+        const tm=el("span",null,dt.toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit",hour12:false}));h.append(tm);
+        const rb=el("button",null,"⚑");rb.type="button";rb.setAttribute("aria-label","Αναφορά");rb.onclick=async()=>{if(confirm("Να αναφερθεί αυτό το μήνυμα;")){try{await sbRpc("report_message",{c:code,mid:m.id});rb.textContent="✓"}catch(e){}}};h.append(rb);d.append(h)}
+      if(m.media_url&&m.media_url.startsWith(SB.url+"/storage/")){if(m.media_type==="video"){const v=el("video");v.src=m.media_url;v.controls=true;v.playsInline=true;v.preload="metadata";d.append(v)}else{const im=el("img");im.src=m.media_url;im.loading="lazy";im.alt="";im.onclick=()=>lightbox(m.media_url);d.append(im)}}
+      if(m.body)d.append(el("p",null,m.body));
+      row.append(av,d);list.append(row);pv=m});
     if(near||force)window.scrollTo({top:document.body.scrollHeight})};
   const load=async(force)=>{try{const r=await fetch(SB.url+"/rest/v1/messages?select=id,created_at,name,body,media_url,media_type&order=id.desc&limit=80",{headers:sbH(),cache:"no-store"});if(!r.ok)return;draw((await r.json()).reverse(),force)}catch(e){}};
   load(true);chatTimer=setInterval(()=>{if(document.visibilityState==="visible"&&view==="chat")load()},3000);
