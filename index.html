@@ -79,6 +79,29 @@ svg{display:block}
 .row .det[hidden]{display:none}
 .moreb{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;padding:12px;font-size:13.5px;font-weight:700;color:var(--red);cursor:pointer;border-top:1px solid var(--line)}
 
+
+/* chat */
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 2px 12px}
+.chat-head b{font-size:15px}.chat-head button{all:unset;cursor:pointer;font-size:13px;font-weight:700;color:var(--red)}
+.chat-list{display:flex;flex-direction:column;gap:10px;padding-bottom:150px;min-height:40vh}
+.msg{max-width:86%;background:var(--card);border-radius:16px 16px 16px 4px;box-shadow:var(--shadow);padding:9px 12px;align-self:flex-start;display:flex;flex-direction:column;gap:5px}
+.msg.me{align-self:flex-end;background:var(--red);color:#fff;border-radius:16px 16px 4px 16px}
+.msg .mh{display:flex;gap:8px;align-items:baseline;font-size:12px;font-weight:800;opacity:.85}
+.msg .mh span{font-weight:600;opacity:.7}.msg .mh button{all:unset;cursor:pointer;margin-left:auto;opacity:.5;font-size:12px}
+.msg p{margin:0;font-size:15px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap}
+.msg img,.msg video{max-width:100%;max-height:360px;border-radius:12px;display:block;background:#000}
+.composer{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:14;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 12px}
+.composer .in{max-width:680px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+.composer textarea{flex:1;resize:none;font:16px var(--body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:9px 14px;max-height:110px;min-height:40px}
+.composer .ib{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:var(--pill);color:var(--ink);font-size:20px;cursor:pointer;display:grid;place-items:center}
+.composer .ib.send{background:var(--red);color:#fff}
+.composer .st{max-width:680px;margin:0 auto 6px;font-size:12px;color:var(--muted)}
+.gate{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:12px}
+.gate h2{margin:0;font-size:20px}.gate p{margin:0;color:var(--muted);font-size:14px}
+.gate input{font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+.gate button{font:800 15px var(--body);background:var(--red);color:#fff;border:0;border-radius:12px;padding:12px;cursor:pointer}
+.gate .err{color:var(--red);font-size:13px;font-weight:700}
+
 /* next match */
 .next{margin-top:16px}
 .nm{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
@@ -332,8 +355,8 @@ button.pl:hover{background:var(--soft)}
 .hub-btn svg{width:15px;height:15px}
 .hub-btn[aria-pressed="true"]{background:#fff;color:var(--red)}
 .top-r{display:flex;gap:8px;align-items:center}
-.bar-in{max-width:560px!important;grid-template-columns:repeat(6,1fr)!important}
-.bar button{font-size:10.5px!important;letter-spacing:-.1px}
+.bar-in{max-width:560px!important;grid-template-columns:repeat(7,1fr)!important}
+.bar button{font-size:10px!important;letter-spacing:-.1px}
 /* tables */
 .tbl{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
 .tbl-h{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
@@ -423,7 +446,7 @@ button.pl:hover{background:var(--soft)}
 <div class="wrap" id="vs" hidden></div>
 <div class="wrap" id="live" hidden></div>
 <div class="wrap" id="bet" hidden></div>
-<div class="wrap" id="more" hidden></div></main>
+<div class="wrap" id="more" hidden></div><div class="wrap" id="chat" hidden></div></main>
 
 <nav class="bar" aria-label="Ενότητες"><div class="bar-in">
   <button type="button" data-v="news" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>Νέα</button>
@@ -431,6 +454,7 @@ button.pl:hover{background:var(--soft)}
   <button type="button" data-v="vs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 18V9M9 18V5M15 18v-7M20 18V8" stroke-linecap="round"/></svg>Αντίπαλοι</button>
   <button type="button" data-v="bet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg>Στοίχημα</button>
   <button type="button" data-v="live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M6.3 6.3a8 8 0 000 11.4M17.7 6.3a8 8 0 010 11.4M3.5 3.5a12 12 0 000 17M20.5 3.5a12 12 0 010 17" stroke-linecap="round"/></svg>Live</button>
+  <button type="button" data-v="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5h16a1 1 0 011 1v10a1 1 0 01-1 1h-8l-5 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke-linejoin="round"/></svg>Chat</button>
   <button type="button" data-v="roster"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3l-5 3 2 4 2-1v12h10V9l2 1 2-4-5-3c-.5 1.7-2 3-4 3S8.5 4.7 8 3z" stroke-linejoin="round"/></svg>Ρόστερ</button>
 </div></nav>
 
@@ -455,7 +479,7 @@ function when(f,year){const d=/(\d{1,2})\/(\d{1,2})/.exec(f.day||"");const t=/(\
   return new Date(year,+d[2]-1,+d[1],t?+t[1]:12,t?+t[2]:0)}
 
 const RTABS=[["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["polo-men","Πόλο Ανδρών"],["polo-women","Πόλο Γυναικών"]];
-const HASHV={"#roster":"roster","#games":"games","#vs":"vs","#live":"live","#bet":"bet","#more":"more"};let opps=null,vsel=null,live=null,ltimer=null;
+const HASHV={"#roster":"roster","#games":"games","#vs":"vs","#live":"live","#bet":"bet","#more":"more","#chat":"chat"};let opps=null,vsel=null,live=null,ltimer=null;
 let view=HASHV[location.hash]||"news",rosters={},rsport="football",rq="",season=null,gfilter="all",gmode="next";
 try{gfilter=localStorage.getItem("thr_g")||"all"}catch(e){}
 try{rsport=localStorage.getItem("thr_r")||"football"}catch(e){}
@@ -744,9 +768,69 @@ function renderBet(){const box=$("#bet");box.replaceChildren();const d=X.betting
     if(m.risk)c.append(el("div","risk","⚠ "+m.risk));box.append(c)});
   const sl=el("div","slip-f");sl.style.borderRadius="14px";sl.textContent="Ενδεικτικές εκτιμήσεις από δημόσια στοιχεία, όχι σίγουρες επιλογές. Η ένδειξη δίπλα σε κάθε αγορά (Υψηλή, Μέτρια, Χαμηλή) δείχνει πόσο εμπιστεύομαι την εκτίμηση. Παίξε μόνο ό,τι αντέχεις να χάσεις.";box.append(sl);
   const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+d.updatedAt))}
+
+/* ---- live chat (Supabase REST) ---- */
+const SB={url:"https://tgvuaskxikvkzcmdnvit.supabase.co",key:"__KEY__"};
+let chatTimer=null,chatBuilt=false;
+const sbH=(x)=>Object.assign({apikey:SB.key,Authorization:"Bearer "+SB.key},x||{});
+const sbRpc=(fn,args)=>fetch(SB.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:sbH({"Content-Type":"application/json"}),body:JSON.stringify(args)});
+const lsGet=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+function renderChat(){
+  chatBuilt=true;const box=$("#chat");box.replaceChildren();clearInterval(chatTimer);
+  if(!SB.key||SB.key==="__KEY__"){const g=el("div","gate");g.append(el("h2",null,"Live chat έρχεται σύντομα"),el("p",null,"Ετοιμάζουμε το chat της παρέας."));box.append(g);return}
+  let name=lsGet("thr_name"),code=lsGet("thr_code");
+  if(!name||!code){
+    const g=el("div","gate");g.append(el("h2",null,"Μπες στο chat"),el("p",null,"Γράψε ένα όνομα και τον κωδικό πρόσκλησης που σου έδωσαν."));
+    const ni=el("input");ni.placeholder="Το όνομά σου";ni.maxLength=30;ni.value=name;
+    const ci=el("input");ci.placeholder="Κωδικός πρόσκλησης";ci.autocapitalize="off";ci.autocomplete="off";
+    const er=el("div","err");const bt=el("button",null,"Μπες");bt.type="button";
+    bt.onclick=async()=>{er.textContent="";const n=ni.value.trim(),c=ci.value.trim();if(!n||!c){er.textContent="Συμπλήρωσε και τα δύο.";return}
+      bt.disabled=true;try{const r=await sbRpc("valid_code",{c});const ok=r.ok&&(await r.json())===true;if(!ok){er.textContent="Λάθος κωδικός.";bt.disabled=false;return}
+        lsSet("thr_name",n);lsSet("thr_code",c);renderChat()}catch(e){er.textContent="Δεν έγινε σύνδεση. Δοκίμασε ξανά.";bt.disabled=false}};
+    g.append(ni,ci,er,bt);box.append(g);return}
+  const head=el("div","chat-head");head.append(el("b",null,"💬 "+name));const out=el("button",null,"Αλλαγή");out.type="button";out.onclick=()=>{lsSet("thr_code","");renderChat()};head.append(out);
+  const list=el("div","chat-list");box.append(head,list);
+  const cp=el("div","composer");const st=el("div","st");st.hidden=true;
+  const row=el("div","in");
+  const fi=el("input");fi.type="file";fi.accept="image/*,video/*";fi.hidden=true;
+  const ab=el("button","ib","📎");ab.type="button";ab.setAttribute("aria-label","Εικόνα ή βίντεο");ab.onclick=()=>fi.click();
+  const ta=el("textarea");ta.rows=1;ta.placeholder="Γράψε μήνυμα…";ta.maxLength=1000;
+  const sb=el("button","ib send","➤");sb.type="button";sb.setAttribute("aria-label","Αποστολή");
+  row.append(ab,ta,sb);cp.append(st,row,fi);document.body.append(cp);
+  const note=t=>{st.hidden=!t;st.textContent=t||""};
+  const post=async(body,url,type)=>{const r=await sbRpc("post_message",{c:code,n:name,b:body||"",u:url||null,t:type||null});if(!r.ok)throw new Error("post "+r.status)};
+  let busy=false;
+  const send=async()=>{const t=ta.value.trim();if(!t||busy)return;busy=true;try{await post(t);ta.value="";ta.style.height="";await load(true)}catch(e){note("Δεν στάλθηκε. Δοκίμασε ξανά.")}busy=false};
+  sb.onclick=send;ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+  ta.addEventListener("input",()=>{ta.style.height="auto";ta.style.height=Math.min(110,ta.scrollHeight)+"px"});
+  fi.onchange=async()=>{const f=fi.files[0];fi.value="";if(!f||busy)return;
+    const isV=f.type.startsWith("video/"),isI=f.type.startsWith("image/");if(!isV&&!isI){note("Μόνο εικόνες ή βίντεο.");return}
+    if(f.size>50*1024*1024){note("Το αρχείο είναι πάνω από 50MB.");return}
+    busy=true;note("Ανεβαίνει… "+Math.round(f.size/1048576*10)/10+" MB");
+    try{const ext=(f.name.split(".").pop()||(isV?"mp4":"jpg")).toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,5)||"bin";
+      const path=code+"/"+Date.now()+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
+      const r=await fetch(SB.url+"/storage/v1/object/chat/"+encodeURIComponent(code)+"/"+path.split("/")[1],{method:"POST",headers:sbH({"Content-Type":f.type,"x-upsert":"false"}),body:f});
+      if(!r.ok)throw new Error("up "+r.status);
+      await post(ta.value.trim(),SB.url+"/storage/v1/object/public/chat/"+encodeURIComponent(code)+"/"+path.split("/")[1],isV?"video":"image");ta.value="";ta.style.height="";note("");await load(true)}
+    catch(e){note("Δεν ανέβηκε. Δοκίμασε ξανά.")}busy=false};
+  let last="";
+  const draw=(ms,force)=>{const sig=ms.map(m=>m.id).join(",");if(sig===last&&!force)return;last=sig;
+    const near=window.innerHeight+window.scrollY>document.body.scrollHeight-220;
+    list.replaceChildren();
+    if(!ms.length)list.append(el("p","foot","Κανένα μήνυμα ακόμα. Γράψε το πρώτο!"));
+    ms.forEach(m=>{const d=el("div","msg"+(m.name===name?" me":""));const h=el("div","mh");h.append(el("b",null,m.name),el("span",null,new Date(m.created_at).toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit"})));
+      const rb=el("button",null,"⚑");rb.type="button";rb.setAttribute("aria-label","Αναφορά");rb.onclick=async()=>{if(confirm("Να αναφερθεί αυτό το μήνυμα;")){try{await sbRpc("report_message",{c:code,mid:m.id});rb.textContent="✓"}catch(e){}}};h.append(rb);d.append(h);
+      if(m.media_url&&m.media_url.startsWith(SB.url+"/storage/")){if(m.media_type==="video"){const v=el("video");v.src=m.media_url;v.controls=true;v.playsInline=true;v.preload="metadata";d.append(v)}else{const im=el("img");im.src=m.media_url;im.loading="lazy";im.alt="";d.append(im)}}
+      if(m.body)d.append(el("p",null,m.body));list.append(d)});
+    if(near||force)window.scrollTo({top:document.body.scrollHeight})};
+  const load=async(force)=>{try{const r=await fetch(SB.url+"/rest/v1/messages?select=id,created_at,name,body,media_url,media_type&order=id.desc&limit=80",{headers:sbH(),cache:"no-store"});if(!r.ok)return;draw((await r.json()).reverse(),force)}catch(e){}};
+  load(true);chatTimer=setInterval(()=>{if(document.visibilityState==="visible"&&view==="chat")load()},3000);
+}
+
 function setView(v){view=v;
   document.querySelectorAll(".bar button").forEach(b=>{if(b.dataset.v===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
-  $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";
+  $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;
   $("#hubBtn").setAttribute("aria-pressed",v==="more"?"true":"false");
   render();
   try{history.replaceState(null,"",v==="news"?location.pathname+location.search:"#"+v)}catch(_){}
@@ -771,7 +855,8 @@ function renderNext(){const box=$("#next");box.replaceChildren();clearInterval(t
   tick();timer=setInterval(tick,30000)}
 
 function render(){
-  $("#headline").hidden=false;
+  $("#headline").hidden=false;if(view!=="chat"){clearInterval(chatTimer);document.querySelectorAll(".composer").forEach(x=>x.remove())}
+  if(view==="chat"){$("#next").hidden=true;$("#headline").textContent="Live chat για τους φίλους του Θρύλου";$("#tabs").replaceChildren();if(!chatBuilt)renderChat();return}
   if(view==="live"){$("#next").hidden=true;$("#headline").textContent="Live score";$("#tabs").replaceChildren();renderLive();return}
   if(view==="bet"){$("#next").hidden=true;$("#headline").textContent="Στοίχημα · εκτιμήσεις επόμενων αγώνων";renderTabs();renderBet();return}
   if(view==="more"){$("#next").hidden=true;$("#headline").textContent="Βαθμολογίες, στατιστικά, τιμωρίες και αρχείο";renderTabs();renderMore();return}
