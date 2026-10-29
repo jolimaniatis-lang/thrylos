@@ -773,8 +773,7 @@ setView(view);fixCaps();
   const B="data/";let idx=null,idxTxt="";
   const j=async p=>{const r=await fetch(B+p+".json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(p+" "+r.status);return r.text()};
   const subs=[];
-  function poll(fn,ms){let last=null;const run=async()=>{try{const t=await fn(last);if(t!==undefined)last=t}catch(e){}};run();subs.push(run);return run}
-  setInterval(()=>{if(document.visibilityState==="visible")subs.forEach(f=>f())},45000);
+  function poll(fn,ms){let last=null,busy=false;const run=async()=>{if(busy)return;busy=true;try{const t=await fn(last);if(t!==undefined)last=t}catch(e){}busy=false};run();subs.push(run);setInterval(()=>{if(document.visibilityState==="visible")run()},ms||45000);return run}
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")subs.forEach(f=>f())});
   const getIdx=async()=>{const t=await j("index");idx=JSON.parse(t);return t};
   const docSnap=(id,o)=>({id,exists:o!=null,data:()=>o});
@@ -787,7 +786,7 @@ setView(view);fixCaps();
         if(all===last)return;
         cb({docs:ids.map((id,k)=>docSnap(id,JSON.parse(txts[k])))});return all});}};return api},
     doc(path){return{onSnapshot(cb,eb){poll(async last=>{let t;try{t=await j(path)}catch(e){if(last===null||last==="")return;t=""}
-      if(t===last)return;cb(t===""?docSnap(path,null):docSnap(path,JSON.parse(t)));return t})}}}
+      if(t===last)return;cb(t===""?docSnap(path,null):docSnap(path,JSON.parse(t)));return t},path==="live/now"?15000:45000)}}}
   }})();
 
   db.collection("editions").orderBy("date","desc").limit(60).onSnapshot(snap=>{
