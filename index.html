@@ -500,6 +500,12 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .tbl tr.q1 td:first-child{box-shadow:inset 3px 0 #1fa463}.tbl tr.q2 td:first-child{box-shadow:inset 3px 0 #3b82f6}
 .tbl-lg{display:flex;flex-wrap:wrap;gap:6px 14px;padding:9px 14px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line)}.tbl-lg .dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}.dot.q1{background:#1fa463}.dot.q2{background:#3b82f6}
 .ptabs{display:flex;gap:6px;margin:4px 0 10px;position:sticky;top:0;z-index:2}.ptabs button{flex:1;padding:9px 6px;border:0;border-radius:12px;background:var(--soft);color:var(--muted);font:800 13px inherit;font-family:inherit}.ptabs button.on{background:var(--red);color:#fff}
+.pitch{border-radius:14px;overflow:hidden;margin-bottom:10px;background:repeating-linear-gradient(#2f8f4e 0 38px,#2a8447 38px 76px);border:2px solid #fff3;position:relative;display:flex;flex-direction:column}
+.pitch::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:#fff6}
+.ph{display:flex;flex-direction:column;justify-content:space-around;gap:6px;padding:8px 4px;min-height:200px}.ptag{text-align:center;color:#fff;font:800 11px var(--display,inherit);letter-spacing:.6px;text-transform:uppercase;opacity:.9}
+.pr{display:flex;justify-content:space-around;gap:2px}.pp{display:flex;flex-direction:column;align-items:center;width:62px;min-width:0;text-align:center}
+.pp b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#222;font-size:12px;box-shadow:0 1px 3px #0005}.ph.oly .pp b{background:var(--red);color:#fff;border:2px solid #fff}
+.pp span{color:#fff;font-size:10.5px;line-height:1.1;margin-top:2px;text-shadow:0 1px 2px #000a;overflow-wrap:anywhere}
 </style>
 </head><body>
 
@@ -735,6 +741,12 @@ function renderLive(){
     const sub=[m.periods,m.tv].filter(Boolean).join(" · ");if(sub)c.append(el("div","lv-sub",sub));
     if(m.note)c.append(el("div","lv-sub",m.note));
     if(m.lineups&&(m.lineups.oly||m.lineups.opp)){const lu=el("div","lu");lu.append(el("h4",null,"Συνθέσεις"+(m.lineups.status?" · "+m.lineups.status:"")));
+      const fmOk=k=>{const T=m.lineups[k];return T&&/^\d(-\d)+$/.test(T.formation||"")&&(T.starters||[]).length===1+T.formation.split("-").reduce((a,b)=>a+ +b,0)};
+      if(fmOk("oly")||fmOk("opp")){const pt=el("div","pitch");
+        [["opp",1],["oly",0]].forEach(([k,flip])=>{if(!fmOk(k))return;const T=m.lineups[k];const rows=[1,...T.formation.split("-").map(Number)];let i=0;const lines=rows.map(n=>{const a=T.starters.slice(i,i+n);i+=n;return a});if(!flip)lines.reverse();
+          const half=el("div","ph "+k);lines.forEach(ln=>{const r=el("div","pr");ln.forEach(x=>{const d=el("div","pp");d.append(el("b",null,x.no!=null?String(x.no):""),el("span",null,x.name||""));r.append(d)});half.append(r)});
+          const tag=el("div","ptag",(k==="oly"?"Ολυμπιακός":m.opp)+" · "+T.formation);half.prepend(tag);pt.append(half)});
+        lu.append(pt)}
       const g=el("div","lu-g");
       [["oly","Ολυμπιακός"],["opp",m.opp]].forEach(([k,nm])=>{const T=m.lineups[k];const col=el("div","lu-c"+(k==="oly"?" oly":""));
         const hh=el("div","lu-h");hh.append(el("b",null,nm));if(T&&T.formation)hh.append(el("span","fm",T.formation));col.append(hh);
