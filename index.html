@@ -770,7 +770,7 @@ function renderBet(){const box=$("#bet");box.replaceChildren();const d=X.betting
   const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+d.updatedAt))}
 
 /* ---- live chat (Supabase REST) ---- */
-const SB={url:"https://tgvuaskxikvkzcmdnvit.supabase.co",key:"__KEY__"};
+const SB={url:"https://tgvuaskxikvkzcmdnvit.supabase.co",key:"sb_publishable_qG86S1ce3cNWswHLEmvv-g_sxpIf8_H"};
 let chatTimer=null,chatBuilt=false;
 const sbH=(x)=>Object.assign({apikey:SB.key,Authorization:"Bearer "+SB.key},x||{});
 const sbRpc=(fn,args)=>fetch(SB.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:sbH({"Content-Type":"application/json"}),body:JSON.stringify(args)});
@@ -778,7 +778,7 @@ const lsGet=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 function renderChat(){
   chatBuilt=true;const box=$("#chat");box.replaceChildren();clearInterval(chatTimer);
-  if(!SB.key||SB.key==="__KEY__"){const g=el("div","gate");g.append(el("h2",null,"Live chat έρχεται σύντομα"),el("p",null,"Ετοιμάζουμε το chat της παρέας."));box.append(g);return}
+  if(!SB.key){const g=el("div","gate");g.append(el("h2",null,"Live chat έρχεται σύντομα"),el("p",null,"Ετοιμάζουμε το chat της παρέας."));box.append(g);return}
   let name=lsGet("thr_name"),code=lsGet("thr_code");
   if(!name||!code){
     const g=el("div","gate");g.append(el("h2",null,"Μπες στο chat"),el("p",null,"Γράψε ένα όνομα και τον κωδικό πρόσκλησης που σου έδωσαν."));
