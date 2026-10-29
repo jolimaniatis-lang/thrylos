@@ -497,6 +497,9 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 #app>section:nth-child(4),#games>.month:nth-child(4),#bet>.bm:nth-child(4),#vs>*:nth-child(4),#roster>*:nth-child(4),#more>*:nth-child(4),#live>*:nth-child(4){animation-delay:.15s}
 #app>section:nth-child(n+5),#games>.month:nth-child(n+5),#bet>.bm:nth-child(n+5),#vs>*:nth-child(n+5),#roster>*:nth-child(n+5),#more>*:nth-child(n+5),#live>*:nth-child(n+5){animation-delay:.2s}
 @media (prefers-reduced-motion:reduce){.hero,#app>section,#games>*,#bet>*,#vs>*,#roster>*,#more>*,#live>*{animation:none!important}}
+.tbl tr.q1 td:first-child{box-shadow:inset 3px 0 #1fa463}.tbl tr.q2 td:first-child{box-shadow:inset 3px 0 #3b82f6}
+.tbl-lg{display:flex;flex-wrap:wrap;gap:6px 14px;padding:9px 14px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line)}.tbl-lg .dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}.dot.q1{background:#1fa463}.dot.q2{background:#3b82f6}
+.ptabs{display:flex;gap:6px;margin:4px 0 10px;position:sticky;top:0;z-index:2}.ptabs button{flex:1;padding:9px 6px;border:0;border-radius:12px;background:var(--soft);color:var(--muted);font:800 13px inherit;font-family:inherit}.ptabs button.on{background:var(--red);color:#fff}
 </style>
 </head><body>
 
@@ -766,6 +769,7 @@ function openPlayer(p,sport){
   const body=el("div","sh-body");const b=p.bio||{};
   const facts=[["Αριθμός",p.no],["Θέση",p.pos],["Ηλικία",p.age],["Γέννηση",[b.born,b.birthplace].filter(Boolean).join(", ")],["Εθνικότητα",p.nat],["Ύψος",p.height?p.height+" εκ.":""],["Πόδι / χέρι",b.foot],["Συμβόλαιο έως",b.contract],["Αξία",b.value],["Στην ομάδα από",b.joined],["Εθνική ομάδα",b.national]].filter(([,v])=>v!=null&&v!=="");
   const fb=el("div","facts");facts.forEach(([k,v])=>{const d=el("div");d.append(el("small",null,k),el("b",null,String(v)));fb.append(d)});body.append(fb);
+  const g1=[],g2=[],g3=[];const _ap=body.append.bind(body);let cur=g1;const real=body.append.bind(body);body.append=(...n)=>{cur.push(...n)};
   const st=Object.entries(p.stats||{});if(st.length){const k=el("div","box");k.append(el("h4",null,"Φετινή σεζόν"));const sb=el("div","stats");st.forEach(([a,v])=>{const s=el("span");s.append(a+" ",el("b",null,String(v)));sb.append(s)});k.append(sb);body.append(k)}
   const sts=Array.isArray(b.statTables)?b.statTables:(b.statTable?[b.statTable]:[]);
   sts.forEach(tb=>{if(!(tb.rows||[]).length)return;const k=el("div","box");k.append(el("h4",null,tb.title||"Στατιστικά"));const w=el("div","tw");const t=el("table","career");
@@ -774,12 +778,19 @@ function openPlayer(p,sport){
     const hd=el("tr");(tb.columns||[]).forEach((h,ci)=>{if(keep[ci])hd.append(el("th",ci?"n":null,h))});t.append(hd);
     tb.rows.forEach(r=>{const tr=el("tr");r.forEach((v,ci)=>{if(keep[ci])tr.append(el("td",ci?"n":null,v==null||v===""?"":String(v)))});t.append(tr)});
     w.append(t);k.append(w);const nt=(tb.note||"").split(/\s*·\s*λείπουν/i)[0];if(nt)k.append(el("p","foot",nt));body.append(k)});
+  cur=g2;
   if(b.summary){const k=el("div","box");k.append(el("h4",null,"Προφίλ"),el("p",null,b.summary));body.append(k)}
+  cur=g3;
   if((b.career||[]).length){const k=el("div","box");k.append(el("h4",null,"Καριέρα"));const w=el("div","tw");const t=el("table","career");
     const hd=el("tr");[["Περίοδος"],["Ομάδα"],["Αγ.","n"],[sport==="basketball"?"Πόντ.":"Γκολ","n"]].forEach(([h,c])=>hd.append(el("th",c||null,h)));t.append(hd);
     b.career.forEach((c,i)=>{const tr=el("tr",i===b.career.length-1&&/Ολυμπιακ|Olympiac/i.test(c.club||"")?"cur":null);tr.append(el("td",null,c.years||""),el("td",null,c.club||""),el("td","n",c.apps!=null?String(c.apps):"–"),el("td","n",c.goals!=null?String(c.goals):"–"));t.append(tr)});
     w.append(t);k.append(w);body.append(k)}
+  cur=g2;
   if((b.honours||[]).length){const k=el("div","box");k.append(el("h4",null,"Τίτλοι & διακρίσεις"));const ul=el("ul");b.honours.forEach(h=>ul.append(el("li",null,h)));k.append(ul);body.append(k)}
+  cur=g1;body.append=real;
+  const groups=[["Σεζόν",g1],["Προφίλ",g2],["Καριέρα",g3]].filter(([,a])=>a.length);
+  if(groups.length>1){const tabs=el("div","ptabs");const panes=groups.map(([nm,a],i)=>{const d=el("div");d.hidden=i>0;a.forEach(n=>d.append(n));const bt=el("button",i?"":"on",nm);bt.type="button";bt.onclick=()=>{panes.forEach((q,j)=>q.hidden=j!==i);[...tabs.children].forEach((c,j)=>c.classList.toggle("on",j===i))};tabs.append(bt);return d});body.append(tabs);panes.forEach(d=>body.append(d))}
+  else groups.forEach(([,a])=>a.forEach(n=>body.append(n)));
   if((b.sources||[]).length){const d=el("div","chips");b.sources.forEach(s2=>{const a=el("a",null,s2.title+" ↗");a.href=s2.url;a.target="_blank";a.rel="noopener";d.append(a)});body.append(d)}
   sh.append(body);sc.append(sh);document.body.append(sc);document.body.style.overflow="hidden";
   const close=()=>{sc.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc)};
@@ -803,8 +814,12 @@ function srcLink(source,url){if(!source)return el("span");if(url){const a=el("a"
 function relDots(n){const r=el("span","rel");n=Math.max(0,Math.min(5,+n||0));r.append("●".repeat(n));r.append(el("i",null,"●".repeat(5-n)));r.title="Αξιοπιστία "+n+"/5";return r}
 function tableCard(t){const c=el("section","tbl");const h=el("div","tbl-h");h.append(ic(t.sport),el("b",null,t.title));c.append(h);
   const w=el("div","tbl-w");const tb=el("table");const hr=el("tr");(t.columns||[]).forEach((x,i)=>hr.append(el("th",i===1?"l":null,x)));tb.append(hr);
-  (t.rows||[]).forEach(r=>{const tr=el("tr",/ολυμπιακ|olympiak/i.test(r.join(" "))?"me":null);r.forEach((x,i)=>tr.append(el("td",i===1?"l":null,x==null?"":String(x))));tb.append(tr)});
-  w.append(tb);c.append(w);if(t.note)c.append(el("div","tbl-n",t.note));return c}
+  const T=t.title||"";const bands=/europa|conference/i.test(T)&&(t.rows||[]).length>=30?[[8,"q1"],[24,"q2"]]:/euroleague/i.test(T)&&/20|ευρωλιγκ|euroleague/i.test(T)&&(t.rows||[]).length>=18?[[6,"q1"],[10,"q2"]]:null;
+  (t.rows||[]).forEach(r=>{const pos=parseInt(r[0],10);let bc=null;if(bands&&pos)for(const[n,k]of bands)if(pos<=n){bc=k;break}
+    const tr=el("tr",(/ολυμπιακ|olympiak/i.test(r.join(" "))?"me":"")+(bc?" "+bc:""));r.forEach((x,i)=>tr.append(el("td",i===1?"l":null,x==null?"":String(x))));tb.append(tr)});
+  w.append(tb);c.append(w);
+  if(bands){const lg=el("div","tbl-lg");const eu=/europa|conference/i.test(T);[["q1",eu?"Top 8 – απευθείας στους 16":"Top 6 – απευθείας πλέι-οφ"],["q2",eu?"9–24 – μπαράζ πρόκρισης":"7–10 – πλέι-ιν"]].forEach(([k,tx])=>{const i=el("span","lgi");i.innerHTML='<i class="dot '+k+'"></i>'+tx;lg.append(i)});c.append(lg)}
+  if(t.note)c.append(el("div","tbl-n",t.note));return c}
 function renderMore(){const box=$("#more");box.replaceChildren();
   if(mtab==="archive"){renderArchive(box);return}
   const d=X[mtab];if(!d){box.append(emptyBox(MEMPTY[mtab]));return}
