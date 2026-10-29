@@ -3,13 +3,24 @@
 κάνει commit και push (με επανάληψη σε conflict).
 Χρήση: python3 tools/sync.py [--dry-run] [export_dir=/tmp/exp] [μέρη: editions rosters schedule live]
 --dry-run: μόνο έλεγχος της εξαγωγής (τίποτα δεν γράφεται, δεν γίνεται commit/push).
-ΠΡΟΣΟΧΗ: το push γίνεται στο main (παραγωγή). Μην το τρέχεις από checkout άλλου branch."""
+Προστασίες (το push γίνεται στο main = παραγωγή):
+ 1. Εκτελείται μόνο όταν το τρέχον branch είναι το main (το --dry-run επιτρέπεται παντού).
+ 2. Το commit περιλαμβάνει ΜΟΝΟ διαδρομές data/ (ό,τι άλλο είναι staged δεν μπαίνει).
+ 3. Πριν από κάθε push ελέγχεται ότι τα commits που θα σταλούν αγγίζουν μόνο data/· αλλιώς το push ακυρώνεται."""
 import json, os, sys, glob, shutil, subprocess, time
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dry = "--dry-run" in sys.argv
 argv = [a for a in sys.argv[1:] if a != "--dry-run"]
 exp = argv[0] if argv else "/tmp/exp"
 parts = argv[1:] or ["editions", "rosters", "schedule", "live"]
+def _git(*a):
+    return subprocess.run(["git", "-C", root, *a], capture_output=True, text=True)
+if not dry:
+    br = _git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+    if br != "main":
+        print("ΑΡΝΗΣΗ: το sync.py τρέχει μόνο στο branch 'main' (τώρα: '%s'). Δεν γράφτηκε τίποτα, δεν έγινε push." % br)
+        print("Για απλό έλεγχο εξαγωγής χρησιμοποίησε --dry-run.")
+        sys.exit(2)
 try:
     from validate_data import check  # προειδοποιήσεις δομής: ενημερωτικές, δεν μπλοκάρουν τίποτα
 except Exception:
@@ -46,13 +57,24 @@ ip = os.path.join(data, "index.json")
 if not os.path.exists(ip) or open(ip).read() != idx:
     open(ip, "w").write(idx); n += 1
 print("αλλαγμένα αρχεία:", n)
-g = lambda *a: subprocess.run(["git", "-C", root, *a], capture_output=True, text=True)
+g = _git
+def non_data_changes():
+    """Αρχεία εκτός data/ στα commits που θα σταλούν (None αν δεν μπορεί να ελεγχθεί)."""
+    if g("fetch", "-q", "origin", "main").returncode != 0: return None
+    r = g("log", "--name-only", "--format=", "origin/main..HEAD")
+    if r.returncode != 0: return None
+    return [l for l in r.stdout.splitlines() if l and not l.startswith("data/")]
 g("add", "-A", "data")
-if g("diff", "--cached", "--quiet").returncode == 0:
+if g("diff", "--cached", "--quiet", "--", "data").returncode == 0:
     print("τίποτα νέο για commit"); sys.exit(0)
 g("-c", "user.name=Thrylos Bot", "-c", "user.email=bot@thrylos.local", "commit", "-qm",
-  "data " + time.strftime("%Y-%m-%d %H:%M", time.gmtime()) + "Z (" + ",".join(parts) + ")")
+  "data " + time.strftime("%Y-%m-%d %H:%M", time.gmtime()) + "Z (" + ",".join(parts) + ")", "--", "data")
 for i in range(5):
+    bad = non_data_changes()
+    if bad:
+        print("ΑΚΥΡΩΣΗ push: τα commits περιέχουν αρχεία εκτός data/:", ", ".join(bad[:8])); sys.exit(3)
+    if bad is None:
+        print("push ακυρώθηκε προσωρινά: δεν ήταν δυνατός ο έλεγχος του origin/main"); time.sleep(3 + i * 2); continue
     r = g("push", "origin", "HEAD:main")
     if r.returncode == 0:
         print("push OK"); sys.exit(0)
