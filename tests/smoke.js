@@ -114,9 +114,10 @@ const AUDIT=()=>{
   await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(1500);
   await p.evaluate(()=>navigator.serviceWorker.ready);await p.reload();await p.waitForTimeout(1500);
   ok(await p.evaluate(()=>!!navigator.serviceWorker.controller),'ο service worker δεν ελέγχει τη σελίδα');
+  await p.evaluate(()=>setView('games'));await p.waitForTimeout(600);const balls=await p.evaluate(()=>{const im=[...document.querySelectorAll('.ic img')];return{n:im.length,srcs:[...new Set(im.map(i=>i.getAttribute('src')))],broken:im.filter(i=>!i.complete||i.naturalWidth===0).length}});ok(balls.n>0&&balls.broken===0,'εικονίδια μπάλας: '+JSON.stringify(balls));await p.evaluate(()=>setView('news'));
   const keys=await p.evaluate(async()=>{const o=[];for(const n of await caches.keys()){const c=await caches.open(n);for(const r of await c.keys())o.push(new URL(r.url).pathname+(new URL(r.url).host.includes('localhost')?'':'@ext'))}return o});
   ok(!keys.some(k=>k.includes('/data/live/')),'live δεδομένα στην cache: '+keys.filter(k=>k.includes('/data/live/')));ok(!keys.some(k=>k.includes('@ext')||/supabase/.test(k)),'εξωτερικά/Supabase στην cache');
-  ok(['/manifest.webmanifest','/icons/icon-192.png','/assets/gate7.jpg','/assets/oly-football.jpg'].every(x=>keys.includes(x)),'λείπουν αρχεία από το precache: '+keys.length);
+  ok(['/manifest.webmanifest','/icons/icon-192.png','/assets/gate7.jpg','/assets/oly-football.jpg','/assets/ball-football.png','/assets/ball-basketball.png','/assets/ball-polo.png','/assets/ball-volleyball.png'].every(x=>keys.includes(x)),'λείπουν αρχεία από το precache: '+keys.length);
   await ctx.setOffline(true);await p.reload();await p.waitForTimeout(1500);
   ok(await p.evaluate(()=>!!document.querySelector('.bar')&&document.body.innerText.length>200),'offline: η εφαρμογή δεν φόρτωσε');
   ok(await p.evaluate(()=>document.documentElement.scrollWidth-innerWidth<=1),'offline: overflow');
