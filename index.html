@@ -596,29 +596,33 @@ const ICON={
  football:'<img src="assets/ball-football.png" alt="" decoding="async">',
  basketball:'<img src="assets/ball-basketball.png" alt="" decoding="async">',
  polo:'<img src="assets/ball-polo.png" alt="" decoding="async">',
+ handball:'<img src="assets/ball-handball.png" alt="" decoding="async">',
  volleyball:'<img src="assets/ball-volleyball.png" alt="" decoding="async">',
  amateur:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3c-1 4 0 7 3 9M21 12c-4-1-7 0-9 3M12 21c1-4-1-7-4-8.5M3.6 8.2C7 10 10 9.5 12 7"/></svg>'
 };
 const SPORT={football:"Ποδόσφαιρο",basketball:"Μπάσκετ",polo:"Πόλο",amateur:"Ερασιτέχνης"};
 const KIND={match:"Αγώνας",injury:"Τραυματισμός",transfer:"Μεταγραφή",quote:"Δήλωση",odds:"Προγνωστικά",club:"Ομάδα",off:"Εκτός γηπέδου"};
-const TABS=[["all","Όλα"],["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["polo","Πόλο"],["amateur","Ερασιτέχνης"]];
+const TABS=[["all","Όλα"],["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["amateur","Ερασιτέχνης"]];
+// Το πόλο ανήκει στην κατηγορία «Ερασιτέχνης» (κρατά τη δική του μπάλα)
+const SP=x=>x==="polo"?"amateur":x;
 let editions=[],cur=null,filter="all",timer=null,loaded=false;
 try{filter=localStorage.getItem("thr_f")||"all"}catch(e){}
 const $=s=>document.querySelector(s);
 const el=(t,c,txt)=>{const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e};
 // Το εικονίδιο μπάλας ακολουθεί το πραγματικό άθλημα· στα «amateur» (βόλεϊ, μπάσκετ γυναικών, χάντμπολ…) κρίνεται από το κείμενο
-const BALLKW=[["volleyball",/βόλεϊ|volley/i],["basketball",/μπάσκετ|basket/i],["polo",/πόλο|water ?polo/i],["football",/ποδόσφαιρ|football/i]];
+const BALLKW=[["volleyball",/βόλεϊ|volley/i],["basketball",/μπάσκετ|basket/i],["handball",/χάντμπολ|handball/i],["polo",/πόλο|water ?polo/i],["football",/ποδόσφαιρ|football/i]];
 const ballKind=(s,t)=>{if(s!=="amateur")return s;t=String(t||"");let k="amateur",bi=1e9;BALLKW.forEach(([n,r])=>{const m=t.search(r);if(m>=0&&m<bi){bi=m;k=n}});return k};
 const ic=(s,t)=>{const d=el("div","ic");const h=ICON[ballKind(s,t)]||ICON.amateur;d.innerHTML=h;if(h.startsWith("<svg"))d.classList.add("glyph");return d};
-const ok=x=>filter==="all"||x.sport===filter;
+const ok=x=>filter==="all"||SP(x.sport)===SP(filter);
 function fmtDate(d){try{return new Date(d+"T12:00:00").toLocaleDateString("el-GR",{weekday:"short",day:"numeric",month:"short"})}catch(e){return d}}
 function when(f,year){const d=/(\d{1,2})\/(\d{1,2})/.exec(f.day||"");const t=/(\d{1,2}):(\d{2})/.exec(f.time||"");if(!d)return null;
   return new Date(year,+d[2]-1,+d[1],t?+t[1]:12,t?+t[2]:0)}
 
-const RTABS=[["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["polo-men","Πόλο Ανδρών"],["polo-women","Πόλο Γυναικών"]];
+const RTABS=[["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["polo-men","Πόλο Ανδρών"],["polo-women","Πόλο Γυναικών"],["handball-men","Χάντμπολ Ανδρών"],["handball-women","Χάντμπολ Γυναικών"]];
 const HASHV={"#roster":"roster","#games":"games","#vs":"vs","#live":"live","#bet":"bet","#more":"more","#chat":"chat"};let opps=null,vsel=null,live=null,ltimer=null;
 let mmenu=true,view=HASHV[location.hash]||"news",rosters={},rsport="football",rq="",season=null,gfilter="all",gmode="next";
 try{gfilter=localStorage.getItem("thr_g")||"all"}catch(e){}
+if(gfilter==="polo")gfilter="amateur";
 try{rsport=localStorage.getItem("thr_r")||"football"}catch(e){}
 
 /* Phase 2.3 — «Κι άλλα» menu (grouped entry points to the secondary sections) */
@@ -647,11 +651,11 @@ function renderTabs(){const box=$("#tabs");box.replaceChildren();
     up.forEach(o=>{const b=el("button","tab");b.dataset.o=o.id;b.setAttribute("aria-pressed",o.id===vsel?"true":"false");const dt=new Date(o.d+"T12:00:00");
       b.append(o.opp,el("span","n",dt.getDate()+"/"+(dt.getMonth()+1)));box.append(b)});return}
   if(view==="games"){TABS.forEach(([k,label])=>{const b=el("button","tab");b.dataset.g=k;b.setAttribute("aria-pressed",k===gfilter?"true":"false");b.append(label);
-    if(season){const n=(season.matches||[]).filter(x=>k==="all"||x.sport===k).length;b.append(el("span","n",String(n)))}box.append(b)});return}
+    if(season){const n=(season.matches||[]).filter(x=>k==="all"||SP(x.sport)===k).length;b.append(el("span","n",String(n)))}box.append(b)});return}
   if(view==="roster"){RTABS.forEach(([k,label])=>{const b=el("button","tab");b.dataset.r=k;b.setAttribute("aria-pressed",k===rsport?"true":"false");b.append(label);
     const r=rosters[k];if(r){const n=(r.groups||[]).reduce((a,g)=>a+(g.players||[]).length,0);b.append(el("span","n",String(n)))}box.append(b)});return}
   TABS.forEach(([k,label])=>{const b=el("button","tab");b.dataset.s=k;b.setAttribute("aria-pressed",k===filter?"true":"false");b.append(label);
-    if(cur){const n=(cur.items||[]).filter(i=>k==="all"||i.sport===k).length;b.append(el("span","n",String(n)))}box.append(b)})}
+    if(cur){const n=(cur.items||[]).filter(i=>k==="all"||SP(i.sport)===k).length;b.append(el("span","n",String(n)))}box.append(b)})}
 
 function renderRoster(){
   const box=$("#roster");box.replaceChildren();
@@ -683,7 +687,7 @@ function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMo
 function renderGames(){
   const box=$("#games");box.replaceChildren();
   if(!season){const e=el("div","empty");e.append(el("b",null,"Το ημερολόγιο φορτώνει"),el("p",null,"Όλοι οι αγώνες της σεζόν, σε όλα τα τμήματα."));box.append(e);return}
-  const all=(season.matches||[]).filter(x=>gfilter==="all"||x.sport===gfilter);
+  const all=(season.matches||[]).filter(x=>gfilter==="all"||SP(x.sport)===SP(gfilter));
   const played=all.filter(x=>x.score);
   const tg=el("div","toggle");[["next","Επόμενοι"],["past","Αποτελέσματα"]].forEach(([k,l])=>{const b=el("button",null,l);b.type="button";b.dataset.m=k;b.setAttribute("aria-pressed",k===gmode?"true":"false");tg.append(b)});
   tg.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;gmode=b.dataset.m;renderGames()});box.append(tg);
@@ -936,7 +940,7 @@ function renderBet(){const box=$("#bet");box.replaceChildren();const d=X.betting
     r.append(el("div","sec-h")); r.firstChild.append(el("h2",null,"Πόσο βγαίνουν οι εκτιμήσεις"));r.append(t);
     const dots=el("div","rec-dots");h.slice(-14).forEach(x=>{const i=el("i",x.res,{W:"✓",L:"✗",V:"–",P:"…"}[x.res]||"…");i.title=[x.match,x.pick].filter(Boolean).join(" · ");dots.append(i)});r.append(dots);
     if(d.recordNote)r.append(el("p","foot",d.recordNote));box.append(r)}
-  const t0=todayStr();const ms=(d.matches||[]).filter(m=>m.d>=t0&&(bfilter==="all"||m.sport===bfilter)).sort((a,b)=>(a.d+(a.t||"")).localeCompare(b.d+(b.t||"")));
+  const t0=todayStr();const ms=(d.matches||[]).filter(m=>m.d>=t0&&(bfilter==="all"||SP(m.sport)===SP(bfilter))).sort((a,b)=>(a.d+(a.t||"")).localeCompare(b.d+(b.t||"")));
   if(!ms.length)box.append(el("div","none","Δεν υπάρχουν εκτιμήσεις για αυτό το τμήμα ακόμα."));
   ms.forEach(m=>{const c=el("section","bm");const hd=el("div","bm-h");const dt=new Date(m.d+"T12:00:00");
     const sm=el("small",null,[WD[dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1),m.t,m.comp,m.tv].filter(Boolean).join(" · "));const tr=el("div");tr.style.cssText="display:flex;align-items:center;gap:10px";tr.append(ic(m.sport,m.comp),el("b",null,m.match));hd.append(tr,sm);c.append(hd);
@@ -1120,9 +1124,9 @@ function render(){
     if(arr.length>N){const mb=el("button","moreb","Δες άλλα "+(arr.length-N));mb.type="button";mb.onclick=()=>{arr.slice(N).forEach(i=>L.insertBefore(mkRow(i),mb));mb.remove()};L.append(mb)}
     sec.append(h,L);return sec};
   if(!its.length){const sec=el("section");sec.append(el("div","none","Τίποτα νέο σε αυτό το τμήμα σήμερα."));app.append(sec)}
-  else if(filter==="all"){["football","basketball","polo","amateur"].forEach(k=>{const a=its.filter(i=>i.sport===k);if(a.length)app.append(mkGroup(SPORT[k],a,k))});
+  else if(filter==="all"){["football","basketball","amateur"].forEach(k=>{const a=its.filter(i=>SP(i.sport)===k);if(a.length)app.append(mkGroup(SPORT[k],a,k))});
     const rest=its.filter(i=>!SPORT[i.sport]);if(rest.length)app.append(mkGroup("Άλλα",rest))}
-  else app.append(mkGroup(SPORT[filter]||"Νέα",its));
+  else app.append(mkGroup(SPORT[SP(filter)]||"Νέα",its));
 
   const bet=(cur.betting||[]).filter(b=>typeof b==="string"||ok(b));
   if(bet.length){const s3=el("section");const h3=el("div","sec-h");h3.append(el("h2",null,"Για τα στοιχήματα"));
