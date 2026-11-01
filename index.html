@@ -213,6 +213,20 @@ button:active,.tab:active,.gm:active{transform:scale(.97)}
 .lc-row .st-badge{margin-left:0}
 @media (min-width:900px){.lc-g{gap:12px}}
 
+
+/* Φάση 2: Match Center */
+.sh-hero.mc-hero{display:flex;flex-direction:column;align-items:stretch;gap:14px;padding-top:20px}
+.mc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-right:40px;font-size:12.5px;font-weight:700;opacity:.95}
+.mc-top .st-badge{margin-left:0;background:rgba(255,255,255,.22);color:#fff}.mc-top .st-badge.live{background:#fff;color:var(--red)}.mc-top .st-badge.live::before{background:var(--red)}
+.mc-board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.mc-side{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
+.mc-side b{font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.mc-side .mc-cr{width:52px;height:52px;font-size:18px}
+.mc-sc{font-family:var(--display);font-weight:900;font-size:clamp(34px,9vw,48px);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mc-live{margin:0}.mc-live>.lv-h,.mc-live>.board{display:none}
+.mc-nav{margin-top:4px}
+.sheet .box h4{margin:0 0 6px}
+
 /* sticky sport switcher */
 .switch{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .switch .wrap{padding-block:12px}
@@ -966,6 +980,38 @@ function renderLive(){
     g.slice(0,CAP).forEach(addRow);if(g.length>CAP){sec.append(more);more.onclick=()=>{g.slice(CAP).forEach(addRow);more.remove()}}
     box.append(sec)});
   const ft=el("p","foot","Σκορ ποδοσφαίρου/μπάσκετ: ");const sa=el("a",null,"Powered by SportScore");sa.href="https://sportscore.com";sa.target="_blank";sa.rel="noopener";ft.append(sa);box.append(ft);
+}
+/* Φάση 2: Match Center (φύλλο λεπτομερειών αγώνα) */
+function openMatch(it,liveCard){
+  const m=it.m,sc=el("div","scrim"),sh=el("div","sheet");sh.setAttribute("role","dialog");sh.setAttribute("aria-modal","true");
+  const oppN=it.opp||"Αντίπαλος";sh.setAttribute("aria-label","Ολυμπιακός – "+oppN);
+  const dt=new Date(it.d+"T12:00:00");const dstr=isNaN(dt)?it.d:dt.toLocaleDateString("el-GR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const cf=it.bucket==="live",stale=it.bucket==="stale";
+  const stTxt=cf?(m.status==="ht"?"ΗΜΙΧΡΟΝΟ":"LIVE"):stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":it.bucket==="done"?"ΤΕΛΙΚΟ":"ΠΡΟΣΕΧΩΣ";
+  const hero=el("div","sh-hero mc-hero");const top=el("div","mc-top");top.append(el("span",null,it.comp||""),el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),stTxt));
+  const A=[{n:"Ολυμπιακός",s:it.olyS},{n:oppN,s:it.oppS}];const [L,R]=it.home?A:[A[1],A[0]];
+  const board=el("div","mc-board");const side=x=>{const d=el("div","mc-side");d.append(crest(x.n,"mc-cr",it.sport),el("b",null,x.n));return d};
+  const showSc=it.bucket!=="next";const mid=el("div","mc-sc",showSc?scoreTxt(L.s)+" – "+scoreTxt(R.s):"vs");
+  board.append(side(L),mid,side(R));
+  const x=el("button","sh-close","×");x.type="button";x.setAttribute("aria-label","Κλείσιμο");
+  hero.append(top,board,x);sh.append(hero);
+  const body=el("div","sh-body");
+  const facts=[["Διοργάνωση",it.comp],["Ημερομηνία",dstr],["Ώρα",it.t||m.kickoff||m.t],["Τηλεόραση",m.tv],["Αγώνας",it.home?"Εντός έδρας":"Εκτός έδρας"],["Άθλημα",SPORT[it.sport]||""]].filter(([,v])=>v);
+  const fb=el("div","facts");facts.forEach(([k,v])=>{const d=el("div");d.append(el("small",null,k),el("b",null,String(v)));fb.append(d)});body.append(fb);
+  if(it.src==="season"&&m.note){const n=el("div","box");n.append(el("h4",null,"Σημείωση"),el("p",null,m.note));body.append(n)}
+  if(it.src==="live"&&liveCard){const lc=liveCard(m);lc.classList.add("mc-live");body.append(lc)}
+  else{const e=el("div","lc-empty");e.append(el("b",null,"Δεν υπάρχουν αναλυτικά στοιχεία"),el("p",null,"Συνθέσεις, γεγονότα και στατιστικά εμφανίζονται μόνο όταν τα δίνει η πηγή. Για αυτόν τον αγώνα δεν έχουν δοθεί."));body.append(e)}
+  const nav=el("div","qk mc-nav");
+  const b1=el("button","qk-b","Βαθμολογία διοργάνωσης");b1.type="button";b1.onclick=()=>{close();mmenu=false;mtab="standings";try{localStorage.setItem("thr_m",mtab)}catch(_){}setView("more")};
+  const b2=el("button","qk-b","Πρόγραμμα αθλήματος");b2.type="button";b2.onclick=()=>{close();gfilter=SP(it.sport);gmode=it.bucket==="done"?"past":"next";setView("games")};
+  nav.append(b1,b2);body.append(nav);
+  if(it.src==="season"||(m.source==="SportScore")){const ft=el("p","foot","Πηγή δεδομένων: Θρύλος Daily"+(m.source==="SportScore"?" · ":""));if(m.source==="SportScore"){const a=el("a",null,"Powered by SportScore");a.href="https://sportscore.com";a.target="_blank";a.rel="noopener";ft.append(a)}body.append(ft)}
+  sh.append(body);sc.append(sh);document.body.append(sc);document.body.style.overflow="hidden";
+  const opener=document.activeElement;
+  const close=()=>{sc.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc);if(opener&&opener.focus&&document.contains(opener))opener.focus()};
+  const esc=e=>{if(e.key==="Escape"){close();return}
+    if(e.key==="Tab"){const f=[...sh.querySelectorAll('button,a[href]')].filter(q=>q.offsetParent!==null);if(!f.length)return;const a1=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a1){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a1.focus()}}};
+  document.addEventListener("keydown",esc);x.onclick=close;sc.addEventListener("click",e=>{if(e.target===sc)close()});x.focus();
 }
 function jersey(sport,no){const n=no!=null&&no!==""?String(no):"";const col=getComputedStyle(document.documentElement).getPropertyValue("--red").trim()||"#C8102E";
   if(sport&&sport.startsWith("polo"))return `<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M20 70c0-30 18-52 40-52s40 22 40 52v8H20z" fill="#fff"/><path d="M20 70h80v8H20z" fill="${col}"/><circle cx="24" cy="80" r="9" fill="#fff" stroke="${col}" stroke-width="3"/><circle cx="96" cy="80" r="9" fill="#fff" stroke="${col}" stroke-width="3"/><text x="60" y="60" text-anchor="middle" font-family="Fira Sans Extra Condensed,Arial Narrow,sans-serif" font-weight="900" font-size="34" fill="${col}">${n}</text></svg>`;

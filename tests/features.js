@@ -82,6 +82,21 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  ok(await p.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'J10 χωρίς οριζόντιο overflow στο Live');
  ok((await txt('#live')).includes('Powered by SportScore'),'J11 Powered by SportScore στο Live');
  await p.reload();await p.waitForTimeout(1000);
+ // K. Match Center
+ await go('live');await p.waitForTimeout(400);
+ await p.locator('#live [data-f=status] button',{hasText:'Προσεχείς'}).click();await p.waitForTimeout(200);
+ await p.locator('#live .lc-row').first().click();await p.waitForTimeout(300);
+ ok(await cnt('.sheet .mc-hero')===1,'K1 ανοίγει Match Center για προσεχή αγώνα');
+ ok((await txt('.sheet .mc-sc')).trim()==='vs','K2 προσεχής αγώνας: «vs», όχι σκορ');
+ ok(await cnt('.sheet .facts > div')>=3,'K3 στοιχεία αγώνα (διοργάνωση, ημερομηνία, ώρα…)');
+ ok(await cnt('.sheet .lu,.sheet .ev,.sheet .cmp')===0&&(await txt('.sheet')).includes('Δεν υπάρχουν αναλυτικά στοιχεία'),'K4 χωρίς δεδομένα πηγής: κενή κατάσταση, κανένα ψεύτικο στοιχείο');
+ ok(await cnt('.sheet .mc-nav .qk-b')===2,'K5 σύνδεσμοι προς βαθμολογία/πρόγραμμα');
+ await p.keyboard.press('Escape');await p.waitForTimeout(250);ok(await cnt('.sheet')===0,'K6 κλείσιμο με Esc');
+ await p.locator('#live [data-f=status] button',{hasText:'Ολοκληρωμένοι'}).click();await p.waitForTimeout(200);
+ await p.locator('#live .lc-row').first().click();await p.waitForTimeout(300);
+ ok(/\d\s*–\s*\d/.test(await txt('.sheet .mc-sc')),'K7 ολοκληρωμένος αγώνας: σκορ');
+ await p.locator('.sheet .mc-nav .qk-b',{hasText:'Βαθμολογία'}).click();await p.waitForTimeout(400);
+ ok(await cnt('.sheet')===0&&await cnt('#more .tbl')>=1,'K8 «Βαθμολογία διοργάνωσης» ανοίγει τους πίνακες');
  // D. Live
  await go('live');
  ok((await txt('#live')).trim().length>0,'D1 η καρτέλα Live δεν είναι άδεια (κάρτα αγώνα ή κενή κατάσταση)');
