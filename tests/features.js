@@ -129,7 +129,7 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
   const x=m.filter(q=>!q.score&&q.d>=t&&/^Βόλεϊ γυναικών/.test(q.comp)).sort((a,b)=>(a.d+(a.t||'')).localeCompare(b.d+(b.t||'')))[0];return x?x.opp:null});
  const vw=await p.evaluate(()=>document.querySelector('#more .tm-card[data-team="volleyball-w"]').textContent);
  const nn=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();ok(exp&&nn(vw).includes(nn(exp)),'L14 «επόμενος αγώνας» Βόλεϊ γυναικών = από το ημερολόγιο ('+exp+')');
- ok(await cnt('#more details.tm-un summary')===1,'L15 καταγραφή αγώνων που δεν ταξινομήθηκαν με βεβαιότητα');
+ ok(await cnt('#more #tm-unconfirmed .lc-row')>=1,'L15 καταγραφή αγώνων με μη επιβεβαιωμένη ομάδα (ορατή, όχι κρυμμένη)');
  await p.locator('#more .tm-card[data-team="polo-m"] .qk-b[data-focus=results]').click();await p.waitForTimeout(500);
  ok(await cnt('#more #tm-results')===1&&await cnt('#more .lc-row:not([data-team="polo-m"])')===0,'L16 «Αποτελέσματα» από τον Ερασιτέχνη ανοίγει την ομάδα, μόνο με δικούς της αγώνες');
  // φύλο στο Live και στο Ημερολόγιο
@@ -147,6 +147,68 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  await go('news');await p.locator('#app .qk-b',{hasText:'Οι 10 ομάδες'}).click();await p.waitForTimeout(400);ok(await cnt('#more .tm-card')===10,'L20 σύνδεσμος «Οι 10 ομάδες» από την αρχική');
  ok(await p.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'L21 χωρίς οριζόντιο overflow στις σελίδες ομάδων');
  await go('news');
+ // N. Έλεγχος αξιοπιστίας Βήματος Α: αμφιβολίες, αποκλειστικότητα δεδομένων, φίλτρα, διπλοεγγραφές
+ await go('more');await p.click('.mm-i[data-go="amateur"]');await p.waitForTimeout(500);
+ const U=await p.evaluate(()=>allItems().filter(x=>!x.team).map(x=>({d:x.d,opp:x.opp,src:x.src,sc:!!(x.m&&x.m.score)})));
+ ok(U.length>=1,'N1 υπάρχουν αγώνες αμφιβολίας για έλεγχο ('+U.length+')');
+ ok(await cnt('#more #tm-unconfirmed .lc-row')===U.length,'N2 όλοι οι αγώνες αμφιβολίας εμφανίζονται στον Ερασιτέχνη ('+U.length+')');
+ ok(await p.evaluate(()=>[...document.querySelectorAll('#tm-unconfirmed .lc-row')].every(r=>/δεν εχει επιβεβαιωθει η ομαδα/.test(r.innerText.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()))),'N3 κάθε αγώνας αμφιβολίας φέρει «Δεν έχει επιβεβαιωθεί η ομάδα»');
+ ok(await cnt('#more #tm-unconfirmed [data-team]')===0,'N4 κανένας αγώνας αμφιβολίας δεν αποδίδεται σε ομάδα (data-team)');
+ // δεν χάνονται από το γενικό ημερολόγιο
+ await go('games');
+ for(const u of U){const mode=u.sc?'past':'next';await p.locator('#games .toggle button[data-m='+mode+']').click();await p.waitForTimeout(200);
+  const inG=await p.evaluate(([o,d])=>[...document.querySelectorAll('#games .gm')].some(r=>r.innerText.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().includes(o)&&/δεν εχει επιβεβαιωθει η ομαδα/.test(r.innerText.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase())),[nn(u.opp),u.d]);
+  ok(inG,'N5 στο γενικό ημερολόγιο ('+mode+'): '+u.d+' '+u.opp+' με ένδειξη μη επιβεβαιωμένης ομάδας')}
+ // να μην αποδίδονται σε ομάδα ανδρών/γυναικών: το φίλτρο φύλου τους εξαιρεί και το δηλώνει
+ await p.locator('#games .toggle button[data-m=next]').click();await p.locator('#games .gg button[data-gg=m]').click();await p.waitForTimeout(200);
+ ok(!(await p.evaluate(()=>[...document.querySelectorAll('#games .gm')].some(r=>/εχει επιβεβαιωθει/.test(r.innerText.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase())))),'N6 φίλτρο «Ανδρών»: δεν περιλαμβάνει μη επιβεβαιωμένους αγώνες');
+ ok(await cnt('#games .un-note')===1||U.filter(u=>!u.sc).length===0&&await cnt('#games .un-note')<=1,'N7 φίλτρο φύλου: δηλώνει πόσοι αγώνες εξαιρούνται');
+ await p.locator('#games .gg button[data-gg=all]').click();
+ // ένα-προς-ένα: κάθε αγώνας είτε σε μία ομάδα είτε μη επιβεβαιωμένος· χωρίς διπλοεγγραφές
+ const dup=await p.evaluate(()=>{const a=allItems();const keys={};a.forEach(x=>{const k=x.d+'|'+nrm(x.opp)+'|'+nrm(x.comp);keys[k]=(keys[k]||0)+1});
+  const d2={};a.forEach(x=>{const k=x.d+'|'+nrm(x.opp);d2[k]=(d2[k]||0)+1});
+  const byTeam=TEAMS.reduce((n,t)=>n+teamItems(t.id,a).length,0);const un=a.filter(x=>!x.team).length;
+  const ids=a.every(x=>!x.team||TEAM_BY[x.team]);
+  return {dupFull:Object.entries(keys).filter(([,v])=>v>1).map(([k])=>k),dupDayOpp:Object.entries(d2).filter(([,v])=>v>1).map(([k])=>k),total:a.length,byTeam,un,ids}});
+ ok(dup.dupFull.length===0&&dup.dupDayOpp.length===0,'N8 καμία διπλοεγγραφή αγώνα (ίδια ημέρα+αντίπαλος): '+dup.dupDayOpp.join(';'));
+ ok(dup.byTeam+dup.un===dup.total&&dup.ids,'N9 κάθε αγώνας ανήκει ακριβώς σε μία ομάδα ή στους μη επιβεβαιωμένους ('+dup.byTeam+'+'+dup.un+'='+dup.total+')');
+ // αποκλειστικά δεδομένα κάθε ομάδας
+ for(const id of ['football-m','football-w','basketball-m','basketball-w','volleyball-m','volleyball-w','polo-m','polo-w','handball-m','handball-w']){
+  await p.evaluate(i=>openTeam(i),id);await p.waitForTimeout(250);
+  const r=await p.evaluate(id=>{const t=TEAM_BY[id];const rows=[...document.querySelectorAll('#more .lc-row')];
+   const tbl=[...document.querySelectorAll('#more .tbl')].map(e=>e.querySelector('.tbl-h b').textContent);
+   const all=[...(X.standings&&X.standings.tables||[]),...(X.scorers&&X.scorers.tables||[])];
+   const wrongT=tbl.filter(ti=>{const tb=all.find(q=>nrm(q.title)===nrm(ti));return !tb||classifyTeam(tb.sport,tb.title).id!==id});
+   const ro=t.roster?rosters[t.roster]:null;const rosBtn=!!document.querySelector('#more #tm-roster .tm-ro');
+   return {foreign:rows.filter(x=>x.dataset.team!==id).length,wrongT,rosOk:!rosBtn||(ro&&ro.sport===t.roster),rosNone:!t.roster&&rosBtn,sportsOk:rows.every(x=>x.dataset.sport===lcNorm({sport:t.sport}))}},id);
+  ok(r.foreign===0&&r.wrongT.length===0&&r.rosOk&&!r.rosNone,'N10 '+id+': αποκλειστικά δικοί της αγώνες/πίνακες/ρόστερ'+(r.wrongT.length?' ΛΑΘΟΣ ΠΙΝΑΚΑΣ '+r.wrongT:''))}
+ // συνεργασία φίλτρων στο Live: φύλο × άθλημα × κατάσταση (+ διοργάνωση)
+ await go('live');await p.waitForTimeout(300);let bad=[];let combos=0;
+ for(const g of ['all','m','w'])for(const sp of ['all','football','basketball','amateur'])for(const st of ['all','live','next','done']){
+  await p.locator('#live [data-f=gender] button[data-k='+g+']').click();await p.locator('#live [data-f=sport] button[data-k='+sp+']').click();await p.locator('#live [data-f=status] button[data-k='+st+']').click();await p.waitForTimeout(60);combos++;
+  const r=await p.evaluate(([g,sp,st])=>{const rows=[...document.querySelectorAll('#live .lc-row')];const lv=[...document.querySelectorAll('#live .lv')].length;
+   const badRow=rows.filter(x=>(g!=='all'&&!(x.dataset.team||'').endsWith(g==='m'?'-m':'-w'))||(sp!=='all'&&x.dataset.sport!==sp)||(st==='next'&&x.dataset.b!=='next')||(st==='done'&&x.dataset.b!=='done')).length;
+   const cap=[...document.querySelectorAll('#live .lc-g .cnt')].reduce((a,e)=>a+ +e.textContent,0);
+   const chip=document.querySelector('#live [data-f=status] button[data-k='+st+'] .n');return {badRow,cap,chip:chip?+chip.textContent:null}},[g,sp,st]);
+  if(r.badRow||(r.chip!=null&&r.cap!==r.chip))bad.push(g+'/'+sp+'/'+st+' '+JSON.stringify(r))}
+ ok(bad.length===0,'N11 φίλτρα Live συνεργάζονται ('+combos+' συνδυασμοί φύλου×αθλήματος×κατάστασης)'+(bad.length?': '+bad.slice(0,3).join(' | '):''));
+ await p.locator('#live [data-f=gender] button[data-k=all]').click();await p.locator('#live [data-f=sport] button[data-k=amateur]').click();await p.locator('#live [data-f=status] button[data-k=all]').click();await p.waitForTimeout(120);
+ const cc=await p.locator('#live [data-f=comp] button').count();let cbad=0;
+ for(let i=1;i<cc;i++){await p.locator('#live [data-f=comp] button').nth(i).click();await p.waitForTimeout(60);const k=await p.locator('#live [data-f=comp] button').nth(i).getAttribute('data-k');
+  cbad+=await p.evaluate(k=>[...document.querySelectorAll('#live .lc-row')].filter(x=>x.dataset.comp!==k).length,k)}
+ ok(cc>=3&&cbad===0,'N12 φίλτρο διοργάνωσης μέσα στον Ερασιτέχνη: '+(cc-1)+' διοργανώσεις, μόνο αντίστοιχοι αγώνες');
+ await p.locator('#live [data-f=comp] button').first().click();await p.locator('#live [data-f=sport] button[data-k=all]').click();
+ // Ημερολόγιο: m + w + μη επιβεβαιωμένοι = όλοι
+ await go('games');const cntG=async()=>{let n=0;for(const m of ['next','past']){await p.locator('#games .toggle button[data-m='+m+']').click();await p.waitForTimeout(80);n+=await cnt('#games .gm')}return n};
+ const gAll2=await cntG();await p.locator('#games .gg button[data-gg=m]').click();const gMen2=await cntG();await p.locator('#games .gg button[data-gg=w]').click();const gWom2=await cntG();
+ await p.locator('#games .gg button[data-gg=all]').click();await p.waitForTimeout(100);const gUnc2=await p.evaluate(()=>{const s=seasonKeep.matches;return s.filter(x=>!classifyTeam(x.sport,x.comp).id&&(x.score||x.d>=todayStr())).length});
+ ok(gMen2+gWom2+gUnc2===gAll2,'N13 Ημερολόγιο: ανδρών('+gMen2+')+γυναικών('+gWom2+')+μη επιβεβαιωμένοι('+gUnc2+')=όλοι('+gAll2+')');
+ // Ερασιτέχνης: όλα τα τμήματα ορατά, σαφής διάκριση διαθέσιμων/μη διαθέσιμων
+ await go('more');await p.click('.mm-i[data-go="amateur"]');await p.waitForTimeout(400);
+ const H=await p.evaluate(()=>[...document.querySelectorAll('#more .tm-card')].map(c=>({id:c.dataset.team,chips:[...c.querySelectorAll('.tm-chip')].filter(x=>x.dataset.on==='0').map(x=>x.dataset.cap).join(','),miss:c.querySelector('.tm-miss').dataset.miss,txt:c.querySelector('.tm-miss').textContent})));
+ ok(H.length===8&&['football-w','basketball-w','volleyball-m','volleyball-w','polo-m','polo-w','handball-m','handball-w'].every(i=>H.some(h=>h.id===i)),'N14 Ερασιτέχνης: και τα 8 τμήματα ορατά ('+H.map(h=>h.id).join(',')+')');
+ ok(H.every(h=>h.chips===h.miss&&(h.miss===''?/Διαθέσιμα όλα/.test(h.txt):/Δεν παρέχονται ακόμα/.test(h.txt))),'N15 σαφής διάκριση: τα «Δεν παρέχονται ακόμα» = τα στοιχεία που λείπουν πραγματικά');
+ ok(H.find(h=>h.id==='football-w').miss.includes('Αγώνες')&&H.find(h=>h.id==='football-w').miss.includes('Ρόστερ'),'N16 Ποδόσφαιρο γυναικών: ορατό, με δηλωμένες τις ελλείψεις');
  // D. Live
  await go('live');
  ok((await txt('#live')).trim().length>0,'D1 η καρτέλα Live δεν είναι άδεια (κάρτα αγώνα ή κενή κατάσταση)');
