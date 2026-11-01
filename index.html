@@ -1399,11 +1399,18 @@ function crest(name,cls,sport){name=String(name||"?");const oly=/ολυμπια�
   addEventListener("touchstart",e=>{y0=(window.scrollY<=0&&!e.target.closest("textarea,input,.rail,.seg"))?e.touches[0].clientY:null;pull=0},{passive:true});
   addEventListener("touchmove",e=>{if(y0==null)return;pull=e.touches[0].clientY-y0;if(pull>70){ind.classList.add("on");ind.textContent="Άφησε για ανανέωση"}else{ind.classList.toggle("on",pull>30);ind.textContent="↓ Τράβα για ανανέωση"}},{passive:true});
   addEventListener("touchend",()=>{if(y0!=null&&pull>70){ind.textContent="Ανανέωση…";location.reload()}else ind.classList.remove("on");y0=null},{passive:true})})();
-/* Κουτάκι «μέλη»: διαφορετικά ονόματα που έχουν γράψει στο chat (μόνο ανάγνωση, χωρίς αλλαγές στη βάση) */
+/* Κουτάκι πάνω-αριστερά: αριθμός διαφορετικών συσκευών που συνδέθηκαν. Κάθε συσκευή έχει τυχαίο ανώνυμο αναγνωριστικό (μόνο στο localStorage της)·
+   καταγράφεται μέσω RPC register_device και μετριέται με device_count (βλ. docs/DEVICES.sql). Αν το RPC δεν υπάρχει ακόμα → εμφανίζει όπως πριν τα ονόματα του chat. */
+let devReg=false;
+function devId(){let d=lsGet("thr_dev");if(!d||d.length<8){d=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));lsSet("thr_dev",d)}return lsGet("thr_dev")===d?d:""}
+async function devicesCount(){try{
+  if(!devReg){const d=devId();if(d){const r=await sbRpc("register_device",{d});if(r.ok)devReg=true}}
+  const r=await sbRpc("device_count",{});if(!r.ok)return null;const n=await r.json();return Number.isInteger(n)&&n>=0?n:null}catch(e){return null}}
 async function membersCount(){try{if(document.visibilityState!=="visible"||!SB.key)return;
-  const r=await fetch(SB.url+"/rest/v1/messages?select=name&limit=1000",{headers:sbH(),cache:"no-store"});if(!r.ok)return;const a=await r.json();if(!Array.isArray(a))return;
-  const n=new Set(a.map(x=>String(x.name||"").trim().toLowerCase()).filter(Boolean)).size;
-  $("#membersN").textContent=String(n);$("#membersL").textContent=n===1?"μέλος":"μέλη";$("#members").hidden=false}catch(e){}}
+  let n=await devicesCount(),one="συσκευή",many="συσκευές";
+  if(n===null){const r=await fetch(SB.url+"/rest/v1/messages?select=name&limit=1000",{headers:sbH(),cache:"no-store"});if(!r.ok)return;const a=await r.json();if(!Array.isArray(a))return;
+    n=new Set(a.map(x=>String(x.name||"").trim().toLowerCase()).filter(Boolean)).size;one="μέλος";many="μέλη"}
+  $("#membersN").textContent=String(n);$("#membersL").textContent=n===1?one:many;$("#members").hidden=false}catch(e){}}
 membersCount();setInterval(membersCount,300000);
 async function chatBadge(){try{if(view==="chat"||!lsGet("thr_code")||document.visibilityState!=="visible")return;
   const r=await fetch(SB.url+"/rest/v1/messages?select=id&order=id.desc&limit=1",{headers:sbH(),cache:"no-store"});if(!r.ok)return;const a=await r.json();const id=a[0]?a[0].id:0;
