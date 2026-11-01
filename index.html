@@ -503,6 +503,7 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .ptabs{display:flex;gap:6px;margin:4px 0 10px;position:sticky;top:0;z-index:2}.ptabs button{flex:1;padding:9px 6px;border:0;border-radius:12px;background:var(--soft);color:var(--muted);font:800 13px inherit;font-family:inherit}.ptabs button.on{background:var(--red);color:#fff}
 .pitch{border-radius:14px;overflow:hidden;margin-bottom:10px;background:repeating-linear-gradient(#2f8f4e 0 38px,#2a8447 38px 76px);border:2px solid #fff3;position:relative;display:flex;flex-direction:column}
 .pitch::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:#fff6}
+.court{border-radius:14px;overflow:hidden;margin-bottom:10px;background:repeating-linear-gradient(90deg,#c98f4f 0 34px,#bf8445 34px 68px);border:2px solid #fff3;position:relative;display:flex;flex-direction:column}.court::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:#fff9}.court::before{content:"";position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border:2px solid #fff9;border-radius:50%;z-index:0}.court .ph{position:relative;z-index:1}
 .ph{display:flex;flex-direction:column;justify-content:space-around;gap:6px;padding:8px 4px;min-height:200px}.ptag{text-align:center;color:#fff;font:800 11px var(--display,inherit);letter-spacing:.6px;text-transform:uppercase;opacity:.9}
 .pr{display:flex;justify-content:space-around;gap:2px}.pp{display:flex;flex-direction:column;align-items:center;width:62px;min-width:0;text-align:center}
 .pp b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#222;font-size:12px;box-shadow:0 1px 3px #0005}.ph.oly .pp b{background:var(--red);color:#fff;border:2px solid #fff}
@@ -817,6 +818,16 @@ function renderLive(){
           const half=el("div","ph "+k);lines.forEach(ln=>{const r=el("div","pr");ln.forEach(x=>{const d=el("div","pp");d.append(el("b",null,x.no!=null?String(x.no):""),el("span",null,x.name||""));r.append(d)});half.append(r)});
           const tag=el("div","ptag",(k==="oly"?"Ολυμπιακός":m.opp)+" · "+T.formation);half.prepend(tag);pt.append(half)});
         lu.append(pt)}
+      // Μπάσκετ: αρχική πεντάδα σε γήπεδο (γκαρντ → φόργουορντ → σέντερ), όταν υπάρχουν 5 βασικοί
+      const bkOk=k=>{const T=m.lineups[k];return m.sport==="basketball"&&T&&(T.starters||[]).length===5};
+      if(bkOk("oly")||bkOk("opp")){const ct=el("div","court");
+        [["opp",1],["oly",0]].forEach(([k,flip])=>{if(!bkOk(k))return;const T=m.lineups[k];const R=["G","F","C"];
+          const rk=x=>{const i=R.indexOf(String(x.pos||"").trim().charAt(0).toUpperCase());return i<0?1:i};
+          const st=T.starters.map((x,i)=>({x,i,r:rk(x)})).sort((p,q)=>p.r-q.r||p.i-q.i);
+          const rows=[[],[],[]];st.forEach(o=>rows[o.r].push(o.x));const lines=rows.filter(r=>r.length);if(flip)lines.reverse();
+          const half=el("div","ph "+k);half.append(el("div","ptag",k==="oly"?"Ολυμπιακός":m.opp));
+          lines.forEach(ln=>{const r=el("div","pr");ln.forEach(x=>{const d=el("div","pp");d.append(el("b",null,x.no!=null&&x.no!==""?String(x.no):(x.pos||"")),el("span",null,x.name||""));r.append(d)});half.append(r)});ct.append(half)});
+        lu.append(ct)}
       const g=el("div","lu-g");
       [["oly","Ολυμπιακός"],["opp",m.opp]].forEach(([k,nm])=>{const T=m.lineups[k];const col=el("div","lu-c"+(k==="oly"?" oly":""));
         const hh=el("div","lu-h");hh.append(el("b",null,nm));if(T&&T.formation)hh.append(el("span","fm",T.formation));col.append(hh);
