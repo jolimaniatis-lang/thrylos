@@ -823,8 +823,12 @@ function ago(iso){const t=Date.parse(iso);if(!t)return"";const m=Math.round((Dat
 /* Φάση 2: επιβεβαίωση live και σκορ «μη διαθέσιμο» */
 const LIVE_FRESH=30*60e3;
 function liveStamp(){const t=live&&live.updatedAt?Date.parse(live.updatedAt):NaN;return isNaN(t)?null:t}
+/* LIVE = έγκυρο status από την πηγή (live/ht) ΚΑΙ πρόσφατο, έγκυρο updatedAt (όχι παλιό, όχι μελλοντικό) ΚΑΙ ημερομηνία αγώνα σήμερα/χθες */
 function isLiveConfirmed(m){if(!m||(m.status!=="live"&&m.status!=="ht"))return false;
-  if(m.elSrc&&Date.now()-m.elSrc<LIVE_FRESH)return true;const t=liveStamp();return t!=null&&Date.now()-t<LIVE_FRESH}
+  const now=Date.now(),fresh=t=>typeof t==="number"&&isFinite(t)&&t<=now+5*60e3&&now-t<LIVE_FRESH;
+  const t0=todayStr(),y=new Date(now-864e5),ys=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
+  if(m.d!==t0&&m.d!==ys)return false;
+  if(m.elSrc&&fresh(m.elSrc))return true;return fresh(liveStamp())}
 function scoreTxt(v){return v==null||v===""||isNaN(+v)?"–":String(+v)}
 const EL={};const elCodes={};let elBusy=false,elFail=0,elNext=0;
 const elSeason=()=>{const d=new Date();return "E"+(d.getMonth()>=7?d.getFullYear():d.getFullYear()-1)};
@@ -980,7 +984,7 @@ function renderLive(){
       r.append(when,mid,bd);r.onclick=()=>{if(typeof openMatch==="function")openMatch(it,liveCard)};sec.insertBefore(r,more.parentNode?more:null)};
     g.slice(0,CAP).forEach(addRow);if(g.length>CAP){sec.append(more);more.onclick=()=>{g.slice(CAP).forEach(addRow);more.remove()}}
     box.append(sec)});
-  const ft=el("p","foot","Σκορ ποδοσφαίρου/μπάσκετ: ");const sa=el("a",null,"Powered by SportScore");sa.href="https://sportscore.com";sa.target="_blank";sa.rel="noopener";ft.append(sa);box.append(ft);
+  const ft=el("p","foot","Ορισμένα σκορ ποδοσφαίρου/μπάσκετ: ");const sa=el("a",null,"Powered by SportScore");sa.href="https://sportscore.com";sa.target="_blank";sa.rel="noopener";ft.append(sa);box.append(ft);
 }
 /* Φάση 2: Match Center (φύλλο λεπτομερειών αγώνα) */
 function openMatch(it,liveCard){
@@ -1357,7 +1361,7 @@ function render(){
   if((cur.sources||[]).length){const s4=el("section");const h4=el("div","sec-h");h4.append(el("h2",null,"Πηγές ("+cur.sources.length+")"));const d=el("div","chips");d.hidden=true;h4.style.cursor="pointer";h4.tabIndex=0;h4.setAttribute("role","button");h4.setAttribute("aria-expanded","false");const tgS=()=>{d.hidden=!d.hidden;h4.setAttribute("aria-expanded",d.hidden?"false":"true")};h4.onclick=tgS;h4.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tgS()}});
     cur.sources.forEach(x=>{const a=el("a",null,x.title);a.href=x.url;a.target="_blank";a.rel="noopener";d.append(a)});s4.append(h4,d);app.append(s4)}
   app.append(el("p","foot","Νέα έκδοση κάθε πρωί στις 10:00"));
-  {const p=el("p","foot","Σκορ ποδοσφαίρου/μπάσκετ: ");const a=el("a",null,"Powered by SportScore");a.href="https://sportscore.com";a.target="_blank";a.rel="noopener";p.append(a);app.append(p)}
+  {const p=el("p","foot","Ορισμένα σκορ ποδοσφαίρου/μπάσκετ: ");const a=el("a",null,"Powered by SportScore");a.href="https://sportscore.com";a.target="_blank";a.rel="noopener";p.append(a);app.append(p)}
 }
 function fillSelect(){const s=$("#edition");s.replaceChildren();editions.slice(0,14).forEach((e,i)=>{const o=el("option",null,(i===0?"Σήμερα · ":"")+fmtDate(e.date));o.value=e.date;s.append(o)});if(cur)s.value=cur.date}
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;
