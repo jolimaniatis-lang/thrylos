@@ -189,7 +189,7 @@ button:active,.tab:active,.gm:active{transform:scale(.97)}
 .qk{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .qk-b{font:700 14px var(--body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;text-align:left;min-height:44px}
 .qk-b:hover{border-color:var(--red)}
-@media (min-width:900px){.rs-rail{display:grid;grid-template-columns:repeat(4,1fr);overflow:visible}.rs-rail .rs{width:auto}}
+@media (min-width:900px){.rail.rs-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;margin-inline:0;padding-inline:0}.rail.rs-rail .rs{width:auto}}
 
 /* sticky sport switcher */
 .switch{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
