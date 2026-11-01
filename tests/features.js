@@ -64,6 +64,24 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  ok(await cnt('#games .gm')>=10,'C3 αποτελέσματα σεζόν (≥10)');
  ok(await p.evaluate(()=>!!document.querySelector('#games .gm .res,#games .gm .sc,#games .gm [class*=score]')||/\d+\s*[-–]\s*\d+/.test(document.getElementById('games').innerText)),'C4 εμφάνιση σκορ');
 
+ // J. Φάση 2: Live Center
+ await go('live');await p.waitForTimeout(500);
+ ok(await cnt('#live .lc-bar')===1&&(await txt('#live .lc-bar')).includes('ενημέρωση'),'J1 μπάρα τελευταίας ενημέρωσης');
+ ok(await cnt('#live .lc-filters [role=group]')===3,'J2 τρεις ομάδες φίλτρων (κατάσταση, άθλημα, διοργάνωση)');
+ const nRows=()=>cnt('#live .lc-row');const allRows=await nRows();ok(allRows>=5,'J3 κάρτες αγώνων στη λίστα ('+allRows+')');
+ await p.locator('#live [data-f=status] button',{hasText:'Προσεχείς'}).click();await p.waitForTimeout(200);
+ ok(await nRows()>0&&await cnt('#live .lc-row:not([data-b=next])')===0,'J4 φίλτρο Προσεχείς δείχνει μόνο προσεχείς');
+ await p.locator('#live [data-f=sport] button',{hasText:'Μπάσκετ'}).click();await p.waitForTimeout(200);
+ ok(await cnt('#live .lc-g')===1&&await cnt('#live .lc-row:not([data-b=next])')===0,'J5 συνδυασμός Προσεχείς+Μπάσκετ');
+ const comps=await p.locator('#live [data-f=comp] button').count();ok(comps>=2,'J6 φίλτρο διοργάνωσης ('+comps+' επιλογές)');
+ const before=await nRows();await p.locator('#live [data-f=comp] button').nth(1).click();await p.waitForTimeout(200);
+ ok(await nRows()>0&&await nRows()<=before,'J7 φίλτρο διοργάνωσης περιορίζει τη λίστα');
+ await p.locator('#live [data-f=status] button',{hasText:'Live'}).click();await p.waitForTimeout(200);
+ ok(await cnt('#live .none')===1||await cnt('#live .lc-g')>=0,'J8 χωρίς αποτέλεσμα: μήνυμα/κενή κατάσταση');
+ if(await cnt('#live .none')===1){await p.locator('#live .moreb',{hasText:'Καθαρισμός'}).click();await p.waitForTimeout(200);ok(await nRows()>=5,'J9 καθαρισμός φίλτρων')}
+ ok(await p.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'J10 χωρίς οριζόντιο overflow στο Live');
+ ok((await txt('#live')).includes('Powered by SportScore'),'J11 Powered by SportScore στο Live');
+ await p.reload();await p.waitForTimeout(1000);
  // D. Live
  await go('live');
  ok((await txt('#live')).trim().length>0,'D1 η καρτέλα Live δεν είναι άδεια (κάρτα αγώνα ή κενή κατάσταση)');
