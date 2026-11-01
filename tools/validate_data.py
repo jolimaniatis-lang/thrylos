@@ -64,6 +64,8 @@ def check(rel, d):
             for k, t in fields.items():
                 if k not in o: w.append(f"{rel}: {lk}[{i}] λείπει '{k}'")
                 elif not isinstance(o[k], t): w.append(f"{rel}: {lk}[{i}].{k} δεν είναι {_tn(t)}")
+            if "gender" in o and o["gender"] not in ("m", "w"):
+                w.append(f"{rel}: {lk}[{i}].gender='{o['gender']}' (επιτρέπεται μόνο 'm' ή 'w')")
             if len(w) > 40: w.append(f"{rel}: … (περισσότερες προειδοποιήσεις)"); return w
     return w
 

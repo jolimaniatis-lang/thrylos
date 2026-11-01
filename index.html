@@ -791,12 +791,12 @@ function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMo
 function renderGames(){
   const box=$("#games");box.replaceChildren();
   if(!season){const e=el("div","empty");e.append(el("b",null,"Το ημερολόγιο φορτώνει"),el("p",null,"Όλοι οι αγώνες της σεζόν, σε όλα τα τμήματα."));box.append(e);return}
-  const all=(season.matches||[]).filter(x=>gfilter==="all"||SP(x.sport)===SP(gfilter)).filter(x=>ggender==="all"||(TEAM_BY[classifyTeam(x.sport,x.comp).id]||{}).g===ggender);
+  const all=(season.matches||[]).filter(x=>gfilter==="all"||SP(x.sport)===SP(gfilter)).filter(x=>ggender==="all"||(TEAM_BY[classifyTeam(x.sport,x.comp,x.gender).id]||{}).g===ggender);
   const played=all.filter(x=>x.score);
   const tg=el("div","toggle");[["next","Επόμενοι"],["past","Αποτελέσματα"]].forEach(([k,l])=>{const b=el("button",null,l);b.type="button";b.dataset.m=k;b.setAttribute("aria-pressed",k===gmode?"true":"false");tg.append(b)});
   tg.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;gmode=b.dataset.m;renderGames()});box.append(tg);
   {const gg=el("div","gg");gg.setAttribute("role","group");gg.setAttribute("aria-label","Ομάδα");[["all","Ανδρών & γυναικών"],["m","Ανδρών"],["w","Γυναικών"]].forEach(([k,l])=>{const b=el("button","tab",l);b.type="button";b.dataset.gg=k;b.setAttribute("aria-pressed",String(k===ggender));b.onclick=()=>{ggender=k;renderGames()};gg.append(b)});box.append(gg)}
-  if(ggender!=="all"){const hid=(season.matches||[]).filter(x=>(gfilter==="all"||SP(x.sport)===SP(gfilter))&&!classifyTeam(x.sport,x.comp).id).length;
+  if(ggender!=="all"){const hid=(season.matches||[]).filter(x=>(gfilter==="all"||SP(x.sport)===SP(gfilter))&&!classifyTeam(x.sport,x.comp,x.gender).id).length;
     if(hid){const nt=el("div","un-note");nt.append(hid+(hid===1?" αγώνας δεν περιλαμβάνεται":" αγώνες δεν περιλαμβάνονται")+" (δεν έχει επιβεβαιωθεί η ομάδα). ");const bb=el("button","moreb","Δες όλους");bb.type="button";bb.onclick=()=>{ggender="all";renderGames()};nt.append(bb);box.append(nt)}}
   const t=todayStr();
   let list=gmode==="next"?all.filter(x=>!x.score&&x.d>=t):all.filter(x=>x.score).slice().reverse();
@@ -808,7 +808,7 @@ function renderGames(){
     const row=el("div","gm"+(x.d===t?" today":""));
     const gd=el("div","gd");gd.append(el("b",null,String(dt.getDate())),el("small",null,WD[dt.getDay()]));
     const mid=el("div","gmid");const op=el("div","gopp");op.className="gopp";op.append(el("span","ha"+(x.home?" h":""),x.home?"ΕΝΤΟΣ":"ΕΚΤΟΣ"),crest(x.opp,"sm",x.sport),x.opp);if(x.d===t)op.append(el("span","tag-today","ΣΗΜΕΡΑ"));
-    const cp=el("div","gcomp");cp.append(ic(x.sport,x.comp),el("span",null,x.comp));if(!classifyTeam(x.sport,x.comp).id)cp.append(el("span","un-tag","⚠ Δεν έχει επιβεβαιωθεί η ομάδα"));mid.append(op,cp);if(x.note)mid.append(el("div","gnote",x.note));
+    const cp=el("div","gcomp");cp.append(ic(x.sport,x.comp),el("span",null,x.comp));if(!classifyTeam(x.sport,x.comp,x.gender).id)cp.append(el("span","un-tag","⚠ Δεν έχει επιβεβαιωθεί η ομάδα"));mid.append(op,cp);if(x.note)mid.append(el("div","gnote",x.note));
     const r=el("div","gr");
     if(x.score){r.append(el("span","score "+x.res,x.score))}else{r.append(el("span","gtime",x.t||"—"));if(x.tv)r.append(el("span","gtv",x.tv))}
     row.append(gd,mid,r);row.tabIndex=0;row.setAttribute("role","button");row.setAttribute("aria-expanded","false");
@@ -925,7 +925,7 @@ function nrm(x){return String(x||"").toLowerCase().normalize("NFD").replace(/[̀
 const KNOWN_M={football:/(super league|europa league|champions league|conference league|κυπελλο|ποδοσφαιρο)/,
   basketball:/(euroleague|basket league|basketball champions league|κυπελλο)/,
   handball:/handball premier/};
-function classifyTeam(sport,text){
+function classifyText(sport,text){
   const n=nrm(text),w=/γυναικ/.test(n),m=/ανδρ/.test(n);
   if(w&&m)return {id:null,why:"αναφέρονται και «ανδρών» και «γυναικών»"};
   let disc=sport==="football"||sport==="basketball"||sport==="polo"?sport:null;
@@ -936,7 +936,16 @@ function classifyTeam(sport,text){
   if(w)return {id:disc+"-w",rule:"ρητό «γυναικών»"};
   if(m)return {id:disc+"-m",rule:"ρητό «ανδρών»"};
   if(KNOWN_M[disc]&&KNOWN_M[disc].test(n))return {id:disc+"-m",rule:"γνωστή διοργάνωση ανδρών"};
-  return {id:null,why:"η διοργάνωση δεν δηλώνει φύλο και δεν είναι στη λίστα γνωστών"}}
+  return {id:null,why:"η διοργάνωση δεν δηλώνει φύλο και δεν είναι στη λίστα γνωστών",disc:disc,nogender:true}}
+/* Φάση 3Β: προαιρετικό πεδίο gender ("m"|"w") στον αγώνα. Προτιμάται όταν υπάρχει· αλλιώς ισχύει η ταξινόμηση κειμένου.
+   Αντίφαση πεδίου–κειμένου, ή άκυρη τιμή, ή άγνωστο άθλημα → ΔΕΝ αποδίδεται σε ομάδα (id:null). */
+function classifyTeam(sport,text,gender){
+  const r=classifyText(sport,text);
+  if(gender===undefined||gender===null||gender==="")return r;
+  if(gender!=="m"&&gender!=="w")return {id:null,why:"άκυρη τιμή στο πεδίο gender"};
+  if(r.id){if(TEAM_BY[r.id].g!==gender)return {id:null,why:"αντίφαση: το πεδίο gender δεν συμφωνεί με τον τίτλο διοργάνωσης"};return {id:r.id,rule:"πεδίο gender (συμφωνεί με τον τίτλο)"}}
+  if(r.nogender&&r.disc)return {id:r.disc+"-"+gender,rule:"πεδίο gender"};
+  return r}
 
 function liveCardOf(m){
     const c=el("section","lv");const h=el("div","lv-h");h.append(ic(m.sport,m.comp),el("span",null,m.comp||""));
@@ -1000,12 +1009,12 @@ function compKey(c,sport){const parts=String(c||"").split(" · ").map(x=>x.trim(
   return parts[0]||"Άλλο"}
 function seasonToItem(m){const done=!!m.score||!!m.res||(!!m.d&&m.d<todayStr());let oS=null,pS=null;
   if(done){const pr=String(m.score).split("-");if(pr.length===2){oS=m.home===false?pr[1]:pr[0];pS=m.home===false?pr[0]:pr[1]}}
-  const cl=classifyTeam(m.sport,m.comp);
+  const cl=classifyTeam(m.sport,m.comp,m.gender);
   return {src:"season",m,sport:m.sport,comp:m.comp||"",d:m.d,t:m.t||"",opp:m.opp,home:m.home!==false,bucket:done?"done":"next",olyS:oS,oppS:pS,status:done?"ft":"pre",key:m.d+"|"+m.opp,team:cl.id,gender:cl.id?TEAM_BY[cl.id].g:null,cwhy:cl.why||""}}
 /* όλοι οι αγώνες: live/now (προτεραιότητα) + ολόκληρο το ημερολόγιο, χωρίς διπλότυπα */
 function allItems(){
   const out=[];const lv=((live&&live.matches)||[]).map(m=>EL[m.id]?Object.assign({},m,EL[m.id]):m);
-  lv.forEach(m=>{const cf=isLiveConfirmed(m),stale=(m.status==="live"||m.status==="ht")&&!cf;const cl=classifyTeam(m.sport,m.comp||"");
+  lv.forEach(m=>{const cf=isLiveConfirmed(m),stale=(m.status==="live"||m.status==="ht")&&!cf;const cl=classifyTeam(m.sport,m.comp||"",m.gender);
     out.push({src:"live",m,sport:m.sport,comp:m.comp||"",d:m.d,t:m.kickoff||"",opp:m.opp,home:m.home!==false,
       bucket:cf?"live":stale?"stale":m.status==="ft"?"done":"next",olyS:m.olyScore,oppS:m.oppScore,status:m.status,key:m.id,team:cl.id,gender:cl.id?TEAM_BY[cl.id].g:null,cwhy:cl.why||""})});
   const seen=out.map(o=>o.d+"|"+nrm(o.opp));

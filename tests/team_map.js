@@ -16,6 +16,19 @@ const KNOWN=[
  ['polo','Champions League · Όμιλος','null'],
  ['amateur','Χάντμπολ · Handball Premier 7η αγων.','handball-m'],['amateur','Χάντμπολ · EHF European Cup (32)','null'],['amateur','Χάντμπολ γυναικών · Α1','handball-w'],['amateur','Χάντμπολ ανδρών · EHF European League','handball-m'],
  ['amateur','Νέο τμήμα','null'],['amateur','Βόλεϊ ανδρών και γυναικών · Φιλικό','null'],['football','Βόλεϊ ανδρών · Volley League','null'],['polo','Μπάσκετ γυναικών · Α1','null']];
+
+// Φάση 3Β: προαιρετικό πεδίο gender — [sport, τίτλος, gender, αναμενόμενη ομάδα]
+const GCASES=[
+ ['polo','Champions League · Όμιλος','m','polo-m'],['polo','Champions League · Όμιλος','w','polo-w'],['polo','Champions League · Όμιλος',undefined,'null'],
+ ['amateur','Χάντμπολ · EHF European Cup (32)','m','handball-m'],['amateur','Χάντμπολ · EHF European Cup (32)','w','handball-w'],['amateur','Χάντμπολ · EHF European Cup (32)','','null'],
+ ['polo','Πόλο ανδρών · Waterpolo League 6η αγων.','m','polo-m'],['polo','Πόλο ανδρών · Waterpolo League 6η αγων.','w','null'],   // αντίφαση → όχι σε ομάδα
+ ['polo','Πόλο γυναικών · Champions League 1η αγων.','m','null'],['polo','Πόλο γυναικών · Champions League 1η αγων.','w','polo-w'],
+ ['football','Super League · 9η αγων.','w','null'],['football','Super League · 9η αγων.','m','football-m'],['football','Super League · 9η αγων.',undefined,'football-m'],
+ ['basketball','Euroleague · 10η αγων.','x','null'],['basketball','Euroleague · 10η αγων.','M','null'],   // άκυρη τιμή
+ ['amateur','Νέο τμήμα','m','null'],                                                    // άγνωστο άθλημα: το πεδίο δεν το σώζει
+ ['amateur','Βόλεϊ ανδρών και γυναικών · Φιλικό','m','null'],                           // αντιφατικός τίτλος: το πεδίο δεν τον σώζει
+ ['football','Βόλεϊ ανδρών · Volley League','m','null'],                                // λάθος άθλημα
+ ['amateur','Βόλεϊ · Κάποιο τουρνουά','w','volleyball-w'],['amateur','Βόλεϊ · Κάποιο τουρνουά','m','volleyball-m']];
 const TABLES=[['Super League · μετά την 9η αγωνιστική (Ολυμπιακός)','football','football-m'],['Europa League · League Phase · μετά την 3η αγωνιστική','football','football-m'],['Euroleague · μετά την 9η αγωνιστική','basketball','basketball-m'],['Basket League · μετά την 4η αγωνιστική','basketball','basketball-m'],
  ['Champions League πόλο ανδρών · Όμιλος Α','polo','polo-m'],['Handball Premier · κορυφή (μετά την 7η αγων.)','amateur','handball-m'],['Σκόρερ Ολυμπιακού (ποδόσφαιρο)','football','football-m'],['Μέσοι όροι Ολυμπιακού (Basket League)','basketball','basketball-m'],['Σκόρερ πόλο ανδρών (Champions League)','polo','polo-m']];
 (async()=>{await new Promise(r=>srv.listen(0,r));const port=srv.address().port;const b=await chromium.launch();let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}};let n=0;
@@ -30,6 +43,15 @@ for(const t of [...stand,...sc]){n++;const g=await cls(t.sport,t.title);const x=
  if(g!=='null'){if(/γυναικ/i.test(t.title))ok(g.endsWith('-w'),'πίνακας με «γυναικών» σε ομάδα ανδρών: '+t.title);if(/ανδρ/i.test(t.title))ok(g.endsWith('-m'),'πίνακας με «ανδρών» σε ομάδα γυναικών: '+t.title)}
  else console.log('  ΜΗ ΤΑΞΙΝΟΜΗΜΕΝΟΣ ΠΙΝΑΚΑΣ:',t.title)}
 // όλοι οι αγώνες του ημερολογίου
+
+for(const [sp,t,g,e] of GCASES){n++;const r=await p.evaluate(([s,t,g])=>classifyTeam(s,t,g).id||'null',[sp,t,g]);ok(r===e,'gender «'+t+'» ('+sp+', '+JSON.stringify(g)+'): '+r+' αντί '+e)}
+// seasonToItem: το πεδίο φτάνει στο στοιχείο· χωρίς πεδίο = προηγούμενη συμπεριφορά
+for(const [m,e] of [[{sport:'polo',comp:'Champions League · Όμιλος',opp:'Χ',d:'2026-12-01',home:true,gender:'m'},'polo-m'],[{sport:'polo',comp:'Champions League · Όμιλος',opp:'Χ',d:'2026-12-01',home:true},'null'],[{sport:'polo',comp:'Πόλο ανδρών · Waterpolo League',opp:'Χ',d:'2026-12-01',home:true,gender:'w'},'null']]){n++;
+ const r=await p.evaluate(m=>seasonToItem(m).team||'null',m);ok(r===e,'seasonToItem '+m.comp+' gender='+m.gender+': '+r+' αντί '+e)}
+// όλοι οι αγώνες του repo: η προτεινόμενη τιμή (tools/gender_preview.js) ταξινομεί ΧΩΡΙΣ αντίφαση και χωρίς αμφιβολία
+{const {spawnSync}=require('child_process');const pv=spawnSync('node',[path.join(root,'tools/gender_preview.js'),path.join(root,'data/schedule/season.json'),'/tmp/gp.json'],{encoding:'utf8'});n++;
+ let j={};try{j=JSON.parse(pv.stdout)}catch(e){}ok(pv.status===0&&j.total===J("data/schedule/season.json").matches.length&&j.contradictions===0&&j.unclassified===0,'gender_preview: '+pv.stdout);
+ const pr=JSON.parse(fs.readFileSync('/tmp/gp.json','utf8'));for(const o of pr){n++;const r=await p.evaluate(([s,c,g])=>classifyTeam(s,c,g).id||'null',[o.sport,o.comp,o.proposed]);ok(r===o.team&&r!=='null','προτεινόμενο gender '+o.proposed+' για '+o.d+' '+o.opp+': '+r)}}
 const ms=J('data/schedule/season.json').matches;const un=[];const byTeam={};
 for(const m of ms){n++;const g=await cls(m.sport,m.comp);
  if(g==='null'){un.push(m);continue}
