@@ -1156,6 +1156,7 @@ function render(){
   if((cur.sources||[]).length){const s4=el("section");const h4=el("div","sec-h");h4.append(el("h2",null,"Πηγές ("+cur.sources.length+")"));const d=el("div","chips");d.hidden=true;h4.style.cursor="pointer";h4.tabIndex=0;h4.setAttribute("role","button");h4.setAttribute("aria-expanded","false");const tgS=()=>{d.hidden=!d.hidden;h4.setAttribute("aria-expanded",d.hidden?"false":"true")};h4.onclick=tgS;h4.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tgS()}});
     cur.sources.forEach(x=>{const a=el("a",null,x.title);a.href=x.url;a.target="_blank";a.rel="noopener";d.append(a)});s4.append(h4,d);app.append(s4)}
   app.append(el("p","foot","Νέα έκδοση κάθε πρωί στις 10:00"));
+  {const p=el("p","foot","Σκορ ποδοσφαίρου/μπάσκετ: ");const a=el("a",null,"Powered by SportScore");a.href="https://sportscore.com";a.target="_blank";a.rel="noopener";p.append(a);app.append(p)}
 }
 function fillSelect(){const s=$("#edition");s.replaceChildren();editions.slice(0,14).forEach((e,i)=>{const o=el("option",null,(i===0?"Σήμερα · ":"")+fmtDate(e.date));o.value=e.date;s.append(o)});if(cur)s.value=cur.date}
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;
