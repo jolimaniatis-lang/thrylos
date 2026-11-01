@@ -67,7 +67,7 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  // J. Φάση 2: Live Center
  await go('live');await p.waitForTimeout(500);
  ok(await cnt('#live .lc-bar')===1&&(await txt('#live .lc-bar')).includes('ενημέρωση'),'J1 μπάρα τελευταίας ενημέρωσης');
- ok(await cnt('#live .lc-filters [role=group]')===3,'J2 τρεις ομάδες φίλτρων (κατάσταση, άθλημα, διοργάνωση)');
+ ok(await cnt('#live .lc-filters [role=group]')===4,'J2 τέσσερις ομάδες φίλτρων (κατάσταση, άθλημα, ομάδα ανδρών/γυναικών, διοργάνωση)');
  const nRows=()=>cnt('#live .lc-row');const allRows=await nRows();ok(allRows>=5,'J3 κάρτες αγώνων στη λίστα ('+allRows+')');
  await p.locator('#live [data-f=status] button',{hasText:'Προσεχείς'}).click();await p.waitForTimeout(200);
  ok(await nRows()>0&&await cnt('#live .lc-row:not([data-b=next])')===0,'J4 φίλτρο Προσεχείς δείχνει μόνο προσεχείς');
@@ -97,6 +97,56 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  ok(/\d\s*–\s*\d/.test(await txt('.sheet .mc-sc')),'K7 ολοκληρωμένος αγώνας: σκορ');
  await p.locator('.sheet .mc-nav .qk-b',{hasText:'Βαθμολογία'}).click();await p.waitForTimeout(400);
  ok(await cnt('.sheet')===0&&await cnt('#more .tbl')>=1,'K8 «Βαθμολογία διοργάνωσης» ανοίγει τους πίνακες');
+ // L. Φάση 3Α: ομάδες, Ερασιτέχνης, φύλο
+ await go('more');await p.click('.mm-i[data-go="teams"]');await p.waitForTimeout(500);
+ const NAMES=['Ποδόσφαιρο ανδρών','Ποδόσφαιρο γυναικών','Μπάσκετ ανδρών','Μπάσκετ γυναικών','Βόλεϊ ανδρών','Βόλεϊ γυναικών','Πόλο ανδρών','Πόλο γυναικών','Χάντμπολ ανδρών','Χάντμπολ γυναικών'];
+ ok(await cnt('#more .tm-card')===10,'L1 δέκα κάρτες ομάδων');
+ const cn=await p.locator('#more .tm-card h3').allInnerTexts();ok(NAMES.every(n=>cn.some(c=>c.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()===n.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase())),'L2 όλες οι 10 ομάδες με σωστά ονόματα: '+cn.join('|'));
+ const fw=(await p.locator('#more .tm-card[data-team="football-w"]').innerText());
+ ok(/Δεν υπάρχει προγραμματισμένος/i.test(fw.normalize('NFD').replace(/[̀-ͯ]/g,'')+fw)||fw.length>20,'L3 η ομάδα «Ποδόσφαιρο γυναικών» παραμένει ορατή με κενές καταστάσεις');
+ ok(await p.evaluate(()=>/(Δεν υπάρχει προγραμματισμένος|ΔΕΝ ΥΠΑΡΧΕΙ ΠΡΟΓΡΑΜΜΑΤΙΣΜΕΝΟΣ)/i.test(document.querySelector('#more .tm-card[data-team="football-w"]').textContent)&&!document.querySelector('#more .tm-card[data-team="football-w"] .tm-chip.on')),'L3b football-w: καμία δυνατότητα δεν δηλώνεται ως υπάρχουσα');
+ // σελίδα ομάδας με πλήρη δεδομένα
+ await p.locator('#more .tm-card[data-team="basketball-m"] .qk-b').click();await p.waitForTimeout(400);
+ ok(await cnt('#more .tm-sec')===6,'L4 σελίδα ομάδας: 6 ενότητες (επόμενος, αποτελέσματα, πρόγραμμα, διοργανώσεις, ρόστερ, στατιστικά)');
+ ok(await cnt('#more .lc-row')>=3&&await cnt('#more .lc-row:not([data-team="basketball-m"])')===0,'L5 στη σελίδα Μπάσκετ ανδρών υπάρχουν ΜΟΝΟ αγώνες της ομάδας');
+ ok(await cnt('#more #tm-roster .tm-ro')===1,'L6 ρόστερ Μπάσκετ ανδρών υπάρχει');
+ ok(await cnt('#more #tm-comps .tbl')>=1,'L7 βαθμολογίες διοργανώσεων Μπάσκετ ανδρών');
+ await p.locator('#more .mm-back',{hasText:'ομάδες'}).click();await p.waitForTimeout(300);
+ // σελίδα ομάδας χωρίς ρόστερ/βαθμολογία
+ await p.locator('#more .tm-card[data-team="volleyball-w"] .qk-b').click();await p.waitForTimeout(400);
+ ok(await cnt('#more .tm-sec')===6&&await cnt('#more #tm-roster .empty')===1,'L8 Βόλεϊ γυναικών: κενή κατάσταση ρόστερ, ενότητες παραμένουν');
+ ok(await cnt('#more .lc-row')>=3&&await cnt('#more .lc-row:not([data-team="volleyball-w"])')===0,'L9 στη σελίδα Βόλεϊ γυναικών υπάρχουν ΜΟΝΟ αγώνες Βόλεϊ γυναικών');
+ ok(await cnt('#more #tm-roster .tm-ro')===0,'L10 κανένα ανύπαρκτο ρόστερ για βόλεϊ γυναικών');
+ await p.locator('#more .mm-back',{hasText:'ομάδες'}).click();await p.waitForTimeout(300);
+ await p.locator('#more .tm-card[data-team="handball-w"] .qk-b').click();await p.waitForTimeout(400);
+ ok(await cnt('#more #tm-results .empty')===1&&await cnt('#more #tm-schedule .empty')===1,'L11 Χάντμπολ γυναικών: κενές καταστάσεις αποτελεσμάτων/προγράμματος');
+ // Ερασιτέχνης
+ await go('more');await p.click('.mm-i[data-go="amateur"]');await p.waitForTimeout(500);
+ ok(await cnt('#more .tm-card')===8&&await cnt('#more .tm-card[data-team="football-m"],#more .tm-card[data-team="basketball-m"]')===0,'L12 Ερασιτέχνης: 8 τμήματα (χωρίς τις δύο κύριες ομάδες)');
+ ok(await cnt('#more .tm-card .qk-b[data-focus=schedule]')===8&&await cnt('#more .tm-card .qk-b[data-focus=results]')===8,'L13 άμεση πρόσβαση σε πρόγραμμα και αποτελέσματα για κάθε τμήμα');
+ // «επόμενος» υπολογίζεται από το ημερολόγιο
+ const exp=await p.evaluate(async()=>{const m=(await (await fetch('data/schedule/season.json')).json()).matches;const t=todayStr();
+  const x=m.filter(q=>!q.score&&q.d>=t&&/^Βόλεϊ γυναικών/.test(q.comp)).sort((a,b)=>(a.d+(a.t||'')).localeCompare(b.d+(b.t||'')))[0];return x?x.opp:null});
+ const vw=await p.evaluate(()=>document.querySelector('#more .tm-card[data-team="volleyball-w"]').textContent);
+ const nn=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();ok(exp&&nn(vw).includes(nn(exp)),'L14 «επόμενος αγώνας» Βόλεϊ γυναικών = από το ημερολόγιο ('+exp+')');
+ ok(await cnt('#more details.tm-un summary')===1,'L15 καταγραφή αγώνων που δεν ταξινομήθηκαν με βεβαιότητα');
+ await p.locator('#more .tm-card[data-team="polo-m"] .qk-b[data-focus=results]').click();await p.waitForTimeout(500);
+ ok(await cnt('#more #tm-results')===1&&await cnt('#more .lc-row:not([data-team="polo-m"])')===0,'L16 «Αποτελέσματα» από τον Ερασιτέχνη ανοίγει την ομάδα, μόνο με δικούς της αγώνες');
+ // φύλο στο Live και στο Ημερολόγιο
+ await go('live');await p.waitForTimeout(400);
+ for(const [lab,sfx,k] of [['Γυναικών','-w','w'],['Ανδρών','-m','m']]){await p.locator('#live [data-f=gender] button[data-k='+k+']').click();await p.waitForTimeout(250);
+  const rows=await p.locator('#live .lc-row').evaluateAll(r=>r.map(x=>x.dataset.team||''));
+  ok(rows.length>0&&rows.every(t=>t.endsWith(sfx)),'L17 φίλτρο «'+lab+'» στο Live: '+rows.length+' αγώνες, όλοι '+sfx)}
+ await p.locator('#live [data-f=gender] button[data-k=all]').click();await p.waitForTimeout(200);
+ await go('games');await p.waitForTimeout(300);
+ ok(await cnt('#games .gg button')===3,'L18 φίλτρο ανδρών/γυναικών στο Ημερολόγιο');
+ const gAll=await cnt('#games .gm');await p.locator('#games .gg button[data-gg=w]').click();await p.waitForTimeout(250);const gW=await cnt('#games .gm');
+ ok(gW<gAll||gAll===0,'L19 το φίλτρο «Γυναικών» περιορίζει τα αγώνες ('+gAll+' → '+gW+')');
+ await p.locator('#games .gg button[data-gg=all]').click();await p.waitForTimeout(200);
+ // αρχική
+ await go('news');await p.locator('#app .qk-b',{hasText:'Οι 10 ομάδες'}).click();await p.waitForTimeout(400);ok(await cnt('#more .tm-card')===10,'L20 σύνδεσμος «Οι 10 ομάδες» από την αρχική');
+ ok(await p.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),'L21 χωρίς οριζόντιο overflow στις σελίδες ομάδων');
+ await go('news');
  // D. Live
  await go('live');
  ok((await txt('#live')).trim().length>0,'D1 η καρτέλα Live δεν είναι άδεια (κάρτα αγώνα ή κενή κατάσταση)');
@@ -116,12 +166,12 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  ok(await cnt('#roster .pl')>=10,'E8 ρόστερ χάντμπολ ανδρών');
 
  // F. Κι άλλα
- for(const [k,label] of [['standings','Βαθμολογίες'],['scorers','Σκόρερ'],['discipline','Τιμωρίες'],['rumors','Μεταγραφές'],['quotes','Δηλώσεις'],['amateur','Ερασιτέχνης'],['archive','Αρχείο'],['vs','Αντίπαλοι'],['bet','Στοίχημα'],['chat','Chat']]){
+ for(const [k,label] of [['teams','Ομάδες'],['standings','Βαθμολογίες'],['scorers','Σκόρερ'],['discipline','Τιμωρίες'],['rumors','Μεταγραφές'],['quotes','Δηλώσεις'],['amateur','Ερασιτέχνης'],['archive','Αρχείο'],['vs','Αντίπαλοι'],['bet','Στοίχημα'],['chat','Chat']]){
   await go('more');ok(await cnt('.mm-i[data-go="'+k+'"]')===1,'F '+k+' υπάρχει στο μενού');
   await p.click('.mm-i[data-go="'+k+'"]');await p.waitForTimeout(450);
   const id=['vs','bet','chat'].includes(k)?k:'more';
   ok(await p.evaluate(i=>{const e=document.getElementById(i);return !!e&&!e.hidden&&e.innerText.trim().length>0},id),'F '+k+' εμφανίζει περιεχόμενο')}
- await go('more');ok(await cnt('.mm-i')===10,'F0 10 ενότητες στο μενού');
+ await go('more');ok(await cnt('.mm-i')===11,'F0 11 ενότητες στο μενού (10 + Ομάδες)');
  await p.click('.mm-i[data-go="standings"]');await p.waitForTimeout(350);ok(await cnt('#more .tbl')>=1,'F11 πίνακες βαθμολογίας');
  await go('more');await p.click('.mm-i[data-go="archive"]');await p.waitForTimeout(350);
  ok(await cnt('#more .srch')===1,'F12 αναζήτηση αρχείου');

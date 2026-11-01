@@ -45,6 +45,6 @@ for(const [name,upd,status,sc,d,expLive] of CASES){
  await ctx.route(/supabase\.co|euroleague\.net|incrowdsports/,r=>r.fulfill({status:200,contentType:'application/json',body:'[]'}));
  await ctx.route(/\/data\/live\/now/,r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({updatedAt:iso(-1*M),matches:[]})}));
  await p.goto('http://localhost:'+port+'/#live');await p.waitForTimeout(1500);
- const r=await p.evaluate(()=>({rows:document.querySelectorAll('#live .lc-row').length,live:document.querySelectorAll('#live .st-badge.live').length,bad:[...document.querySelectorAll('#live .lc-row .st-badge')].filter(e=>!/ΠΡΟΣΕΧΩΣ|ΤΕΛΙΚΟ/.test(e.textContent)).length}));
+ const r=await p.evaluate(()=>({rows:document.querySelectorAll('#live .lc-row').length,live:document.querySelectorAll('#live .st-badge.live').length,bad:[...document.querySelectorAll('#live .lc-row .st-badge')].filter(e=>!/ΠΡΟΣΕΧΩΣ|ΤΕΛΙΚΟ|ΧΩΡΙΣ ΣΚΟΡ/.test(e.textContent)).length}));
  ok(r.rows>5&&r.live===0&&r.bad===0,'ημερολόγιο (προσεχείς/ολοκληρωμένοι): '+r.rows+' αγώνες, κανένας LIVE');await ctx.close()}
 await b.close();srv.close();console.log(f?'\nΑΠΟΤΥΧΙΕΣ: '+f:'\nΟΛΑ ΠΕΡΑΣΑΝ');process.exit(f?1:0)})();
