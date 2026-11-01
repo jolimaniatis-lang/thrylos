@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');const http=require('http');const fs=require('fs');const path=require('path');
 const root=path.join(__dirname,'..');const mime={'.html':'text/html','.js':'text/javascript','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.webmanifest':'application/manifest+json'};
 const srv=http.createServer((q,r)=>{let p=decodeURIComponent(q.url.split('?')[0]);if(p.endsWith('/'))p+='index.html';const f=path.join(root,p);fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'Content-Type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})});
-const VIEWS=['news','games','live','roster'];const MENU_VIEWS=['vs','bet','chat'];const MT=['standings','scorers','discipline','rumors','quotes','amateur','archive'];const SIZES=[[360,780],[390,844],[430,932],[1280,800]];
+const VIEWS=['news','games','live','roster'];const MENU_VIEWS=['vs','bet','chat'];const MT=['teams','standings','scorers','discipline','rumors','quotes','amateur','archive'];const SIZES=[[360,780],[390,844],[430,932],[1280,800]];
 let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log('  FAIL',m)}};
 (async()=>{await new Promise(r=>srv.listen(0,r));const port=srv.address().port;const b=await chromium.launch();
 for(const [w,h] of SIZES){console.log('== '+w+'px');const ctx=await b.newContext({viewport:{width:w,height:h}});const p=await ctx.newPage();const errs=[];
@@ -19,9 +19,9 @@ for(const [w,h] of SIZES){console.log('== '+w+'px');const ctx=await b.newContext
  for(const g of MENU_VIEWS){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(300);ok(await p.evaluate(()=>!document.getElementById('more').hidden&&!!document.querySelector('.mm-i')),'το μενού δεν άνοιξε');
   await p.click('.mm-i[data-go="'+g+'"]');await p.waitForTimeout(500);const st=await p.evaluate(v=>{const e=document.getElementById(v);return !!e&&!e.hidden&&e.innerText.trim().length},g);ok(st>0,'μενού→'+g+' άδεια/κρυμμένη');
   ok(await p.evaluate(()=>document.querySelector('.bar button[data-v="more"]').getAttribute('aria-current')==='page'),'το «Κι άλλα» δεν είναι ενεργό στο '+g);await ovf('menu→'+g)}
- for(const k of MT){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===10,'το μενού πρέπει να έχει 10 ενότητες');
+ for(const k of MT){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===11,'το μενού πρέπει να έχει 11 ενότητες (10 + Ομάδες)');
   await p.click('.mm-i[data-go="'+k+'"]');await p.waitForTimeout(350);ok(await p.evaluate(()=>!document.getElementById('more').hidden&&!!document.querySelector('.mm-back')),'περιεχόμενο '+k+' / κουμπί πίσω');ok(await p.evaluate(()=>document.getElementById('more').innerText.length>20),'άδειο '+k);ok(await p.evaluate(k=>localStorage.getItem('thr_m')===k,k),'thr_m '+k);await ovf('more '+k)}
- await p.click('.mm-back');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===10,'το «‹ Κι άλλα» δεν επέστρεψε στο μενού');
+ await p.click('.mm-back');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===11,'το «‹ Κι άλλα» δεν επέστρεψε στο μενού');
  // roster + player sheet
  await p.click('.bar button[data-v="roster"]');await p.waitForTimeout(400);const pl=p.locator('#roster .pl').first();
  if(await pl.count()){await pl.click();await p.waitForTimeout(300);ok(await p.locator('.sheet').count()===1,'φύλλο παίκτη');await ovf('player sheet');await p.keyboard.press('Escape');ok(await p.locator('.sheet').count()===0,'το φύλλο δεν έκλεισε')}else ok(false,'ρόστερ χωρίς παίκτες');
