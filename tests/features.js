@@ -41,6 +41,21 @@ for(const [w,h] of SIZES){console.log('== features '+w+'px');
  await p.locator('#tabs button',{hasText:'Όλα'}).first().click();await p.waitForTimeout(250);
  ok((await txt('#next')).length>0||await p.evaluate(()=>document.getElementById('next').hidden),'B10 κάρτα επόμενου αγώνα/live (#next)');
 
+ // I. Φάση 1: αρχική portal
+ await go('news');await p.waitForTimeout(600);
+ ok(await cnt('#app .lead .lead-t')===1,'I1 κεντρική είδηση');
+ ok(await cnt('#app .rs')>=3,'I2 πρόσφατα αποτελέσματα (κάρτες)');
+ ok(await p.evaluate(()=>[...document.querySelectorAll('#app .rs')].every(c=>/\d/.test(c.innerText))),'I3 κάθε αποτέλεσμα έχει σκορ');
+ ok(await cnt('#app .amx')===1,'I4 ενότητα Ερασιτέχνης');
+ ok(await cnt('#app .qk-b')>=6,'I5 γρήγορη πρόσβαση');
+ await p.locator('#tabs button',{hasText:'Μπάσκετ'}).first().click();await p.waitForTimeout(300);
+ ok(await cnt('#app .lead')===0&&await cnt('#app .amx')===0,'I6 με φίλτρο αθλήματος δεν εμφανίζονται τα τμήματα της αρχικής');
+ await p.locator('#tabs button',{hasText:'Όλα'}).first().click();await p.waitForTimeout(300);
+ if(process.env.SHOTS){await p.evaluate(()=>window.scrollTo(0,0));await p.screenshot({path:process.env.SHOTS+'/home-'+w+'.png',fullPage:true})}
+ await p.locator('#app .qk-b',{hasText:'Βαθμολογίες'}).click();await p.waitForTimeout(400);
+ ok(await cnt('#more .tbl')>=1,'I7 σύνδεσμος «Βαθμολογίες» ανοίγει πίνακες');
+ await go('news');
+
  // C. Αγώνες
  await go('games');
  ok(await cnt('#games .toggle button')===2,'C1 διακόπτης Επόμενοι/Αποτελέσματα');
