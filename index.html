@@ -963,7 +963,8 @@ function renderLive(){
   if(!nLive&&(lcS==="all"||lcS==="live")){const e=el("div","lc-empty");e.append(el("b",null,"Δεν παίζει κάποιος αγώνας αυτή τη στιγμή"),el("p",null,"Δες παρακάτω τα προσεχή και τα πρόσφατα αποτελέσματα· όταν ξεκινήσει αγώνας εμφανίζεται εδώ αυτόματα."));box.append(e)}
   if(!list.length){const e=el("div","none","Κανένας αγώνας με αυτά τα φίλτρα.");const rb=el("button","moreb","Καθαρισμός φίλτρων");rb.type="button";rb.onclick=()=>{lcS=lcSp=lcC="all";renderLive()};box.append(e,rb)}
   const order={live:0,stale:1,next:2,done:3};
-  [["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["amateur","Ερασιτέχνης"]].forEach(([k,title])=>{
+  const hasLive=k=>list.some(x=>lcNorm(x)===k&&(x.bucket==="live"||x.bucket==="stale"));
+  [["football","Ποδόσφαιρο"],["basketball","Μπάσκετ"],["amateur","Ερασιτέχνης"]].sort((p1,p2)=>(hasLive(p2[0])?1:0)-(hasLive(p1[0])?1:0)).forEach(([k,title])=>{
     const g=list.filter(x=>lcNorm(x)===k).sort((a,b)=>order[a.bucket]-order[b.bucket]||(a.bucket==="done"?(b.d+b.t).localeCompare(a.d+a.t):(a.d+a.t).localeCompare(b.d+b.t)));if(!g.length)return;
     const sec=el("section","lc-g");sec.style.setProperty("--acc",({football:"#E3263F",basketball:"#F28C28",amateur:"#2FA36B"})[k]);
     const h=el("div","grp-h");h.append(ic(k),el("h2",null,title),el("span","cnt",g.length+""));sec.append(h);
