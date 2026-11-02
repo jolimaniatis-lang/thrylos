@@ -716,6 +716,7 @@ main{padding-bottom:24px!important}
 #app>:first-child,#games>:first-child,#roster>:first-child{margin-top:0}
 #games>.month{break-inside:auto}
 #roster>div:not([class]){break-inside:auto}
+.rail.fxr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;margin-inline:0;padding-inline:0}.rail.fxr .fx{width:auto}
 #more:not([hidden]){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
 #live:not([hidden]){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
 #live>.lc-bar,#live>.lc-filters,#live>.lc-empty,#live>.foot{grid-column:1/-1}
@@ -1561,7 +1562,7 @@ function render(){
 
   const fx=(cur.fixtures||[]).filter(ok);
   if(fx.length){const s=el("section");const h=el("div","grp-h");h.append(el("h2",null,"Πρόγραμμα"),el("span","cnt",fx.length+""));
-    const r=el("div","rail");fx.forEach(f=>{const c=el("div","fx");const top=el("div","fx-top");top.append(ic(f.sport,f.comp+" "+f.match),el("div","fx-time",f.time||""));
+    const r=el("div","rail fxr");fx.forEach(f=>{const c=el("div","fx");const top=el("div","fx-top");top.append(ic(f.sport,f.comp+" "+f.match),el("div","fx-time",f.time||""));
       c.append(top,el("div","fx-day",f.day||""),el("div","fx-match",f.match),el("div","fx-meta",[f.comp,f.tv].filter(Boolean).join(" · ")));r.append(c)});
     s.append(h,r);app.append(s)}
 
