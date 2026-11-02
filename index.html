@@ -1352,18 +1352,20 @@ function renderAmateurHub(box){
     const L=el("div","tm-list");un.forEach(x=>L.append(mkMatchRow(x)));d.append(L)}
   box.append(d)}
 const GAL=16;
-function openPhoto(i){const o=el("div","lb");o.setAttribute("role","dialog");o.setAttribute("aria-label","Φωτογραφία");
-  const im=el("img");im.alt="";const n=String(i).padStart(2,"0");im.src="assets/gallery/"+n+".jpg";
+function openPhoto(i,url){const o=el("div","lb");o.setAttribute("role","dialog");o.setAttribute("aria-label","Φωτογραφία");
+  const im=el("img");im.alt="";const n=String(i).padStart(2,"0");im.src=url||"assets/gallery/"+n+".jpg";im.referrerPolicy="no-referrer";
   const x=el("button","lb-x","✕");x.type="button";x.setAttribute("aria-label","Κλείσιμο");
   const pv=el("button","lb-n lb-p","‹");pv.type="button";pv.setAttribute("aria-label","Προηγούμενη");const nx=el("button","lb-n lb-nx","›");nx.type="button";nx.setAttribute("aria-label","Επόμενη");
   const hint=el("div","lb-h","Πάτησε παρατεταμένα στην εικόνα για αποθήκευση");
-  const go=d=>{i=(i-1+d+GAL)%GAL+1;im.src="assets/gallery/"+String(i).padStart(2,"0")+".jpg"};
+  const go=d=>{if(url)return;i=(i-1+d+GAL)%GAL+1;im.src="assets/gallery/"+String(i).padStart(2,"0")+".jpg"};
   const close=()=>{o.remove();document.removeEventListener("keydown",key)};
   const key=e=>{if(e.key==="Escape")close();else if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1)};
   x.onclick=close;pv.onclick=()=>go(-1);nx.onclick=()=>go(1);o.addEventListener("click",e=>{if(e.target===o)close()});document.addEventListener("keydown",key);
   o.append(im,x,pv,nx,hint);document.body.append(o);x.focus()}
 function renderGallery(box){const g=el("div","gal");
   for(let i=1;i<=GAL;i++){const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Φωτογραφία "+i);const im=el("img");im.alt="";im.loading="lazy";im.src="assets/gallery/"+String(i).padStart(2,"0")+"t.jpg";b.append(im);b.addEventListener("click",()=>openPhoto(i));g.append(b)}
+  const B="https://www.olympiacosbc.gr/images/";const OF=["2024/wallpapers/2023/mobile/Thomas-Walkup.jpg","2024/wallpapers/2023/mobile/Space-Shaq.jpg","2024/wallpapers/2024/SashaVezenkov-SM.png","2024/wallpapers/2024/pantheon15.png"];
+  OF.forEach(u=>{const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Επίσημη ταπετσαρία");const im=el("img");im.alt="";im.loading="lazy";im.referrerPolicy="no-referrer";im.src=B+u;im.onerror=()=>b.remove();b.append(im);b.addEventListener("click",()=>openPhoto(0,B+u));g.append(b)});
   box.append(g);
   const ls=el("div","gal-l");[["Ταπετσαρίες μπάσκετ (επίσημο)","https://www.olympiacosbc.gr/el/we-are-olympiacos/wallpapers.html"],["Photostories ποδοσφαίρου (επίσημο)","https://www.olympiacos.org/"]].forEach(([t,u])=>{const x=el("a","gal-a",t+" ›");x.href=u;x.target="_blank";x.rel="noopener";ls.append(x)});box.append(ls)}
 function renderMore(){const box=$("#more");box.replaceChildren();
