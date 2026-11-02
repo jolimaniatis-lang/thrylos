@@ -1364,7 +1364,7 @@ function openPhoto(i,url){const o=el("div","lb");o.setAttribute("role","dialog")
   o.append(im,x,pv,nx,hint);document.body.append(o);x.focus()}
 function renderGallery(box){const g=el("div","gal");
   for(let i=1;i<=GAL;i++){const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Φωτογραφία "+i);const im=el("img");im.alt="";im.loading="lazy";im.src="assets/gallery/"+String(i).padStart(2,"0")+"t.jpg";b.append(im);b.addEventListener("click",()=>openPhoto(i));g.append(b)}
-  const B="https://www.olympiacosbc.gr/images/";const OF=["2024/wallpapers/2023/mobile/Thomas-Walkup.jpg","2024/wallpapers/2023/mobile/Space-Shaq.jpg","2024/wallpapers/2024/SashaVezenkov-SM.png","2024/wallpapers/2024/pantheon15.png"];
+  const B="https://www.olympiacosbc.gr/images/";const OF=["2024/wallpapers/2024/SashaVezenkov-SM.png","2024/wallpapers/2024/pantheon15.png"];
   OF.forEach(u=>{const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Επίσημη ταπετσαρία");const im=el("img");im.alt="";im.loading="lazy";im.referrerPolicy="no-referrer";im.src=B+u;im.onerror=()=>b.remove();b.append(im);b.addEventListener("click",()=>openPhoto(0,B+u));g.append(b)});
   box.append(g);
   const ls=el("div","gal-l");[["Ταπετσαρίες μπάσκετ (επίσημο)","https://www.olympiacosbc.gr/el/we-are-olympiacos/wallpapers.html"],["Photostories ποδοσφαίρου (επίσημο)","https://www.olympiacos.org/"]].forEach(([t,u])=>{const x=el("a","gal-a",t+" ›");x.href=u;x.target="_blank";x.rel="noopener";ls.append(x)});box.append(ls)}
