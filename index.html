@@ -116,6 +116,7 @@ svg{display:block}
 .msg video,.msg img{width:min(260px,64vw);object-fit:cover}
 .msg img{cursor:zoom-in}
 .chat-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:60px 0;color:var(--muted)}.chat-empty .big{font-size:42px}.chat-empty b{color:var(--ink)}
+.gal-l{display:flex;flex-direction:column;gap:8px;margin-top:14px}.gal-a{display:block;padding:14px 16px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);color:var(--red);font-weight:800;text-decoration:none}
 .lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:12px}.lb img{max-width:100%;max-height:100%;border-radius:8px}
 
 
@@ -1363,7 +1364,8 @@ function openPhoto(i){const o=el("div","lb");o.setAttribute("role","dialog");o.s
   o.append(im,x,pv,nx,hint);document.body.append(o);x.focus()}
 function renderGallery(box){const g=el("div","gal");
   for(let i=1;i<=GAL;i++){const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Φωτογραφία "+i);const im=el("img");im.alt="";im.loading="lazy";im.src="assets/gallery/"+String(i).padStart(2,"0")+"t.jpg";b.append(im);b.addEventListener("click",()=>openPhoto(i));g.append(b)}
-  box.append(g)}
+  box.append(g);
+  const ls=el("div","gal-l");[["Ταπετσαρίες μπάσκετ (επίσημο)","https://www.olympiacosbc.gr/el/we-are-olympiacos/wallpapers.html"],["Photostories ποδοσφαίρου (επίσημο)","https://www.olympiacos.org/"]].forEach(([t,u])=>{const x=el("a","gal-a",t+" ›");x.href=u;x.target="_blank";x.rel="noopener";ls.append(x)});box.append(ls)}
 function renderMore(){const box=$("#more");box.replaceChildren();
   if(mtab==="archive"){renderArchive(box);return}
   if(mtab==="gallery"){renderGallery(box);return}
