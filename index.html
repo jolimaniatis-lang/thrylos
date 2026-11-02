@@ -846,6 +846,35 @@ body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
 @media (max-width:480px){.hero .word .w1{flex-direction:column;align-items:flex-start;gap:5px}.hero .word i{border-left:0;padding:0;font-size:9.5px;letter-spacing:.42em;display:flex;align-items:center;gap:7px}.hero .word i::before{content:"";width:16px;height:1px;background:rgba(232,203,142,.7)}.hero .word span{display:none!important}.hero .word b{font-size:29px}}
 @media (max-width:360px){.hero .word b{font-size:25px}}
 @media (prefers-reduced-motion:reduce){.hero .crest::after{animation:none}}
+/* ===== LIQUID GLASS ===== */
+:root{--g-fill:linear-gradient(150deg,rgba(255,255,255,.78),rgba(255,255,255,.34) 55%,rgba(255,255,255,.5));
+ --g-rim:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.4),inset 1px 0 0 rgba(255,255,255,.55),inset -1px 0 0 rgba(255,255,255,.35),inset 0 0 14px rgba(255,255,255,.35);
+ --g-drop:0 8px 18px -8px rgba(60,20,30,.32),0 1px 2px rgba(60,20,30,.10);--g-bd:rgba(255,255,255,.7);
+ --g-red:linear-gradient(155deg,rgba(235,48,72,.92),rgba(150,12,32,.9));--g-blur:blur(16px) saturate(1.9)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g-fill:linear-gradient(150deg,rgba(255,255,255,.17),rgba(255,255,255,.05) 55%,rgba(255,255,255,.1));--g-rim:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(255,255,255,.08),inset 1px 0 0 rgba(255,255,255,.14),inset -1px 0 0 rgba(255,255,255,.08),inset 0 0 14px rgba(255,255,255,.06);--g-drop:0 10px 20px -8px rgba(0,0,0,.7);--g-bd:rgba(255,255,255,.14)}}
+:root[data-theme="dark"]{--g-fill:linear-gradient(150deg,rgba(255,255,255,.17),rgba(255,255,255,.05) 55%,rgba(255,255,255,.1));--g-rim:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(255,255,255,.08),inset 1px 0 0 rgba(255,255,255,.14),inset -1px 0 0 rgba(255,255,255,.08),inset 0 0 14px rgba(255,255,255,.06);--g-drop:0 10px 20px -8px rgba(0,0,0,.7);--g-bd:rgba(255,255,255,.14)}
+/* φόντο με χρώμα για να «διαθλά» το γυαλί */
+body{background:radial-gradient(60% 28% at 8% 38%,color-mix(in srgb,var(--red) 10%,transparent),transparent 70%) no-repeat,radial-gradient(55% 26% at 96% 62%,color-mix(in srgb,var(--gold) 16%,transparent),transparent 70%) no-repeat,radial-gradient(130% 50% at 50% 0,color-mix(in srgb,var(--gold) 10%,transparent),transparent 70%) no-repeat,var(--bg)}
+/* κουμπιά και τσιπ στο περιεχόμενο */
+.tab,.toggle button[aria-pressed="false"],.qk-b,.gal-a,.nmc-b{background:var(--g-fill);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);border:1px solid var(--g-bd);box-shadow:var(--g-rim),var(--g-drop);color:var(--ink)}
+.toggle{background:color-mix(in srgb,var(--pill) 70%,transparent);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);box-shadow:inset 0 1px 2px rgba(60,20,30,.12),inset 0 0 0 1px var(--g-bd)}
+.toggle button[aria-pressed="false"]{background:none;box-shadow:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;color:var(--muted)}
+.toggle button[aria-pressed="true"]{background:var(--g-fill);box-shadow:var(--g-rim),var(--g-drop);color:var(--ink)}
+.tab[aria-pressed="true"]{background:var(--g-red);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 14px -8px rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.06),0 10px 20px -8px color-mix(in srgb,var(--red) 75%,transparent)}
+.tab[aria-pressed="true"]::before{content:"";position:absolute;left:10%;right:10%;top:1px;height:42%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0));pointer-events:none}
+.nmc-b{color:var(--ink)}
+/* κουμπιά στην κεφαλίδα (πάνω στη φωτογραφία) */
+.hub-btn,.date-btn,.sh-close{background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,.08) 55%,rgba(255,255,255,.2));backdrop-filter:blur(14px) saturate(1.8);-webkit-backdrop-filter:blur(14px) saturate(1.8);border:1px solid rgba(255,255,255,.38);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(255,255,255,.2),inset 0 0 12px rgba(255,255,255,.12),0 8px 16px -8px rgba(0,0,0,.45)}
+/* κάτω μενού: μεγάλη γυάλινη κάψουλα */
+.bar{background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.26) 60%,rgba(255,255,255,.4));backdrop-filter:blur(26px) saturate(2);-webkit-backdrop-filter:blur(26px) saturate(2);border:1px solid var(--g-bd);box-shadow:var(--g-rim),0 22px 40px -16px rgba(20,10,12,.45)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bar{background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(255,255,255,.04) 60%,rgba(255,255,255,.09))}}
+:root[data-theme="dark"] .bar{background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(255,255,255,.04) 60%,rgba(255,255,255,.09))}
+.bar button[aria-current="page"]{background:var(--g-red);border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 14px -8px rgba(255,255,255,.2),0 10px 20px -8px color-mix(in srgb,var(--red) 75%,transparent);position:relative}
+.bar button[aria-current="page"]::before{content:"";position:absolute;left:12%;right:12%;top:2px;height:38%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0));pointer-events:none}
+/* εικονίδια: γυάλινα «πλακίδια» */
+.ic.glyph,.mm-i .ic,.mm-ic{background:var(--g-fill);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);box-shadow:var(--g-rim),0 4px 10px -4px rgba(60,20,30,.3);border:1px solid var(--g-bd);color:var(--red)}
+.ic img{box-shadow:0 0 0 1px var(--g-bd),0 4px 10px -4px rgba(60,20,30,.35)}
+@media (prefers-reduced-transparency:reduce){.tab,.bar,.hub-btn,.date-btn{backdrop-filter:none;-webkit-backdrop-filter:none}}
 </style>
 </head><body>
 
