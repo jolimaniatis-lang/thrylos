@@ -833,6 +833,19 @@ body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
 .lead-t{text-shadow:none}
 .grp-h,.month-h,.sec-h{display:flex}
 .month-h{color:var(--red)}
+/* μάρκα κεφαλίδας */
+.hero .logo{gap:11px!important}
+.hero .crest{width:46px!important;height:46px!important;padding:0;position:relative;background:#fff;box-shadow:0 0 0 2px #D6B26B,0 0 0 4px rgba(255,255,255,.22),0 8px 18px -4px rgba(0,0,0,.5)!important;overflow:hidden}
+.hero .crest::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.55) 50%,transparent 62%);background-size:260% 100%;background-position:160% 0;animation:shine 1.4s .6s ease-out 1 both;pointer-events:none}
+.hero .crest img{width:100%;height:100%;object-fit:cover;display:block}
+.hero .word{font-size:inherit!important;letter-spacing:0!important;text-transform:none;font-style:normal;white-space:nowrap}
+.hero .word .w1{display:flex;align-items:baseline;gap:6px;line-height:.95}
+.hero .word b{font-family:var(--display);font-weight:900;font-style:italic;font-size:30px;letter-spacing:.04em;color:#fff}
+.hero .word i{font-family:var(--body);font-style:normal;font-weight:800;font-size:10px;letter-spacing:.32em;color:#E8CB8E;padding:2px 0 2px 7px;border-left:1px solid rgba(232,203,142,.55)}
+.hero .word span{display:block!important;font-family:var(--body);font-weight:700;font-size:8.5px;letter-spacing:.2em;opacity:1;color:rgba(255,255,255,.78);margin-top:5px;text-transform:uppercase}
+@media (max-width:480px){.hero .word .w1{flex-direction:column;align-items:flex-start;gap:5px}.hero .word i{border-left:0;padding:0;font-size:9.5px;letter-spacing:.42em;display:flex;align-items:center;gap:7px}.hero .word i::before{content:"";width:16px;height:1px;background:rgba(232,203,142,.7)}.hero .word span{display:none!important}.hero .word b{font-size:29px}}
+@media (max-width:360px){.hero .word b{font-size:25px}}
+@media (prefers-reduced-motion:reduce){.hero .crest::after{animation:none}}
 </style>
 </head><body>
 
@@ -841,7 +854,7 @@ body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
     <div class="top">
       <div class="logo">
         <div class="crest g7" aria-hidden="true"><img src="assets/gate7.jpg" alt=""></div>
-        <div class="word">Θρύλος Daily<span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
+        <div class="word"><div class="w1"><b>ΘΡΥΛΟΣ</b><i>DAILY</i></div><span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
       </div>
       <div class="top-r"><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:6px 10px">🌓</button>
       <label class="date-btn" id="dateBtn"><span id="edDate">Σήμερα</span>
