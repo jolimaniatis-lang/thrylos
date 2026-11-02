@@ -13,12 +13,13 @@
 <meta name="apple-mobile-web-app-title" content="Θρύλος">
 <meta name="theme-color" content="#C8102E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;0,900;1,900&family=Manrope:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;0,900;1,900&family=Manrope:wght@400;500;700;800&family=Noto+Serif+Display:wght@500;600;700&display=swap">
 <style>
 /* Layout: club-app — striped red hero with headline, floating next-match card + countdown, swipeable fixtures, sticky sport switcher, card feed, betting slip */
 :root{
   --red:#C8102E; --red-2:#8E0A1F; --bg:#F2EFF0; --card:#FFFFFF; --ink:#17110F; --muted:#76696C; --line:#E6DEE0; --soft:#F7F2F3;
   --pill:#F1E6E8; --good:#14804A; --warn:#C27A00; --info:#2B5FD9; --shadow:0 1px 2px rgba(60,10,20,.06),0 8px 24px rgba(60,10,20,.07);
+  --gold:#B8924F;--gold-t:#8A6A2F;--red-t:#C8102E;--serif:"Noto Serif Display","Playfair Display",Georgia,"Times New Roman",serif;
   --display:"Fira Sans Extra Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Manrope","Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -568,7 +569,7 @@ button.pl:hover{background:var(--soft)}
 
 /* ===== v4: lively & modern ===== */
 :root{--shadow:0 1px 2px rgba(60,10,20,.05),0 14px 34px -10px rgba(60,10,20,.20)}
-body{background:radial-gradient(130% 50% at 50% 0,color-mix(in srgb,var(--red) 9%,transparent),transparent 70%) no-repeat,var(--bg)}
+body{background:radial-gradient(130% 50% at 50% 0,color-mix(in srgb,var(--gold) 10%,transparent),transparent 70%) no-repeat,var(--bg)}
 .hero{border-radius:0 0 30px 30px;box-shadow:0 14px 30px -14px color-mix(in srgb,var(--red) 70%,transparent);animation:drift 14s linear infinite}
 @keyframes drift{to{background-position:56px 0,0 0,0 0}}
 .crest{box-shadow:0 0 0 4px rgba(255,255,255,.18),0 4px 14px rgba(0,0,0,.28)}
@@ -794,6 +795,41 @@ main{padding-bottom:24px!important}
 .rec>.sec-h{margin:0 0 10px}.rec>.sec-h h2{font-size:15px}
 .rec>.rec-top{display:flex;flex-direction:row;gap:10px;align-items:baseline}
 .rec>.rec-dots{display:flex;flex-direction:row;gap:5px;margin-top:12px}
+
+/* ===== PREMIUM LAYER ===== */
+:root{--bg:#F7F3EE;--card:#FFFDFB;--ink:#1B1214;--muted:#6B5E62;--line:#EAE1DA;--soft:#F9F4F0;--pill:#F4E9E6;
+  --shadow:0 1px 1px rgba(40,15,20,.04),0 16px 36px -16px rgba(40,15,20,.20);--hair:color-mix(in srgb,var(--gold) 22%,var(--line))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gold:#D6B26B;--gold-t:#D6B26B;--red-t:#FF7A8C;--bg:#0C0809;--card:#161011;--line:#2A2123;--soft:#1D1517;--hair:color-mix(in srgb,var(--gold) 20%,var(--line));--shadow:0 1px 1px rgba(0,0,0,.5),0 18px 40px -16px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]{--gold:#D6B26B;--gold-t:#D6B26B;--red-t:#FF7A8C;--bg:#0C0809;--card:#161011;--line:#2A2123;--soft:#1D1517;--hair:color-mix(in srgb,var(--gold) 20%,var(--line));--shadow:0 1px 1px rgba(0,0,0,.5),0 18px 40px -16px rgba(0,0,0,.6)}
+body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
+.lv,.tbl,.rec,.amx,.vs,.cmp,.box,.slip,.lead,.r-sum,.mm-g,.hs-sec,.lg-c,.facts div,.gm-w,.gg{border:1px solid var(--hair)}
+.lv,.tbl,.rec,.amx,.vs,.cmp,.slip,.r-sum{border-radius:22px}
+.lead{border-left:1px solid var(--hair)}
+.nm-match,.lead-t,.sec-h h2,.grp-h h2,.grp-h,.month-h,.mm-t b,.sheet h2,.sheet h3{font-family:var(--serif);font-weight:600;text-transform:none;letter-spacing:-.005em}
+.nm-match{font-size:22px;line-height:1.18}
+.lead-t{font-size:clamp(21px,4.4vw,30px);line-height:1.2}
+.grp-h,.month-h{font-size:17px}.grp-h h2{font-size:19px}.sec-h h2{font-size:19px}
+.month-h{color:var(--ink);border-bottom:1px solid var(--hair);padding-bottom:10px}
+.month-h::first-letter{color:var(--red)}
+.grp-h{padding-bottom:8px}
+.sec-h{position:relative;padding-bottom:10px;margin-bottom:14px}.sec-h::after{content:"";position:absolute;left:0;bottom:0;width:36px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+.gm,.mm-i,.tbl td,.tbl th{border-color:var(--hair)}
+.tab{border-color:var(--hair);box-shadow:none;background:var(--card)}
+.tab[aria-pressed="true"]{background:linear-gradient(160deg,var(--red),var(--red-2));border-color:color-mix(in srgb,var(--gold) 55%,transparent);box-shadow:0 6px 16px -8px color-mix(in srgb,var(--red) 70%,transparent),inset 0 0 0 1px rgba(255,255,255,.08)}
+.hero{box-shadow:0 18px 36px -18px color-mix(in srgb,var(--red) 65%,transparent),inset 0 -2px 0 color-mix(in srgb,var(--gold) 60%,transparent)}
+.bar{border:1px solid var(--hair);box-shadow:0 18px 36px -14px rgba(20,10,12,.35);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3)}
+.bar button[aria-current="page"]{box-shadow:0 8px 18px -6px color-mix(in srgb,var(--red) 65%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--gold) 45%,transparent)}
+.word{letter-spacing:.02em}
+.mm-t b{font-family:var(--body);font-weight:800}
+.st-badge,.pill,.cnt,.tag-today{letter-spacing:.06em}
+.sh-hero,.mc-hero{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--gold) 55%,transparent)}
+.hs-sec h3,.lg-c h3{font-family:var(--serif)}
+.facts small,.r-sum small,.career th,.amx-c h3{letter-spacing:.12em}
+.gal-i{border:1px solid var(--hair)}
+/* αντίθεση κειμένων */
+.mm-back,.rel,.hs-y,.hs-src,.lg-m,.gal-a,.tbl tr.me td,.amx-s{color:var(--red-t)}
+.cd small{color:var(--muted)}
+.arc b{color:var(--red-t)}
 </style>
 </head><body>
 
