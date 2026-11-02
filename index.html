@@ -657,6 +657,10 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
     radial-gradient(90% 80% at 92% 0%,rgba(255,170,170,.32) 0%,transparent 60%),
     linear-gradient(165deg,#A50F27 0%,#6A0A1A 55%,var(--deep) 100%)}
 @keyframes drift{to{background-position:96px 0,0 0,0 0}}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(120,10,28,.62),rgba(60,5,16,.9)),var(--hp,none) center 18%/cover;opacity:.9;pointer-events:none}
+.hero .wrap{position:relative;z-index:1}
+.empty>.lc-ph{width:calc(100% + 40px);margin:-28px -20px 16px;border-radius:18px 18px 0 0}.lc-ph{display:block;width:calc(100% + 36px);margin:-18px -18px 14px;height:150px;object-fit:cover;object-position:center 25%;border-radius:16px 16px 0 0}
+
 .hero .wrap{padding-bottom:42px}
 .word{letter-spacing:1px}
 .next{margin-top:-30px;position:relative;z-index:2}
@@ -1113,7 +1117,7 @@ function renderLive(){
   const tick=()=>{const age=stamp?Date.now()-stamp:null;dot.classList.toggle("warn",age!=null&&age>LIVE_FRESH);
     l2.textContent=stamp?"Τελευταία ενημέρωση "+clk+" · "+ago(live.updatedAt)+(age>LIVE_FRESH?" · παλιά δεδομένα":""):"Δεν υπάρχει ώρα ενημέρωσης"};tick();ltimer=setInterval(tick,30000);
   box.append(bar);
-  if(!all.length){const e=el("div","empty");e.append(el("b",null,"Δεν υπάρχουν αγώνες"),el("p",null,"Όταν παίζει ο Ολυμπιακός, εδώ βλέπεις ζωντανά σκορ, λεπτό και λεπτομέρειες."));box.append(e);return}
+  if(!all.length){const e=el("div","empty");const ph=el("img","lc-ph");ph.src="assets/photos/live.jpg";ph.alt="";ph.loading="lazy";e.append(ph,el("b",null,"Δεν υπάρχουν αγώνες"),el("p",null,"Όταν παίζει ο Ολυμπιακός, εδώ βλέπεις ζωντανά σκορ, λεπτό και λεπτομέρειες."));box.append(e);return}
   /* φίλτρα: κατάσταση · άθλημα · διοργάνωση (συνδυάζονται) */
   const inSp=x=>(lcSp==="all"||lcNorm(x)===lcSp)&&(lcG==="all"||x.gender===lcG);
   const inSt=x=>lcS==="all"||x.bucket===lcS||(lcS==="live"&&x.bucket==="stale");
@@ -1131,7 +1135,7 @@ function renderLive(){
   const fG=chips("Ομάδα",[["all","Ανδρών & γυναικών"],["m","Ανδρών"],["w","Γυναικών"]],lcG,k=>lcG=k);fG.dataset.f="gender";
   const fC=chips("Διοργάνωση",[["all","Όλες οι διοργανώσεις"],...comps.map(c=>[c,c])],lcC,k=>lcC=k);fC.dataset.f="comp";
   const fw=el("div","lc-filters");fw.append(fS,fSp,fG,fC);box.append(fw);
-  if(!nLive&&(lcS==="all"||lcS==="live")){const e=el("div","lc-empty");e.append(el("b",null,"Δεν παίζει κάποιος αγώνας αυτή τη στιγμή"),el("p",null,"Δες παρακάτω τα προσεχή και τα πρόσφατα αποτελέσματα· όταν ξεκινήσει αγώνας εμφανίζεται εδώ αυτόματα."));box.append(e)}
+  if(!nLive&&(lcS==="all"||lcS==="live")){const e=el("div","lc-empty");const ph=el("img","lc-ph");ph.src="assets/photos/live.jpg";ph.alt="";ph.loading="lazy";e.append(ph,el("b",null,"Δεν παίζει κάποιος αγώνας αυτή τη στιγμή"),el("p",null,"Δες παρακάτω τα προσεχή και τα πρόσφατα αποτελέσματα· όταν ξεκινήσει αγώνας εμφανίζεται εδώ αυτόματα."));box.append(e)}
   if(!list.length){const e=el("div","none","Κανένας αγώνας με αυτά τα φίλτρα.");const rb=el("button","moreb","Καθαρισμός φίλτρων");rb.type="button";rb.onclick=()=>{lcS=lcSp=lcC=lcG="all";renderLive()};box.append(e,rb)}
   if(hidU){const nt=el("div","un-note");nt.append(hidU+(hidU===1?" αγώνας δεν περιλαμβάνεται":" αγώνες δεν περιλαμβάνονται")+" (δεν έχει επιβεβαιωθεί η ομάδα). ");const bb=el("button","moreb","Δες όλους");bb.type="button";bb.onclick=()=>{lcG="all";renderLive()};nt.append(bb);box.append(nt)}
   const order={live:0,stale:1,next:2,done:3};
@@ -1688,5 +1692,6 @@ setView(view);fixCaps();
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.matches&&n.matches(SEL))run(n);n.querySelectorAll&&n.querySelectorAll(SEL).forEach(run)}))).observe(document.body,{childList:true,subtree:true})})();
 
 if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had)location.reload()});navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{})}
+try{document.querySelector(".hero").style.setProperty("--hp","url(assets/photos/h"+(Math.floor(Date.now()/864e5)%4)+".jpg)")}catch(e){}
 </script>
 </body></html>
