@@ -825,12 +825,12 @@ body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
 .cd small{color:var(--muted)}
 .arc b{color:var(--red-t)}
 /* 3D γράμματα στους τίτλους */
-:root{--ex:rgba(120,60,70,.38);--ex-hi:rgba(255,255,255,.9);--ex-sh:rgba(40,10,16,.16)}
+:root{--ex:rgba(120,60,70,.30);--ex-hi:rgba(255,255,255,.9);--ex-sh:rgba(40,10,16,.14)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ex:rgba(0,0,0,.7);--ex-hi:rgba(255,255,255,.12);--ex-sh:rgba(0,0,0,.45)}}
 :root[data-theme="dark"]{--ex:rgba(0,0,0,.7);--ex-hi:rgba(255,255,255,.12);--ex-sh:rgba(0,0,0,.45)}
-.nm-match,.lead-t,.sec-h h2,.grp-h h2,.grp-h,.month-h,.sheet h2,.pl-no{text-shadow:0 -1px 0 var(--ex-hi),1px 1px 0 var(--ex),2px 2px 0 var(--ex),3px 3px 0 var(--ex),4px 7px 7px var(--ex-sh)}
+.nm-match,.lead-t,.sec-h h2,.grp-h h2,.grp-h,.month-h,.sheet h2,.pl-no{text-shadow:0 -1px 0 var(--ex-hi),1px 1px 0 var(--ex),0 3px 4px var(--ex-sh)}
 .month-h span,.grp-h span,.grp-h .cnt{text-shadow:none}
-.lead-t{text-shadow:1px 1px 0 #8E0A1F,2px 2px 0 #6E0716,3px 3px 0 #50040F,4px 7px 8px rgba(0,0,0,.5)}
+.lead-t{text-shadow:1px 1px 0 #8E0A1F,0 3px 5px rgba(0,0,0,.45)}
 .grp-h,.month-h,.sec-h{display:flex}
 .month-h{color:var(--red)}
 </style>
