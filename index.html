@@ -657,6 +657,18 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
     radial-gradient(90% 80% at 92% 0%,rgba(255,170,170,.32) 0%,transparent 60%),
     linear-gradient(165deg,#A50F27 0%,#6A0A1A 55%,var(--deep) 100%)}
 @keyframes drift{to{background-position:96px 0,0 0,0 0}}
+.gal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gal-i{padding:0;border:0;border-radius:16px;overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;aspect-ratio:4/5;display:block}
+.gal-i img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.gal-i:hover img,.gal-i:focus-visible img{transform:scale(1.04)}
+.lb{position:fixed;inset:0;z-index:100;background:rgba(10,4,6,.94);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+.lb>img{max-width:100%;max-height:calc(100% - 40px);object-fit:contain;border-radius:12px}
+.lb-x{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:18px;cursor:pointer}
+.lb-n{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:30px;cursor:pointer;border-radius:12px}
+.lb-p{left:6px}.lb-nx{right:6px}
+.lb-h{position:absolute;bottom:max(10px,env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:12px}
+@media (min-width:1024px){.gal{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.lb>img{max-height:calc(100% - 20px)}}
+
 .hero::before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(120,10,28,.62),rgba(60,5,16,.9)),var(--hp,none) center 18%/cover;opacity:.9;pointer-events:none}
 .hero .wrap{position:relative;z-index:1}
 .empty>.lc-ph{width:calc(100% + 40px);margin:-28px -20px 16px;border-radius:18px 18px 0 0}.lc-ph{display:block;width:calc(100% + 36px);margin:-18px -18px 14px;height:150px;object-fit:cover;object-position:center 25%;border-radius:16px 16px 0 0}
@@ -817,10 +829,11 @@ const MI={teams:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
  rumors:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 12h13M13 7l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  quotes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2H11l-5 4v-4H5a2 2 0 01-2-2V7a2 2 0 012-2z" stroke-linejoin="round"/></svg>',
  amateur:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6" stroke-linecap="round"/></svg>',
+ gallery:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4 18l5-5 3 3 3-3 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  archive:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10h14V9M10 13h4" stroke-linecap="round"/></svg>'};
 const MENU=[["Αγώνες & ομάδα",[["teams","Ομάδες","10 ομάδες: ποδόσφαιρο, μπάσκετ, βόλεϊ, πόλο, χάντμπολ","m"],["vs","Αντίπαλοι","Σύγκριση με τους επόμενους αντιπάλους","v"],["standings","Βαθμολογίες","Super League, Euroleague, Europa League","m"],["scorers","Σκόρερ & στατιστικά","Ο Ολυμπιακός και οι διοργανώσεις","m"],["discipline","Τιμωρίες & κάρτες","Απουσίες, κίτρινες, τραυματίες","m"]]],
  ["Στοίχημα & κοινότητα",[["bet","Στοίχημα","Εκτιμήσεις και bet builders","v"],["chat","Chat","Live chat με τους φίλους του Θρύλου","v"]]],
- ["Ειδήσεις & αρχείο",[["rumors","Μεταγραφές","Φήμες και επίσημες κινήσεις","m"],["quotes","Δηλώσεις","Προπονητές, παίκτες, διοίκηση","m"],["amateur","Ερασιτέχνης","Βόλεϊ, μπάσκετ γυναικών και άλλα","m"],["archive","Αρχείο","Παλαιότερες εκδόσεις","m"]]]];
+ ["Ειδήσεις & αρχείο",[["rumors","Μεταγραφές","Φήμες και επίσημες κινήσεις","m"],["quotes","Δηλώσεις","Προπονητές, παίκτες, διοίκηση","m"],["amateur","Ερασιτέχνης","Βόλεϊ, μπάσκετ γυναικών και άλλα","m"],["archive","Αρχείο","Παλαιότερες εκδόσεις","m"],["gallery","Φωτογραφίες","Ταπετσαρίες και στιγμές του Θρύλου","m"]]]];
 function renderMoreMenu(){const box=$("#more");box.replaceChildren();const unread=!!document.querySelector('.bar button[data-v="more"] .badge');
   MENU.forEach(([title,items])=>{const sec=el("section","mm");sec.append(el("h3","mm-h",title));const l=el("div","mm-l");
     items.forEach(([k,label,sub,kind])=>{const b=el("button","mm-i");b.type="button";b.dataset.go=k;const ic2=el("span","mm-ic");ic2.innerHTML=MI[k];const tx=el("span","mm-t");tx.append(el("b",null,label),el("small",null,sub));
@@ -1233,7 +1246,7 @@ function openPlayer(p,sport){
 const XD=["standings","scorers","discipline","rumors","quotes","amateur","betting"];
 let X={},mtab="standings",bfilter="all",aq="";
 try{mtab=localStorage.getItem("thr_m")||"standings"}catch(e){}
-const MORE=[["teams","Ομάδες"],["standings","Βαθμολογίες"],["scorers","Σκόρερ & στατιστικά"],["discipline","Τιμωρίες & κάρτες"],["rumors","Μεταγραφές"],["quotes","Δηλώσεις"],["amateur","Ερασιτέχνης"],["archive","Αρχείο"]];
+const MORE=[["teams","Ομάδες"],["standings","Βαθμολογίες"],["scorers","Σκόρερ & στατιστικά"],["discipline","Τιμωρίες & κάρτες"],["rumors","Μεταγραφές"],["quotes","Δηλώσεις"],["amateur","Ερασιτέχνης"],["archive","Αρχείο"],["gallery","Φωτογραφίες"]];
 const MEMPTY={standings:["Οι βαθμολογίες συμπληρώνονται","Super League, Euroleague, Champions League, Basket League και πόλο."],scorers:["Τα στατιστικά συμπληρώνονται","Κορυφαίοι σε γκολ, ασίστ, πόντους και ριμπάουντ."],discipline:["Οι τιμωρίες συμπληρώνονται","Ποιος είναι τιμωρημένος, ποιος κινδυνεύει και ποιος γυρίζει."],rumors:["Οι μεταγραφές συμπληρώνονται","Επίσημα, προχωρημένα και φήμες με βαθμό αξιοπιστίας."],quotes:["Οι δηλώσεις συμπληρώνονται","Προπονητές, παίκτες και διοίκηση πριν και μετά τους αγώνες."],amateur:["Ο ερασιτέχνης συμπληρώνεται","Βόλεϊ, μπάσκετ γυναικών, στίβος και λοιπά τμήματα."]};
 const RST={official:["Επίσημο","good"],advanced:["Προχωρημένο","info"],rumor:["Φήμη","warn"],denied:["Διαψεύστηκε","red"]};
 const RDIR={in:"Έρχεται",out:"Φεύγει",renew:"Ανανέωση"};
@@ -1337,8 +1350,23 @@ function renderAmateurHub(box){
   else{d.append(el("p","tm-note","Αυτοί οι αγώνες είναι στο ημερολόγιο αλλά ο τίτλος διοργάνωσης δεν δείχνει με βεβαιότητα αν αφορούν ομάδα ανδρών ή γυναικών. Δεν αποδίδονται σε καμία ομάδα μέχρι να επιβεβαιωθεί."));
     const L=el("div","tm-list");un.forEach(x=>L.append(mkMatchRow(x)));d.append(L)}
   box.append(d)}
+const GAL=16;
+function openPhoto(i){const o=el("div","lb");o.setAttribute("role","dialog");o.setAttribute("aria-label","Φωτογραφία");
+  const im=el("img");im.alt="";const n=String(i).padStart(2,"0");im.src="assets/gallery/"+n+".jpg";
+  const x=el("button","lb-x","✕");x.type="button";x.setAttribute("aria-label","Κλείσιμο");
+  const pv=el("button","lb-n lb-p","‹");pv.type="button";pv.setAttribute("aria-label","Προηγούμενη");const nx=el("button","lb-n lb-nx","›");nx.type="button";nx.setAttribute("aria-label","Επόμενη");
+  const hint=el("div","lb-h","Πάτησε παρατεταμένα στην εικόνα για αποθήκευση");
+  const go=d=>{i=(i-1+d+GAL)%GAL+1;im.src="assets/gallery/"+String(i).padStart(2,"0")+".jpg"};
+  const close=()=>{o.remove();document.removeEventListener("keydown",key)};
+  const key=e=>{if(e.key==="Escape")close();else if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1)};
+  x.onclick=close;pv.onclick=()=>go(-1);nx.onclick=()=>go(1);o.addEventListener("click",e=>{if(e.target===o)close()});document.addEventListener("keydown",key);
+  o.append(im,x,pv,nx,hint);document.body.append(o);x.focus()}
+function renderGallery(box){const g=el("div","gal");
+  for(let i=1;i<=GAL;i++){const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Φωτογραφία "+i);const im=el("img");im.alt="";im.loading="lazy";im.src="assets/gallery/"+String(i).padStart(2,"0")+"t.jpg";b.append(im);b.addEventListener("click",()=>openPhoto(i));g.append(b)}
+  box.append(g)}
 function renderMore(){const box=$("#more");box.replaceChildren();
   if(mtab==="archive"){renderArchive(box);return}
+  if(mtab==="gallery"){renderGallery(box);return}
   if(mtab==="teams"){renderTeams(box);return}
   if(mtab==="amateur"){renderAmateurHub(box);return}
   const d=X[mtab];if(!d){box.append(emptyBox(MEMPTY[mtab]));return}
