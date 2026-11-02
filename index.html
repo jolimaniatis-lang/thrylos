@@ -775,6 +775,17 @@ main{padding-bottom:24px!important}
 .pitch .pp,.court .pp{animation:pdrop .55s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i,0)*70ms)}
 @keyframes pdrop{from{transform:translateY(-26px) scale(.6);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.sc.pop,.lv.goal,.cd b.flip,.tbl tr,.gal-i,.mc-cr,.nm-teams .crest2,.mc-cr::after,.nm-teams .crest2::after,.pp{animation:none!important}.gal-i{transform:none}}
+
+.vs-cr{width:52px;height:52px;font-size:19px}.vs-cr.img{width:52px;height:52px}
+.vs-top .badge,.vs-cr{animation:crin .7s cubic-bezier(.2,1.5,.4,1) both}
+.vs-cr::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.65) 50%,transparent 65%);background-size:250% 100%;background-position:150% 0;animation:shine 1.2s .5s ease-out 1 both;pointer-events:none}
+.vs-mid .gtime{display:inline-block;animation:scpop .8s .3s cubic-bezier(.2,1.6,.4,1) both}
+.cmp .cr{animation:rowin .4s ease-out both;animation-delay:calc(var(--i,0)*70ms)}
+.bars i b{animation:barg .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms + .15s)}
+.bars i:first-child b{transform-origin:right center}.bars i:last-child b{transform-origin:left center}
+@keyframes barg{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.wdl i{animation:pdrop .5s cubic-bezier(.2,1.4,.4,1) both}.wdl i:nth-child(2){animation-delay:.08s}.wdl i:nth-child(3){animation-delay:.16s}.wdl i:nth-child(4){animation-delay:.24s}.wdl i:nth-child(5){animation-delay:.32s}
+@media (prefers-reduced-motion:reduce){.vs-cr,.vs-top .badge,.vs-cr::after,.vs-mid .gtime,.cmp .cr,.bars i b,.wdl i{animation:none!important}}
 </style>
 </head><body>
 
@@ -960,7 +971,7 @@ function renderVs(){
   const v=el("section","vs");const top=el("div","vs-top");
   const oly=el("div","team");oly.append(olyBadge(o.sport),el("b",null,"Ολυμπιακός"),el("small",null,o.home?"Εντός έδρας":"Εκτός έδρας"));
   const ini=o.opp.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
-  const op=el("div","team");op.append(el("div","badge",ini),el("b",null,o.opp),el("small",null,o.meta||""));
+  const op=el("div","team");op.append(crest(o.opp,"vs-cr",o.sport),el("b",null,o.opp),el("small",null,o.meta||""));
   const mid=el("div","vs-mid");mid.append(el("span","gtime",o.t||"—"),el("small",null,WD[dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1)));
   top.append(oly,mid,op);
   const cp=el("div","vs-comp");cp.append(ic(o.sport,o.comp),el("span",null,o.comp));v.append(top,cp);
@@ -974,7 +985,7 @@ function renderVs(){
       const aBest=r.lower?a<b:a>b,bBest=r.lower?b<a:b>a;
       t.append(el("span","v"+(aBest?" best":""),fmt(a)),el("span","l",r.label),el("span","v"+(bBest?" best":""),fmt(b)));
       const bars=el("div","bars");const mx=Math.max(a,b)||1;[[a,aBest],[b,bBest]].forEach(([x,best])=>{const i=el("i");const bb=el("b",best?"best":null);bb.style.width=Math.max(4,x/mx*100)+"%";i.append(bb);bars.append(i)});
-      row.append(t,bars);c.append(row)});
+      row.style.setProperty("--i",c.children.length);row.append(t,bars);c.append(row)});
     box.append(c)}
   if((o.keys||[]).length){const k=el("div","box");k.append(el("h4",null,"Τι πρέπει να ξέρεις"));const ul=el("ul");o.keys.forEach(x=>ul.append(el("li",null,x)));k.append(ul);box.append(k)}
   const two=el("div","two");[["Απουσίες Ολυμπιακού",o.absOly],["Απουσίες "+o.opp,o.absOpp]].forEach(([h,l])=>{const k=el("div","box");k.append(el("h4",null,h));
