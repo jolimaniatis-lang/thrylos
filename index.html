@@ -754,6 +754,27 @@ main{padding-bottom:24px!important}
 #live:not([hidden]){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
 #live>.lc-bar,#live>.lc-filters,#live>.lc-empty,#live>.foot{grid-column:1/-1}
 }
+
+/* κίνηση */
+.sc.pop{animation:scpop .7s cubic-bezier(.2,1.6,.4,1)}
+.lv.goal{animation:goalfl 1.4s ease-out}
+@keyframes scpop{0%{transform:scale(1)}30%{transform:scale(1.5);color:var(--red)}100%{transform:scale(1)}}
+@keyframes goalfl{0%,30%{box-shadow:0 0 0 3px var(--red),0 0 28px rgba(227,27,35,.55)}100%{box-shadow:var(--shadow)}}
+.cd b{backface-visibility:hidden}.cd b.flip{animation:cdflip .55s cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 100%}
+@keyframes cdflip{0%{transform:perspective(200px) rotateX(-90deg);opacity:0}100%{transform:perspective(200px) rotateX(0);opacity:1}}
+.tbl tr{animation:rowin .4s ease-out both;animation-delay:calc(var(--i,0)*28ms)}
+@keyframes rowin{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.gal{perspective:900px}
+.gal-i{transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out,box-shadow .25s;touch-action:pan-y;animation:rise .45s ease-out both;animation-delay:calc(var(--i,0)*35ms)}
+.gal-i.tilt{transition:transform .05s linear;box-shadow:0 14px 30px -10px rgba(20,10,12,.45)}
+.crest2{position:relative}
+.mc-cr,.nm-teams .crest2{animation:crin .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes crin{from{transform:scale(.4) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.mc-cr::after,.nm-teams .crest2::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.65) 50%,transparent 65%);background-size:250% 100%;background-position:150% 0;animation:shine 1.2s .5s ease-out 1 both;pointer-events:none}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+.pitch .pp,.court .pp{animation:pdrop .55s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes pdrop{from{transform:translateY(-26px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sc.pop,.lv.goal,.cd b.flip,.tbl tr,.gal-i,.mc-cr,.nm-teams .crest2,.mc-cr::after,.nm-teams .crest2::after,.pp{animation:none!important}.gal-i{transform:none}}
 </style>
 </head><body>
 
@@ -1059,6 +1080,7 @@ function classifyTeam(sport,text,gender){
   if(r.nogender&&r.disc)return {id:r.disc+"-"+gender,rule:"πεδίο gender"};
   return r}
 
+const SCP={};
 function liveCardOf(m){
     const c=el("section","lv");const h=el("div","lv-h");h.append(ic(m.sport,m.comp),el("span",null,m.comp||""));
     const cf=isLiveConfirmed(m),stale=(m.status==="live"||m.status==="ht")&&!cf;const lab=stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":{live:"LIVE",ht:"ΗΜΙΧΡΟΝΟ",ft:"ΤΕΛΙΚΟ",pre:"ΣΕ ΛΙΓΟ"}[m.status]||m.status;h.append(el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),lab));c.append(h);
@@ -1068,6 +1090,7 @@ function liveCardOf(m){
     const a=pre?"–":scoreTxt(m.olyScore),b=pre?"–":scoreTxt(m.oppScore);
     const L=m.home?[oly,a,b,op]:[op,b,a,oly];sc.append(L[1],el("span",null,":"),L[2]);
     const bd=el("div","board");bd.append(L[0],sc,L[3]);c.append(bd);
+    {const k=(m.id||m.opp||"")+"|"+m.sport,cur=a+":"+b,pv=SCP[k];SCP[k]=cur;if(pv&&pv!==cur&&!pre){sc.classList.add("pop");c.classList.add("goal")}}
     c.append(el("div","clock",pre?(m.kickoff?"Έναρξη "+m.kickoff:""):stale?"Τελευταία γνωστή κατάσταση: "+(m.clock||"Live")+(liveStamp()?" · "+ago(live.updatedAt):""):(m.clock||"")));if(m.elSrc)c.append(el("div","lv-sub","⚡ Απευθείας από την Euroleague"));
     const sub=[m.periods,m.tv].filter(Boolean).join(" · ");if(sub)c.append(el("div","lv-sub",sub));
     if(m.note)c.append(el("div","lv-sub",m.note));
@@ -1077,7 +1100,7 @@ function liveCardOf(m){
         [["opp",1],["oly",0]].forEach(([k,flip])=>{if(!fmOk(k))return;const T=m.lineups[k];const rows=[1,...T.formation.split("-").map(Number)];let i=0;const lines=rows.map(n=>{const a=T.starters.slice(i,i+n);i+=n;return a});if(!flip)lines.reverse();
           const half=el("div","ph "+k);lines.forEach(ln=>{const r=el("div","pr");ln.forEach(x=>{const d=el("div","pp");d.append(el("b",null,x.no!=null?String(x.no):""),el("span",null,x.name||""));r.append(d)});half.append(r)});
           const tag=el("div","ptag",(k==="oly"?"Ολυμπιακός":m.opp)+" · "+T.formation);half.prepend(tag);pt.append(half)});
-        lu.append(pt)}
+        pt.querySelectorAll(".pp").forEach((d,i)=>d.style.setProperty("--i",i));lu.append(pt)}
       // Μπάσκετ: αρχική πεντάδα σε γήπεδο (γκαρντ → φόργουορντ → σέντερ), όταν υπάρχουν 5 βασικοί
       const bkOk=k=>{const T=m.lineups[k];return m.sport==="basketball"&&T&&(T.starters||[]).length===5};
       if(bkOk("oly")||bkOk("opp")){const ct=el("div","court");
@@ -1087,7 +1110,7 @@ function liveCardOf(m){
           const rows=[[],[],[]];st.forEach(o=>rows[o.r].push(o.x));const lines=rows.filter(r=>r.length);if(flip)lines.reverse();
           const half=el("div","ph "+k);half.append(el("div","ptag",k==="oly"?"Ολυμπιακός":m.opp));
           lines.forEach(ln=>{const r=el("div","pr");ln.forEach(x=>{const d=el("div","pp");d.append(el("b",null,x.no!=null&&x.no!==""?String(x.no):(x.pos||"")),el("span",null,x.name||""));r.append(d)});half.append(r)});ct.append(half)});
-        lu.append(ct)}
+        ct.querySelectorAll(".pp").forEach((d,i)=>d.style.setProperty("--i",i));lu.append(ct)}
       const g=el("div","lu-g");
       [["oly","Ολυμπιακός"],["opp",m.opp]].forEach(([k,nm])=>{const T=m.lineups[k];const col=el("div","lu-c"+(k==="oly"?" oly":""));
         const hh=el("div","lu-h");hh.append(el("b",null,nm));if(T&&T.formation)hh.append(el("span","fm",T.formation));col.append(hh);
@@ -1286,7 +1309,7 @@ function tableCard(t){const c=el("section","tbl");const h=el("div","tbl-h");h.ap
   const w=el("div","tbl-w");const tb=el("table");const hr=el("tr");(t.columns||[]).forEach((x,i)=>hr.append(el("th",i===1?"l":null,x)));tb.append(hr);
   const T=t.title||"";const bands=/europa|conference/i.test(T)&&(t.rows||[]).length>=30?[[8,"q1"],[24,"q2"]]:/euroleague/i.test(T)&&/20|ευρωλιγκ|euroleague/i.test(T)&&(t.rows||[]).length>=18?[[6,"q1"],[10,"q2"]]:null;
   (t.rows||[]).forEach(r=>{const pos=parseInt(r[0],10);let bc=null;if(bands&&pos)for(const[n,k]of bands)if(pos<=n){bc=k;break}
-    const tr=el("tr",(/ολυμπιακ|olympiak/i.test(r.join(" "))?"me":"")+(bc?" "+bc:""));r.forEach((x,i)=>tr.append(el("td",i===1?"l":null,x==null?"":String(x))));tb.append(tr)});
+    const tr=el("tr",(/ολυμπιακ|olympiak/i.test(r.join(" "))?"me":"")+(bc?" "+bc:""));tr.style.setProperty("--i",Math.min(tb.rows.length,24));r.forEach((x,i)=>tr.append(el("td",i===1?"l":null,x==null?"":String(x))));tb.append(tr)});
   w.append(tb);c.append(w);
   if(bands){const lg=el("div","tbl-lg");const eu=/europa|conference/i.test(T);[["q1",eu?"Top 8 – απευθείας στους 16":"Top 6 – απευθείας πλέι-οφ"],["q2",eu?"9–24 – μπαράζ πρόκρισης":"7–10 – πλέι-ιν"]].forEach(([k,tx])=>{const i=el("span","lgi");i.innerHTML='<i class="dot '+k+'"></i>'+tx;lg.append(i)});c.append(lg)}
   if(t.note)c.append(el("div","tbl-n",t.note));return c}
@@ -1407,6 +1430,10 @@ function renderGallery(box){const g=el("div","gal");
   for(let i=1;i<=GAL;i++){const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Φωτογραφία "+i);const im=el("img");im.alt="";im.loading="lazy";im.src="assets/gallery/"+String(i).padStart(2,"0")+"t.jpg";b.append(im);b.addEventListener("click",()=>openPhoto(i));g.append(b)}
   const B="https://www.olympiacosbc.gr/images/";const OF=["2024/wallpapers/2024/SashaVezenkov-SM.png","2024/wallpapers/2024/pantheon15.png"];
   OF.forEach(u=>{const b=el("button","gal-i");b.type="button";b.setAttribute("aria-label","Επίσημη ταπετσαρία");const im=el("img");im.alt="";im.loading="lazy";im.referrerPolicy="no-referrer";im.src=B+u;im.onerror=()=>b.remove();b.append(im);b.addEventListener("click",()=>openPhoto(0,B+u));g.append(b)});
+  g.querySelectorAll(".gal-i").forEach((b,i)=>{b.style.setProperty("--i",i);
+    const mv=e=>{const r=b.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;b.style.setProperty("--rx",(-y*14).toFixed(1)+"deg");b.style.setProperty("--ry",(x*14).toFixed(1)+"deg");b.classList.add("tilt")};
+    const rs=()=>{b.classList.remove("tilt");b.style.setProperty("--rx","0deg");b.style.setProperty("--ry","0deg")};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerdown",mv);["pointerleave","pointerup","pointercancel"].forEach(t=>b.addEventListener(t,rs))});
   box.append(g);
   const ls=el("div","gal-l");[["Ταπετσαρίες μπάσκετ (επίσημο)","https://www.olympiacosbc.gr/el/we-are-olympiacos/wallpapers.html"],["Photostories ποδοσφαίρου (επίσημο)","https://www.olympiacos.org/"]].forEach(([t,u])=>{const x=el("a","gal-a",t+" ›");x.href=u;x.target="_blank";x.rel="noopener";ls.append(x)});box.append(ls)}
 function renderMore(){const box=$("#more");box.replaceChildren();
@@ -1599,7 +1626,7 @@ function renderNext(){const box=$("#next");box.replaceChildren();clearInterval(t
   const tick=()=>cds.forEach(([cd,t])=>{let s=Math.max(0,Math.floor((t-Date.now())/1000));
     if(s===0){cd.replaceChildren(el("div",null,"LIVE"));return}
     const parts=[[Math.floor(s/86400),"μέρες"],[Math.floor(s%86400/3600),"ώρες"],[Math.floor(s%3600/60),"λεπτά"]];
-    cd.replaceChildren(...parts.map(([v,u])=>{const d=el("div");d.append(el("b",null,String(v).padStart(2,"0")),el("small",null,u));return d}))});
+    const old=cd._v||[];cd._v=parts.map(p=>p[0]);cd.replaceChildren(...parts.map(([v,u],i)=>{const d=el("div");const b=el("b",null,String(v).padStart(2,"0"));if(old[i]!==v){b.className="flip";b.style.animationDelay=(old.length?0:i*90)+"ms"}d.append(b,el("small",null,u));return d}))});
   tick();timer=setInterval(tick,30000)}
 
 function render(){
