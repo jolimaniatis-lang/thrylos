@@ -805,10 +805,6 @@ body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
 .lv,.tbl,.rec,.amx,.vs,.cmp,.box,.slip,.lead,.r-sum,.mm-g,.hs-sec,.lg-c,.facts div,.gm-w,.gg{border:1px solid var(--hair)}
 .lv,.tbl,.rec,.amx,.vs,.cmp,.slip,.r-sum{border-radius:22px}
 .lead{border-left:1px solid var(--hair)}
-.nm-match,.lead-t,.sec-h h2,.grp-h h2,.grp-h,.month-h,.mm-t b,.sheet h2,.sheet h3{font-family:var(--serif);font-weight:600;text-transform:none;letter-spacing:-.005em}
-.nm-match{font-size:22px;line-height:1.18}
-.lead-t{font-size:clamp(21px,4.4vw,30px);line-height:1.2}
-.grp-h,.month-h{font-size:17px}.grp-h h2{font-size:19px}.sec-h h2{font-size:19px}
 .month-h{color:var(--ink);border-bottom:1px solid var(--hair);padding-bottom:10px}
 .month-h::first-letter{color:var(--red)}
 .grp-h{padding-bottom:8px}
@@ -820,16 +816,23 @@ body{letter-spacing:.005em;font-feature-settings:"kern","liga"}
 .bar{border:1px solid var(--hair);box-shadow:0 18px 36px -14px rgba(20,10,12,.35);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3)}
 .bar button[aria-current="page"]{box-shadow:0 8px 18px -6px color-mix(in srgb,var(--red) 65%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--gold) 45%,transparent)}
 .word{letter-spacing:.02em}
-.mm-t b{font-family:var(--body);font-weight:800}
 .st-badge,.pill,.cnt,.tag-today{letter-spacing:.06em}
 .sh-hero,.mc-hero{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--gold) 55%,transparent)}
-.hs-sec h3,.lg-c h3{font-family:var(--serif)}
 .facts small,.r-sum small,.career th,.amx-c h3{letter-spacing:.12em}
 .gal-i{border:1px solid var(--hair)}
 /* αντίθεση κειμένων */
 .mm-back,.rel,.hs-y,.hs-src,.lg-m,.gal-a,.tbl tr.me td,.amx-s{color:var(--red-t)}
 .cd small{color:var(--muted)}
 .arc b{color:var(--red-t)}
+/* 3D γράμματα στους τίτλους */
+:root{--ex:rgba(120,60,70,.38);--ex-hi:rgba(255,255,255,.9);--ex-sh:rgba(40,10,16,.16)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ex:rgba(0,0,0,.7);--ex-hi:rgba(255,255,255,.12);--ex-sh:rgba(0,0,0,.45)}}
+:root[data-theme="dark"]{--ex:rgba(0,0,0,.7);--ex-hi:rgba(255,255,255,.12);--ex-sh:rgba(0,0,0,.45)}
+.nm-match,.lead-t,.sec-h h2,.grp-h h2,.grp-h,.month-h,.sheet h2,.pl-no{text-shadow:0 -1px 0 var(--ex-hi),1px 1px 0 var(--ex),2px 2px 0 var(--ex),3px 3px 0 var(--ex),4px 7px 7px var(--ex-sh)}
+.month-h span,.grp-h span,.grp-h .cnt{text-shadow:none}
+.lead-t{text-shadow:1px 1px 0 #8E0A1F,2px 2px 0 #6E0716,3px 3px 0 #50040F,4px 7px 8px rgba(0,0,0,.5)}
+.grp-h,.month-h,.sec-h{display:flex}
+.month-h{color:var(--red)}
 </style>
 </head><body>
 
