@@ -698,6 +698,26 @@ main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .row>button:active,.pl:active,.gm:active{background:var(--soft)}
 .fx:active,.rs:active,.qk-b:active,.kchip:active,.tab:active{transform:scale(.97)}
 @media (hover:hover){.row>button:hover,.pl:hover{background:var(--soft)}}
+
+/* ===== Υπολογιστής (≥1100px): φαρδιά διάταξη, πλαϊνό μενού, δύο στήλες ===== */
+@media (min-width:1100px){
+body{padding-left:112px}
+.wrap{max-width:1240px}
+main .wrap{padding-block:6px 56px}
+main{padding-bottom:24px!important}
+.hero{margin-left:-112px;padding-left:112px;border-radius:0 0 30px 30px}
+.bar{left:16px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%);width:84px;padding:8px 6px!important}
+.bar-in{max-width:none!important;grid-template-columns:1fr!important;gap:6px!important}
+.bar button{padding-block:10px!important}
+#app:not([hidden]),#games:not([hidden]),#roster:not([hidden]){display:block!important;column-count:2;column-gap:32px}
+#app>*,#games>*,#roster>*{break-inside:avoid;margin-bottom:24px}
+#app>.brief,#app>.kchips,#app>.foot,#app>.amx,#games>.toggle,#games>.gg,#games>.foot,#games>.chips,#roster>.r-sum,#roster>.r-note,#roster>.coach,#roster>.search,#roster>.chips,#roster>.foot{column-span:all}
+#games>.month{break-inside:auto}
+#roster>div:not([class]){break-inside:auto}
+#more:not([hidden]){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
+#live:not([hidden]){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+#live>.lc-bar,#live>.lc-filters,#live>.lc-empty,#live>.foot{grid-column:1/-1}
+}
 </style>
 </head><body>
 
