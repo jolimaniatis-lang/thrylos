@@ -1259,10 +1259,10 @@ function openPlayer(p,sport){
 }
 
 /* ===== Extras: betting, standings, scorers, discipline, rumours, quotes, amateur, archive, calendar export ===== */
-const XD=["standings","scorers","discipline","rumors","quotes","amateur","betting","history","legends","tickets","academy","club","media"];
+const XD=["standings","scorers","discipline","rumors","quotes","amateur","betting","history","legends","tickets","club","media"];
 let X={},mtab="standings",bfilter="all",aq="";
 try{mtab=localStorage.getItem("thr_m")||"standings"}catch(e){}
-const MORE=[["teams","Ομάδες"],["standings","Βαθμολογίες"],["scorers","Σκόρερ & στατιστικά"],["discipline","Τιμωρίες & κάρτες"],["rumors","Μεταγραφές"],["quotes","Δηλώσεις"],["amateur","Ερασιτέχνης"],["archive","Αρχείο"],["history","Ιστορία"],["legends","Θρύλοι"],["club","Σύλλογος"],["tickets","Εισιτήρια"],["academy","Ακαδημία"],["media","Πολυμέσα"],["gallery","Φωτογραφίες"]];
+const MORE=[["teams","Ομάδες"],["standings","Βαθμολογίες"],["scorers","Σκόρερ & στατιστικά"],["discipline","Τιμωρίες & κάρτες"],["rumors","Μεταγραφές"],["quotes","Δηλώσεις"],["amateur","Ερασιτέχνης"],["archive","Αρχείο"],["history","Ιστορία"],["legends","Θρύλοι"],["club","Σύλλογος"],["tickets","Εισιτήρια"],["media","Πολυμέσα"],["gallery","Φωτογραφίες"]];
 const MEMPTY={standings:["Οι βαθμολογίες συμπληρώνονται","Super League, Euroleague, Champions League, Basket League και πόλο."],scorers:["Τα στατιστικά συμπληρώνονται","Κορυφαίοι σε γκολ, ασίστ, πόντους και ριμπάουντ."],discipline:["Οι τιμωρίες συμπληρώνονται","Ποιος είναι τιμωρημένος, ποιος κινδυνεύει και ποιος γυρίζει."],rumors:["Οι μεταγραφές συμπληρώνονται","Επίσημα, προχωρημένα και φήμες με βαθμό αξιοπιστίας."],quotes:["Οι δηλώσεις συμπληρώνονται","Προπονητές, παίκτες και διοίκηση πριν και μετά τους αγώνες."],amateur:["Ο ερασιτέχνης συμπληρώνεται","Βόλεϊ, μπάσκετ γυναικών, στίβος και λοιπά τμήματα."]};
 const RST={official:["Επίσημο","good"],advanced:["Προχωρημένο","info"],rumor:["Φήμη","warn"],denied:["Διαψεύστηκε","red"]};
 const RDIR={in:"Έρχεται",out:"Φεύγει",renew:"Ανανέωση"};
@@ -1404,7 +1404,7 @@ function renderMore(){const box=$("#more");box.replaceChildren();
   if(mtab==="gallery"){renderGallery(box);return}
   if(mtab==="history"){renderHistory(box);return}
   if(mtab==="legends"){renderLegends(box);return}
-  if(mtab==="club"||mtab==="tickets"||mtab==="academy"||mtab==="media"){renderInfo(box,mtab);return}
+  if(mtab==="club"||mtab==="tickets"||mtab==="media"){renderInfo(box,mtab);return}
   if(mtab==="teams"){renderTeams(box);return}
   if(mtab==="amateur"){renderAmateurHub(box);return}
   const d=X[mtab];if(!d){box.append(emptyBox(MEMPTY[mtab]));return}
