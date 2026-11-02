@@ -1084,7 +1084,7 @@ function compKey(c,sport){const parts=String(c||"").split(" · ").map(x=>x.trim(
   if(parts.length>1&&/^(Βόλεϊ|Πόλο|Χάντμπολ|Μπάσκετ γυναικών)/.test(parts[0]))return parts[0]+" · "+parts[1].replace(/\s*\d+[ηο]ς?\s*(αγων|αγωνιστική|όμιλος).*$/i,"").trim();
   return parts[0]||"Άλλο"}
 function seasonToItem(m){const done=!!m.score||!!m.res||(!!m.d&&m.d<todayStr());let oS=null,pS=null;
-  if(done){const pr=String(m.score).split("-");if(pr.length===2){oS=m.home===false?pr[1]:pr[0];pS=m.home===false?pr[0]:pr[1]}}
+  if(done){const pr=String(m.score).split("-");if(pr.length===2){oS=pr[0];pS=pr[1]}}
   const cl=classifyTeam(m.sport,m.comp,m.gender);
   return {src:"season",m,sport:m.sport,comp:m.comp||"",d:m.d,t:m.t||"",opp:m.opp,home:m.home!==false,bucket:done?"done":"next",olyS:oS,oppS:pS,status:done?"ft":"pre",key:m.d+"|"+m.opp,team:cl.id,gender:cl.id?TEAM_BY[cl.id].g:null,cwhy:cl.why||""}}
 /* όλοι οι αγώνες: live/now (προτεραιότητα) + ολόκληρο το ημερολόγιο, χωρίς διπλότυπα */
@@ -1607,7 +1607,7 @@ function render(){
     if(aD.length||aN.length){const s6=el("section","amx");const h6=el("div","grp-h");h6.append(ic("amateur"),el("h2",null,"Ερασιτέχνης"));
       const g=el("div","amx-g");
       const col=(t,arr,res)=>{const d=el("div","amx-c");d.append(el("h3",null,t));if(!arr.length)d.append(el("p","amx-e","Δεν υπάρχουν ακόμα."));
-        arr.forEach(m=>{const r=el("div","amx-r");r.append(el("span","amx-d",fmtShort(m.d)),el("span","amx-n",(m.home===false?m.opp+" – Ολυμπιακός":"Ολυμπιακός – "+m.opp)),el("span","amx-s",res?m.score:(m.t||"")));
+        arr.forEach(m=>{const r=el("div","amx-r");r.append(el("span","amx-d",fmtShort(m.d)),el("span","amx-n",(m.home===false?m.opp+" – Ολυμπιακός":"Ολυμπιακός – "+m.opp)),el("span","amx-s",res?(m.home===false?String(m.score).split("-").reverse().join("-"):m.score):(m.t||"")));
           r.title=m.comp||"";d.append(r,el("small","amx-cp",m.comp||""))});return d};
       g.append(col("Τελευταία αποτελέσματα",aD,true),col("Επόμενοι αγώνες",aN,false));
       const all=el("button","moreb","Όλα τα αθλήματα ›");all.type="button";all.onclick=()=>{gfilter="amateur";gmode="next";setView("games")};
