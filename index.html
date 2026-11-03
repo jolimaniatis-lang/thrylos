@@ -1926,6 +1926,6 @@ setView(view);fixCaps();
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.matches&&n.matches(SEL))run(n);n.querySelectorAll&&n.querySelectorAll(SEL).forEach(run)}))).observe(document.body,{childList:true,subtree:true})})();
 
 if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had)location.reload()});navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{})}
-try{document.querySelector(".hero").style.setProperty("--hp","url(assets/photos/h"+(Math.floor(Date.now()/864e5)%4)+".jpg)")}catch(e){}
+try{document.querySelector(".hero").style.setProperty("--hp","url(assets/photos/h3.jpg)")}catch(e){}
 </script>
 </body></html>
