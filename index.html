@@ -1072,7 +1072,7 @@ function renderGames(){
     const mid=el("div","gmid");const op=el("div","gopp");op.className="gopp";op.append(el("span","ha"+(x.home?" h":""),x.home?"ΕΝΤΟΣ":"ΕΚΤΟΣ"),crest(x.opp,"sm",x.sport),x.opp);if(x.d===t)op.append(el("span","tag-today","ΣΗΜΕΡΑ"));
     const cp=el("div","gcomp");cp.append(ic(x.sport,x.comp),el("span",null,x.comp));if(!classifyTeam(x.sport,x.comp,x.gender).id)cp.append(el("span","un-tag","⚠ Δεν έχει επιβεβαιωθεί η ομάδα"));mid.append(op,cp);if(x.note)mid.append(el("div","gnote",x.note));
     const r=el("div","gr");
-    if(x.score){r.append(el("span","score "+x.res,x.score))}else{r.append(el("span","gtime",x.t||"—"));if(x.tv)r.append(el("span","gtv",x.tv))}
+    if(x.score){r.append(el("span","score "+x.res,x.home===false&&/^\d+-\d+$/.test(String(x.score).trim())?String(x.score).trim().split("-").reverse().join("-"):x.score))}else{r.append(el("span","gtime",x.t||"—"));if(x.tv)r.append(el("span","gtv",x.tv))}
     row.append(gd,mid,r);row.tabIndex=0;row.setAttribute("role","button");row.setAttribute("aria-expanded","false");
     const tg=()=>{row.classList.toggle("open");row.setAttribute("aria-expanded",row.classList.contains("open")?"true":"false")};
     row.onclick=e=>{if(e.target.closest("a"))return;tg()};row.addEventListener("keydown",e=>{if(e.target===row&&(e.key==="Enter"||e.key===" ")){e.preventDefault();tg()}});sec.append(row)});
