@@ -27,7 +27,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           end=$((SECONDS+1500))
           while [ $SECONDS -lt $end ]; do
-            python3 tools/live_gh.py /tmp/out/auto.json; rc=$?
+            rc=0; python3 tools/live_gh.py /tmp/out/auto.json || rc=$?
             if [ $rc -eq 3 ]; then
               echo "nothing to track"; break
             fi
