@@ -1,116 +1,85 @@
 #!/usr/bin/env python3
-"""Live σκορ για τους αγώνες της ημέρας, χωρίς κλειδί. Τρέχει στο GitHub Actions και γράφει auto.json.
-Πηγές: SportScore (ποδόσφαιρο/μπάσκετ ανδρών) και SofaScore (όλα τα άλλα αθλήματα). Μόνο ό,τι επιστρέφουν — τίποτα επινοημένο.
-Χρήση: live_gh.py <out.json>   (κωδικός εξόδου 3 = κανένας αγώνας στο παράθυρο, δεν χρειάζεται βρόχος)"""
+"""Live σκορ όλων των αθλημάτων του Ολυμπιακού από το 365scores (χωρίς κλειδί). Τρέχει στο GitHub Actions και γράφει auto.json.
+Μόνο ό,τι επιστρέφει η πηγή — τίποτα επινοημένο. Κωδικός εξόδου 3 = κανένας αγώνας στο παράθυρο (δεν χρειάζεται βρόχος).
+Χρήση: live_gh.py <out.json>"""
 import json, sys, time, urllib.request, urllib.parse, datetime, re
 from zoneinfo import ZoneInfo
 ATH = ZoneInfo("Europe/Athens")
-UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) thrylos-live", "Accept": "application/json"}
-def get(url, **q):
-    if q: url += "?" + urllib.parse.urlencode(q)
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=20) as r:
+UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36", "Accept": "application/json"}
+BASE = "https://webws.365scores.com/web/"
+def get(path, **q):
+    q.update(appTypeId=5, langId=1, timezoneName="Europe/Athens", userCountryId=21)
+    with urllib.request.urlopen(urllib.request.Request(BASE + path + "?" + urllib.parse.urlencode(q), headers=UA), timeout=25) as r:
         return json.load(r)
-now = datetime.datetime.now(ATH)
-today = now.strftime("%Y-%m-%d")
+now = datetime.datetime.now(ATH); today = now.strftime("%Y-%m-%d")
 season = json.load(open("data/schedule/season.json", encoding="utf8"))["matches"]
 def kick(m):
     t = m.get("t") or ""
     if re.match(r"^\d{1,2}:\d{2}$", t):
         h, mi = map(int, t.split(":")); return now.replace(hour=h, minute=mi, second=0, microsecond=0)
-    return None
-todo = []
-for m in season:
-    if m.get("d") != today or m.get("score"): continue
+def window(m):
     k = kick(m)
-    if k is None or -75*60 <= (now - k).total_seconds() <= 4*3600 + 1800:
-        todo.append(m)
+    return k is None or -75*60 <= (now - k).total_seconds() <= 4*3600 + 1800
+todo = [m for m in season if m.get("d") == today and window(m)]
+diag = []
 if not todo:
     print("κανένας αγώνας στο παράθυρο"); sys.exit(3)
-def sofa_sport(m):
+SPORT = {"football": {1}, "basketball": {2}, "volleyball": {8}, "handball": {5}}
+def want_sports(m):
     c = (m.get("comp") or "").lower(); s = m.get("sport")
-    if s == "football": return "football"
-    if s == "basketball": return "basketball"
-    if s == "polo": return "water-polo"
-    if "βόλεϊ" in c or "volley" in c: return "volleyball"
-    if "χάντμπολ" in c or "handball" in c: return "handball"
-    if "μπάσκετ" in c: return "basketball"
-    if "ποδόσφαιρο" in c: return "football"
+    if s == "football": return {1}
+    if s == "basketball": return {2}
+    if s == "polo": return None
+    if "βόλεϊ" in c: return {8}
+    if "χάντμπολ" in c: return {5}
+    if "μπάσκετ" in c: return {2}
+    if "ποδόσφαιρο" in c: return {1}
     return None
-def is_oly(n): return bool(re.search(r"olympia[ck]os", n or "", re.I))
-def women(n): return bool(re.search(r"(\bW\b|women|\(w\))\s*$", (n or "").strip(), re.I))
-def sofa_find(m, sp, diag):
-    d = m["d"]
-    try:
-        j = get("https://api.sofascore.com/api/v1/sport/%s/scheduled-events/%s" % (sp, d)); diag.append({"src": "sofa", "sport": sp, "ok": True, "events": len(j.get("events", []))})
-    except Exception as e:
-        diag.append({"src": "sofa", "sport": sp, "ok": False, "err": str(e)[:80]}); return None
-    best = None
-    for ev in j.get("events", []):
-        h, a = ev["homeTeam"]["name"], ev["awayTeam"]["name"]
-        if not (is_oly(h) or is_oly(a)): continue
-        oly = h if is_oly(h) else a
-        if (m.get("gender") == "w") != women(oly): continue
-        k = kick(m); st = datetime.datetime.fromtimestamp(ev["startTimestamp"], ATH)
-        gap = abs((st - k).total_seconds()) if k else 0
-        if gap > 4*3600: continue
-        if best is None or gap < best[0]: best = (gap, ev)
-    return best[1] if best else None
-def from_sofa(m, ev, sp):
-    oh = is_oly(ev["homeTeam"]["name"]); s = ev.get("status", {}).get("type")
-    hs, as_ = ev.get("homeScore", {}), ev.get("awayScore", {})
-    o, p = (hs, as_) if oh else (as_, hs)
-    if s == "notstarted": return None
-    status = {"inprogress": "live", "finished": "ft"}.get(s, "live")
-    desc = (ev.get("status", {}).get("description") or "")
-    if re.search(r"half\s*time|^ht$", desc, re.I): status = "ht"
-    per = []
-    for i in range(1, 8):
-        a, b = o.get("period%d" % i), p.get("period%d" % i)
-        if a is not None and b is not None: per.append("%s-%s" % (a, b))
-    clock = "Τελικό" if status == "ft" else ("Ημίχρονο" if status == "ht" else desc)
-    if sp == "football" and status == "live":
-        t0 = ev.get("time", {}).get("currentPeriodStartTimestamp")
-        if t0:
-            mins = int((time.time() - t0) // 60)
-            if re.search(r"2nd", desc): mins += 45
-            clock = "%d′" % max(mins + 1, 1)
-    if status == "ft" and ev.get("status", {}).get("code") == 100: pass
-    return {"olyScore": o.get("current", 0), "oppScore": p.get("current", 0), "status": status, "clock": clock, "periods": ", ".join(per), "src": "SofaScore"}
-def sportscore(m, diag):
-    sp = m["sport"]; slug = {"football": "olympiacos-piraeus", "basketball": "olympiacos-piraeus-bc"}[sp]
-    k = (kick(m) or now).astimezone(datetime.timezone.utc)
-    for dd in (k.strftime("%Y-%m-%d"), (k + datetime.timedelta(days=1)).strftime("%Y-%m-%d")):
-        try:
-            r = get("https://sportscore.com/api/v1/fixtures/", sport=sp, date=dd, team=slug); diag.append({"src": "sportscore", "sport": sp, "ok": True, "n": len(r.get("matches", []))})
-        except Exception as e:
-            diag.append({"src": "sportscore", "sport": sp, "ok": False, "err": str(e)[:80]}); continue
-        if r.get("matches"):
-            x = r["matches"][0]
-            return x
-    return None
-def from_sc(m, x):
-    s = (x.get("status") or "").lower(); t = (x.get("status_text") or "").lower()
-    st = "ft" if (s == "finished" or t in ("finished", "ft", "after overtime", "aet")) else "ht" if ("half" in t and "time" in t) else "live" if (s in ("live", "inprogress") or x.get("live_minute")) else "pre"
-    if st == "pre": return None
-    try: hs, as_ = int(x.get("home_score") or 0), int(x.get("away_score") or 0)
-    except ValueError: hs = as_ = 0
-    o, p = (hs, as_) if m.get("home") else (as_, hs)
-    mn = x.get("live_minute")
-    clock = "Τελικό" if st == "ft" else "Ημίχρονο" if st == "ht" else ("%s′" % mn if mn not in (None, "") else (x.get("status_text") or "Σε εξέλιξη"))
-    return {"olyScore": o, "oppScore": p, "status": st, "clock": clock, "periods": "", "src": "SportScore"}
-out, diag = [], []
+def is_oly(c): return bool(re.search(r"olympia[ck]os", c.get("name", ""), re.I)) and c.get("countryId") == 13
+def women(c): return bool(re.search(r"\(w\)|women", c.get("name", ""), re.I))
+j = get("games/allscores/", startDate=now.strftime("%d/%m/%Y"), endDate=now.strftime("%d/%m/%Y"), showOdds="false")
+games = [g for g in j.get("games", []) if is_oly(g["homeCompetitor"]) or is_oly(g["awayCompetitor"])]
+diag.append({"games": len(j.get("games", [])), "oly": len(games)})
+def clock_of(g, m):
+    t, d = g.get("statusText", ""), g.get("gameTimeDisplay", "")
+    if g["statusGroup"] == 4: return "Τελικό"
+    if re.search(r"half\s*time|^ht$", t, re.I): return "Ημίχρονο"
+    if g["sportId"] == 1 and d: return d.replace("'", "′")
+    s = re.match(r"^Set (\d)", t)
+    if s: return s.group(1) + "ο σετ"
+    if re.match(r"^Q\d$", t) and d: return t + " " + d.replace("'", "′")
+    return t or "Σε εξέλιξη"
+out = []
 for m in todo:
-    sp = sofa_sport(m)
-    if sp is None: diag.append({"match": m["opp"], "skip": "άγνωστο άθλημα"}); continue
-    res = None
-    if m["sport"] in ("football", "basketball") and m.get("gender", "m") == "m":
-        x = sportscore(m, diag)
-        if x: res = from_sc(m, x)
-    if res is None:
-        ev = sofa_find(m, sp, diag)
-        if ev: res = from_sofa(m, ev, sp)
-    if res:
-        out.append({"d": m["d"], "opp": m["opp"], "sport": m["sport"], "comp": m.get("comp", ""), "kickoff": m.get("t", ""), "home": m.get("home") is not False, "tv": m.get("tv", ""), **res})
+    ws = want_sports(m); k = kick(m); best = None
+    for g in games:
+        oc = g["homeCompetitor"] if is_oly(g["homeCompetitor"]) else g["awayCompetitor"]
+        if (m.get("gender") == "w") != women(oc): continue
+        if ws is not None and g["sportId"] not in ws: continue
+        if ws is None and g["sportId"] in (1, 2, 5, 8): continue
+        st = datetime.datetime.fromisoformat(g["startTime"])
+        gap = abs((st - k).total_seconds()) if k else 0
+        if gap <= 2400 and (best is None or gap < best[0]): best = (gap, g)
+    if not best: diag.append({"match": m["opp"], "found": False}); continue
+    g = best[1]
+    if g["statusGroup"] not in (3, 4): diag.append({"match": m["opp"], "status": g.get("statusText")}); continue
+    oh = is_oly(g["homeCompetitor"]); oc, pc = (g["homeCompetitor"], g["awayCompetitor"]) if oh else (g["awayCompetitor"], g["homeCompetitor"])
+    o, p = int(max(oc.get("score", 0), 0)), int(max(pc.get("score", 0), 0))
+    per = ""
+    if g["sportId"] != 1:
+        try:
+            dj = get("game/", gameId=g["id"], topBookmaker=14); per_l = []
+            for s in dj["game"].get("stages", []):
+                if s.get("name") in ("Current Score", "Sets", "Score") or s.get("shortName") in ("Score", "Sets"): continue
+                a, b = s.get("homeCompetitorScore", -1), s.get("awayCompetitorScore", -1)
+                if a < 0 or b < 0: continue
+                x, y = (a, b) if oh else (b, a)
+                per_l.append("%d-%d" % (x, y))
+            per = ", ".join(per_l)
+        except Exception as e: diag.append({"detail": str(e)[:60]})
+    status = "ft" if g["statusGroup"] == 4 else ("ht" if re.search(r"half\s*time", g.get("statusText", ""), re.I) else "live")
+    out.append({"d": m["d"], "opp": m["opp"], "sport": m["sport"], "comp": m.get("comp", ""), "kickoff": m.get("t", ""), "home": m.get("home") is not False, "tv": m.get("tv", ""),
+                "olyScore": o, "oppScore": p, "status": status, "clock": clock_of(g, m), "periods": per, "src": "365scores"})
 doc = {"updatedAt": datetime.datetime.now(ATH).isoformat(timespec="seconds"), "matches": out, "diag": diag}
 json.dump(doc, open(sys.argv[1], "w", encoding="utf8"), ensure_ascii=False)
-print(json.dumps({"matches": [(x["opp"], x["status"], x["olyScore"], x["oppScore"]) for x in out], "diag": diag}, ensure_ascii=False))
+print(json.dumps({"matches": [(x["opp"], x["status"], x["olyScore"], x["oppScore"], x["clock"], x["periods"]) for x in out], "diag": diag}, ensure_ascii=False))
