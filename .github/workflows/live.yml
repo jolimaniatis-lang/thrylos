@@ -1,0 +1,37 @@
+name: live-scores
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [live-action]
+permissions:
+  contents: write
+concurrency:
+  group: live-scores
+  cancel-in-progress: true
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Poll
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/out && cd /tmp/out && git init -q && git config user.name "Thrylos Live" && git config user.email "live@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          cd "$GITHUB_WORKSPACE"
+          end=$((SECONDS+1500))
+          while [ $SECONDS -lt $end ]; do
+            python3 tools/live_gh.py /tmp/out/auto.json; rc=$?
+            if [ $rc -eq 3 ]; then
+              echo "nothing to track"; break
+            fi
+            (cd /tmp/out && git add -A && git commit -q --amend -m "live" 2>/dev/null || (cd /tmp/out && git commit -q -m "live"); cd /tmp/out && git push -q -f origin HEAD:refs/heads/live-data)
+            sleep 45
+          done
