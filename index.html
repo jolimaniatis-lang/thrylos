@@ -1276,6 +1276,7 @@ function seasonToItem(m){const done=!!m.score||!!m.res||(!!m.d&&m.d<todayStr());
   const cl=classifyTeam(m.sport,m.comp,m.gender);
   return {src:"season",m,sport:m.sport,comp:m.comp||"",d:m.d,t:m.t||"",opp:m.opp,home:m.home!==false,bucket:done?"done":"next",olyS:oS,oppS:pS,status:done?"ft":"pre",key:m.d+"|"+m.opp,team:cl.id,gender:cl.id?TEAM_BY[cl.id].g:null,cwhy:cl.why||""}}
 /* όλοι οι αγώνες: live/now (προτεραιότητα) + ολόκληρο το ημερολόγιο, χωρίς διπλότυπα */
+function startedRecently(m){if(!m||m.d!==todayStr()||!/^\d{1,2}:\d{2}$/.test(m.kickoff||""))return false;const[h,mi]=m.kickoff.split(":").map(Number);const t=new Date();t.setHours(h,mi,0,0);const age=Date.now()-t.getTime();return age>3*60e3&&age<4*36e5}
 function startedNoData(m){if(!m||m.status!=="pre"||m.d!==todayStr()||!/^\d{1,2}:\d{2}$/.test(m.kickoff||""))return false;const[h,mi]=m.kickoff.split(":").map(Number);const t=new Date();t.setHours(h,mi,0,0);const age=Date.now()-t.getTime();return age>3*60e3&&age<4*36e5}
 function allItems(){
   const out=[];const seenL=new Set();const lv=((live&&live.matches)||[]).filter(m=>{const k=m.d+"|"+nrm(m.opp||"")+"|"+m.sport;if(seenL.has(k))return false;seenL.add(k);return true}).map(m=>EL[m.id]?Object.assign({},m,EL[m.id]):m);
@@ -1294,7 +1295,7 @@ function renderLive(){
   const box=$("#live");box.replaceChildren();clearInterval(ltimer);
   const liveCard=liveCardOf;
   const t=todayStr();const all=lcItems();
-  const nLive=all.filter(x=>x.bucket==="live").length;const nPend=all.filter(x=>x.bucket==="stale"&&startedNoData(x.m)).length;
+  const nLive=all.filter(x=>x.bucket==="live").length;const nPend=all.filter(x=>x.bucket==="stale"&&(startedNoData(x.m)||startedRecently(x.m))).length;
   /* μπάρα τελευταίας ενημέρωσης */
   const bar=el("div","lc-bar");const dot=el("i","dot"+(nLive?" on":""));const tx=el("div","lc-bt");
   const l1=el("b",null,"Live Center · "+(nLive?nLive+" σε εξέλιξη":nPend?nPend+(nPend===1?" αγώνας παίζεται τώρα":" αγώνες παίζονται τώρα"):"κανένας αγώνας τώρα"));const l2=el("span");tx.append(l1,l2);bar.append(dot,tx);
