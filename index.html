@@ -1120,7 +1120,16 @@ function ago(iso){const t=Date.parse(iso);if(!t)return"";const m=Math.round((Dat
 // ---- Απευθείας live από το δημόσιο API της Euroleague (μόνο μπάσκετ Euroleague· διαβάζεται από το iPhone, χωρίς tasks) ----
 /* Φάση 2: επιβεβαίωση live και σκορ «μη διαθέσιμο» */
 const LIVE_FRESH=30*60e3;
-function liveStamp(){const t=live&&live.updatedAt?Date.parse(live.updatedAt):NaN;return isNaN(t)?null:t}
+const AUTO={m:null,t:0,busy:false};
+function liveStamp(){const t=live&&live.updatedAt?Date.parse(live.updatedAt):NaN;const a=AUTO.t||0;const v=Math.max(isNaN(t)?0:t,a);return v?v:null}
+async function autoPoll(){if(AUTO.busy||document.visibilityState!=="visible")return;AUTO.busy=true;
+  try{const r=await fetch("https://raw.githubusercontent.com/jolimaniatis-lang/thrylos/live-data/auto.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(r.status);
+    const j=await r.json();const t=Date.parse(j.updatedAt);if(!isNaN(t)&&Array.isArray(j.matches)){const prev=JSON.stringify(AUTO.m);AUTO.m=j.matches;AUTO.t=t;if(prev!==JSON.stringify(AUTO.m)){if(view==="live")render();else if(view==="news")renderNext()}}}catch(e){}
+  AUTO.busy=false}
+setInterval(autoPoll,20000);setTimeout(autoPoll,1200);
+function mergeAuto(base){if(!AUTO.m||!AUTO.t||Date.now()-AUTO.t>10*60e3)return base;const out=base.slice();const key=m=>m.d+"|"+nrm(m.opp||"")+"|"+m.sport;
+  AUTO.m.forEach(a=>{const i=out.findIndex(m=>key(m)===key(a));const up={olyScore:a.olyScore,oppScore:a.oppScore,status:a.status,clock:a.clock,elSrc:AUTO.t};if(a.periods)up.periods=a.periods;
+    if(i>=0)out[i]=Object.assign({},out[i],up);else out.push(Object.assign({id:"auto|"+key(a),events:[],stats:[],links:[]},a,up))});return out}
 /* LIVE = έγκυρο status από την πηγή (live/ht) ΚΑΙ πρόσφατο, έγκυρο updatedAt (όχι παλιό, όχι μελλοντικό) ΚΑΙ ημερομηνία αγώνα σήμερα/χθες */
 function isLiveConfirmed(m){if(!m||(m.status!=="live"&&m.status!=="ht"))return false;
   const now=Date.now(),fresh=t=>typeof t==="number"&&isFinite(t)&&t<=now+5*60e3&&now-t<LIVE_FRESH;
@@ -1220,7 +1229,7 @@ function liveCardOf(m){
     const L=m.home?[oly,a,b,op]:[op,b,a,oly];if(nos)sc.append(el("span","vs0","VS"));else sc.append(L[1],el("span",null,":"),L[2]);
     const bd=el("div","board");bd.append(L[0],sc,L[3]);c.append(bd);
     {const k=(m.id||m.opp||"")+"|"+m.sport,cur=a+":"+b,pv=SCP[k];SCP[k]=cur;if(pv&&pv!==cur&&!nos){sc.classList.add("pop");c.classList.add("goal")}}
-    c.append(el("div","clock"+(nodata?" nd":""),nodata?"Ο αγώνας ξεκίνησε στις "+m.kickoff+" · αναμένεται ενημέρωση":pre?(m.kickoff?"Έναρξη "+m.kickoff:""):stale?"Τελευταία γνωστή κατάσταση: "+(m.clock||"Live")+(liveStamp()?" · "+ago(live.updatedAt):""):(m.clock||"")));if(m.elSrc)c.append(el("div","lv-sub","⚡ Απευθείας από την Euroleague"));
+    c.append(el("div","clock"+(nodata?" nd":""),nodata?"Ο αγώνας ξεκίνησε στις "+m.kickoff+" · αναμένεται ενημέρωση":pre?(m.kickoff?"Έναρξη "+m.kickoff:""):stale?"Τελευταία γνωστή κατάσταση: "+(m.clock||"Live")+(liveStamp()?" · "+ago(new Date(liveStamp()||Date.now()).toISOString()):""):(m.clock||"")));if(m.elSrc)c.append(el("div","lv-sub","⚡ Απευθείας από την Euroleague"));
     const sub=[m.periods,m.tv].filter(Boolean).join(" · ");if(sub)c.append(el("div","lv-sub",sub));
     if(m.note)c.append(el("div","lv-sub",m.note));
     if(m.lineups&&(m.lineups.oly||m.lineups.opp)){const lu=el("div","lu");lu.append(el("h4",null,"Συνθέσεις"+(m.lineups.status?" · "+m.lineups.status:"")));
@@ -1279,7 +1288,8 @@ function seasonToItem(m){const done=!!m.score||!!m.res||(!!m.d&&m.d<todayStr());
 function startedRecently(m){if(!m||m.d!==todayStr()||!/^\d{1,2}:\d{2}$/.test(m.kickoff||""))return false;const[h,mi]=m.kickoff.split(":").map(Number);const t=new Date();t.setHours(h,mi,0,0);const age=Date.now()-t.getTime();return age>3*60e3&&age<4*36e5}
 function startedNoData(m){if(!m||m.status!=="pre"||m.d!==todayStr()||!/^\d{1,2}:\d{2}$/.test(m.kickoff||""))return false;const[h,mi]=m.kickoff.split(":").map(Number);const t=new Date();t.setHours(h,mi,0,0);const age=Date.now()-t.getTime();return age>3*60e3&&age<4*36e5}
 function allItems(){
-  const out=[];const seenL=new Set();const lv=((live&&live.matches)||[]).filter(m=>{const k=m.d+"|"+nrm(m.opp||"")+"|"+m.sport;if(seenL.has(k))return false;seenL.add(k);return true}).map(m=>EL[m.id]?Object.assign({},m,EL[m.id]):m);
+  const out=[];const seenL=new Set();let lv=((live&&live.matches)||[]).filter(m=>{const k=m.d+"|"+nrm(m.opp||"")+"|"+m.sport;if(seenL.has(k))return false;seenL.add(k);return true}).map(m=>EL[m.id]?Object.assign({},m,EL[m.id]):m);
+  lv=mergeAuto(lv);
   lv.forEach(m=>{const cf=isLiveConfirmed(m),stale=(m.status==="live"||m.status==="ht")&&!cf;const cl=classifyTeam(m.sport,m.comp||"",m.gender);
     out.push({src:"live",m,sport:m.sport,comp:m.comp||"",d:m.d,t:m.kickoff||"",opp:m.opp,home:m.home!==false,
       bucket:cf?"live":(stale||startedNoData(m))?"stale":m.status==="ft"?"done":"next",olyS:m.olyScore,oppS:m.oppScore,status:m.status,key:m.id,team:cl.id,gender:cl.id?TEAM_BY[cl.id].g:null,cwhy:cl.why||""})});
@@ -1301,7 +1311,7 @@ function renderLive(){
   const l1=el("b",null,"Live Center · "+(nLive?nLive+" σε εξέλιξη":nPend?nPend+(nPend===1?" αγώνας παίζεται τώρα":" αγώνες παίζονται τώρα"):"κανένας αγώνας τώρα"));const l2=el("span");tx.append(l1,l2);bar.append(dot,tx);
   const stamp=liveStamp();const clk=stamp?new Date(stamp).toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit"}):"";
   const tick=()=>{const age=stamp?Date.now()-stamp:null;dot.classList.toggle("warn",age!=null&&age>LIVE_FRESH);
-    l2.textContent=stamp?"Τελευταία ενημέρωση "+clk+" · "+ago(live.updatedAt)+(age>LIVE_FRESH?" · παλιά δεδομένα":""):"Δεν υπάρχει ώρα ενημέρωσης"};tick();ltimer=setInterval(tick,30000);
+    l2.textContent=stamp?"Τελευταία ενημέρωση "+clk+" · "+ago(new Date(liveStamp()||Date.now()).toISOString())+(age>LIVE_FRESH?" · παλιά δεδομένα":""):"Δεν υπάρχει ώρα ενημέρωσης"};tick();ltimer=setInterval(tick,30000);
   box.append(bar);
   if(!all.length){const e=el("div","empty");const ph=el("img","lc-ph");ph.src="assets/photos/live.jpg";ph.alt="";ph.loading="lazy";e.append(ph,el("b",null,"Δεν υπάρχουν αγώνες"),el("p",null,"Όταν παίζει ο Ολυμπιακός, εδώ βλέπεις ζωντανά σκορ, λεπτό και λεπτομέρειες."));box.append(e);return}
   /* φίλτρα: κατάσταση · άθλημα · διοργάνωση (συνδυάζονται) */
