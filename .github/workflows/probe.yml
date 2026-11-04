@@ -1,0 +1,18 @@
+name: probe
+on:
+  push:
+    branches: [live-action]
+    paths: ["tools/probe.py", ".github/workflows/probe.yml"]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/out && python3 tools/probe.py /tmp/out/probe.json || true
+          cd /tmp/out && git init -q && git config user.name p && git config user.email p@users.noreply.github.com && git add -A && git commit -q -m probe
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/probe-data
