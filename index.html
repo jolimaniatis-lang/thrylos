@@ -903,7 +903,7 @@ body{background:radial-gradient(60% 28% at 8% 38%,color-mix(in srgb,var(--red) 1
 .tab[aria-pressed="true"]{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 14px -8px rgba(255,255,255,.22),0 5px 10px -5px color-mix(in srgb,var(--red) 70%,transparent)}
 .lv,.tbl,.rec,.amx,.vs,.cmp,.slip,.r-sum,.lead{box-shadow:0 1px 1px rgba(40,15,20,.04),0 10px 24px -14px rgba(40,15,20,.22)}
 .mm-ic img{width:28px;height:28px;object-fit:contain;display:block}
-.clock.nd{font-family:var(--body);font-size:13.5px;font-weight:600;color:var(--muted);text-align:center;padding:0 16px 14px;line-height:1.4}
+.sc .vs0{font-size:.6em;letter-spacing:.14em;opacity:.7}.clock.nd{font-family:var(--body);font-size:13.5px;font-weight:600;color:var(--muted);text-align:center;padding:0 16px 14px;line-height:1.4}
 </style>
 </head><body>
 
@@ -1212,15 +1212,15 @@ function classifyTeam(sport,text,gender){
 const SCP={};
 function liveCardOf(m){
     const c=el("section","lv");const h=el("div","lv-h");h.append(ic(m.sport,m.comp),el("span",null,m.comp||""));
-    const nodata=startedNoData(m);const cf=isLiveConfirmed(m),stale=((m.status==="live"||m.status==="ht")&&!cf)||nodata;const lab=nodata?"ΞΕΚΙΝΗΣΕ · ΧΩΡΙΣ LIVE ΣΚΟΡ":stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":{live:"LIVE",ht:"ΗΜΙΧΡΟΝΟ",ft:"ΤΕΛΙΚΟ",pre:"ΣΕ ΛΙΓΟ"}[m.status]||m.status;h.append(el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),lab));c.append(h);
+    const nodata=startedNoData(m);const cf=isLiveConfirmed(m),stale=((m.status==="live"||m.status==="ht")&&!cf)||nodata;const lab=nodata?"ΞΕΚΙΝΗΣΕ":stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":{live:"LIVE",ht:"ΗΜΙΧΡΟΝΟ",ft:"ΤΕΛΙΚΟ",pre:"ΣΕ ΛΙΓΟ"}[m.status]||m.status;h.append(el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),lab));c.append(h);
     const oly=el("div","team");oly.append(olyBadge(m.sport),el("b",null,"Ολυμπιακός"));
     const ini=(m.opp||"").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();const op=el("div","team");op.append(el("div","badge",ini),el("b",null,m.opp));
     const sc=el("div","sc");const pre=m.status==="pre";
-    const a=pre?"–":scoreTxt(m.olyScore),b=pre?"–":scoreTxt(m.oppScore);
-    const L=m.home?[oly,a,b,op]:[op,b,a,oly];sc.append(L[1],el("span",null,":"),L[2]);
+    const nos=pre||nodata,a=nos?"":scoreTxt(m.olyScore),b=nos?"":scoreTxt(m.oppScore);
+    const L=m.home?[oly,a,b,op]:[op,b,a,oly];if(nos)sc.append(el("span","vs0","VS"));else sc.append(L[1],el("span",null,":"),L[2]);
     const bd=el("div","board");bd.append(L[0],sc,L[3]);c.append(bd);
-    {const k=(m.id||m.opp||"")+"|"+m.sport,cur=a+":"+b,pv=SCP[k];SCP[k]=cur;if(pv&&pv!==cur&&!pre){sc.classList.add("pop");c.classList.add("goal")}}
-    c.append(el("div","clock"+(nodata?" nd":""),nodata?"Ο αγώνας ξεκίνησε στις "+m.kickoff+" · το σκορ δεν έχει ενημερωθεί ακόμα":pre?(m.kickoff?"Έναρξη "+m.kickoff:""):stale?"Τελευταία γνωστή κατάσταση: "+(m.clock||"Live")+(liveStamp()?" · "+ago(live.updatedAt):""):(m.clock||"")));if(m.elSrc)c.append(el("div","lv-sub","⚡ Απευθείας από την Euroleague"));
+    {const k=(m.id||m.opp||"")+"|"+m.sport,cur=a+":"+b,pv=SCP[k];SCP[k]=cur;if(pv&&pv!==cur&&!nos){sc.classList.add("pop");c.classList.add("goal")}}
+    c.append(el("div","clock"+(nodata?" nd":""),nodata?"Ο αγώνας ξεκίνησε στις "+m.kickoff+" · αναμένεται ενημέρωση":pre?(m.kickoff?"Έναρξη "+m.kickoff:""):stale?"Τελευταία γνωστή κατάσταση: "+(m.clock||"Live")+(liveStamp()?" · "+ago(live.updatedAt):""):(m.clock||"")));if(m.elSrc)c.append(el("div","lv-sub","⚡ Απευθείας από την Euroleague"));
     const sub=[m.periods,m.tv].filter(Boolean).join(" · ");if(sub)c.append(el("div","lv-sub",sub));
     if(m.note)c.append(el("div","lv-sub",m.note));
     if(m.lineups&&(m.lineups.oly||m.lineups.opp)){const lu=el("div","lu");lu.append(el("h4",null,"Συνθέσεις"+(m.lineups.status?" · "+m.lineups.status:"")));
@@ -1261,10 +1261,10 @@ function mkMatchRow(it,lc){
   const r=el("button","lc-row");r.type="button";r.dataset.b=it.bucket;r.dataset.sport=lcNorm(it);r.dataset.comp=compKey(it.comp,it.sport);if(it.team)r.dataset.team=it.team;
   const dt=new Date(it.d+"T12:00:00");const when=el("div","lc-w");when.append(el("b",null,it.bucket==="next"?(it.t||"–"):WDS[dt.getDay()]),el("small",null,dt.getDate()+"/"+(dt.getMonth()+1)));
   const mid=el("div","lc-m");const A=[{n:"Ολυμπιακός",s:it.olyS},{n:it.opp,s:it.oppS}];const [L,R]=it.home?A:[A[1],A[0]];
-  [L,R].forEach(x=>{const tr=el("div","lc-t");tr.append(crest(x.n,"",it.sport),el("span",null,x.n),el("b",null,it.bucket==="next"?"":scoreTxt(x.s)));mid.append(tr)});
+  [L,R].forEach(x=>{const tr=el("div","lc-t");tr.append(crest(x.n,"",it.sport),el("span",null,x.n),el("b",null,it.bucket==="next"||x.s==null||x.s===""||isNaN(+x.s)?"":String(+x.s)));mid.append(tr)});
   mid.append(el("small","lc-c",it.comp));if(!it.team)mid.append(el("small","lc-un","⚠ Δεν έχει επιβεβαιωθεί η ομάδα"));
-  const bd=el("span","st-badge"+(it.bucket==="live"?" live":""),it.bucket==="done"?(it.olyS==null||it.oppS==null?"ΧΩΡΙΣ ΣΚΟΡ":"ΤΕΛΙΚΟ"):it.bucket==="live"?"LIVE":it.bucket==="stale"?"ΕΚΚΡΕΜΕΙ":"ΠΡΟΣΕΧΩΣ");
-  r.append(when,mid,bd);r.onclick=()=>openMatch(it,lc||liveCardOf);return r}
+  const bd=el("span","st-badge"+(it.bucket==="live"?" live":""),it.bucket==="done"?(it.olyS==null||it.oppS==null?"":"ΤΕΛΙΚΟ"):it.bucket==="live"?"LIVE":it.bucket==="stale"?"ΕΚΚΡΕΜΕΙ":"ΠΡΟΣΕΧΩΣ");
+  r.append(when,mid);if(bd.textContent)r.append(bd);r.append(...[]);;r.onclick=()=>openMatch(it,lc||liveCardOf);return r}
 /* Φάση 2: Live Center */
 let lcS="all",lcSp="all",lcC="all",lcG="all";
 const WDS=["Κυρ","Δευ","Τρί","Τετ","Πέμ","Παρ","Σάβ"];
@@ -1343,11 +1343,11 @@ function openMatch(it,liveCard){
   const oppN=it.opp||"Αντίπαλος";sh.setAttribute("aria-label","Ολυμπιακός – "+oppN);
   const dt=new Date(it.d+"T12:00:00");const dstr=isNaN(dt)?it.d:dt.toLocaleDateString("el-GR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   const cf=it.bucket==="live",stale=it.bucket==="stale";
-  const stTxt=cf?(m.status==="ht"?"ΗΜΙΧΡΟΝΟ":"LIVE"):stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":it.bucket==="done"?(it.olyS==null||it.oppS==null?"ΧΩΡΙΣ ΣΚΟΡ":"ΤΕΛΙΚΟ"):"ΠΡΟΣΕΧΩΣ";
-  const hero=el("div","sh-hero mc-hero");const top=el("div","mc-top");top.append(el("span",null,it.comp||""),el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),stTxt));
+  const stTxt=cf?(m.status==="ht"?"ΗΜΙΧΡΟΝΟ":"LIVE"):stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":it.bucket==="done"?(it.olyS==null||it.oppS==null?"":"ΤΕΛΙΚΟ"):"ΠΡΟΣΕΧΩΣ";
+  const hero=el("div","sh-hero mc-hero");const top=el("div","mc-top");top.append(el("span",null,it.comp||""));if(stTxt)top.append(el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),stTxt));
   const A=[{n:"Ολυμπιακός",s:it.olyS},{n:oppN,s:it.oppS}];const [L,R]=it.home?A:[A[1],A[0]];
   const board=el("div","mc-board");const side=x=>{const d=el("div","mc-side");d.append(crest(x.n,"mc-cr",it.sport),el("b",null,x.n));return d};
-  const showSc=it.bucket!=="next";const mid=el("div","mc-sc",showSc?scoreTxt(L.s)+" – "+scoreTxt(R.s):"vs");
+  const showSc=it.bucket!=="next"&&L.s!=null&&R.s!=null&&L.s!==""&&R.s!=="";const mid=el("div","mc-sc",showSc?scoreTxt(L.s)+" – "+scoreTxt(R.s):"vs");
   board.append(side(L),mid,side(R));
   const x=el("button","sh-close","×");x.type="button";x.setAttribute("aria-label","Κλείσιμο");
   hero.append(top,board,x);sh.append(hero);
