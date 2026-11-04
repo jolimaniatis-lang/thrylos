@@ -10,9 +10,9 @@ def probe(name, url, headers=None):
         return b
     except Exception as e:
         res[name] = {"err": str(e)[:100]}
-b=probe("365_all", "https://webws.365scores.com/web/games/allscores/?appTypeId=5&langId=1&timezoneName=Europe/Athens&userCountryId=21&startDate=04/11/2026&endDate=04/11/2026&showOdds=false")
+b=probe("365_all", "https://webws.365scores.com/web/games/allscores/?appTypeId=5&langId=1&timezoneName=Europe/Athens&userCountryId=21&startDate=03/11/2026&endDate=03/11/2026&showOdds=false")
 try:
-    j=json.loads(b); res["365_games"]=[g for g in j.get("games",[]) if re.search(r"olympia[ck]os",json.dumps([g.get("homeCompetitor",{}).get("name"),g.get("awayCompetitor",{}).get("name")]),re.I)][:12]; res["365_sports"]=j.get("sports"); res["365_keys"]=list(j.keys())
+    j=json.loads(b); res["365_games"]=[g for g in j.get("games",[]) if re.search(r"olympia[ck]os",json.dumps([g.get("homeCompetitor",{}).get("name"),g.get("awayCompetitor",{}).get("name")]),re.I)][:12]; res["365_sports"]=j.get("sports"); res["365_keys"]=[ (g.get("sportId"),g.get("statusText"),[k for k in g.keys() if k not in ("homeCompetitor","awayCompetitor")], {k:g.get(k) for k in g if k in ("stages","scores","score","periods","scoresByPeriod","statusGroup","subStatusId","gameTime")}) for g in res["365_games"]]
 except Exception as e: res["365_err"]=str(e)
 probe("sofa_www", "https://www.sofascore.com/api/v1/sport/volleyball/scheduled-events/2026-11-04")
 for sid, nm in ((12, "volley"), (7, "handball"), (22, "wpolo"), (3, "basket")):
