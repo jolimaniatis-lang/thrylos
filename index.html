@@ -1878,7 +1878,7 @@ function render(){
     const SC=({football:"#E3263F",basketball:"#F28C28",polo:"#2B7BE3",amateur:"#2FA36B"});
     const mkRes=m=>{const c=el("div","rs");c.style.setProperty("--acc",SC[SP(m.sport)]||"var(--red)");const top=el("div","rs-top");top.append(ic(m.sport,m.comp),el("span","rs-d",fmtShort(m.d)));
       const pr=m.score?String(m.score).split("-"):[];const oly=pr.length===2?pr:["",""];
-      const L={n:"Ολυμπιακός",s:m.home===false?oly[1]:oly[0]},R={n:m.opp,s:m.home===false?oly[0]:oly[1]};const [A,B]=m.home===false?[R,L]:[L,R];
+      const L={n:"Ολυμπιακός",s:oly[0]},R={n:m.opp,s:oly[1]};const [A,B]=m.home===false?[R,L]:[L,R];
       const row=el("div","rs-row");[A,B].forEach(t=>{const l=el("div","rs-t");l.append(crest(t.n,"",m.sport),el("span",null,t.n),el("b",null,t.s));row.append(l)});
       const res=m.res==="W"?"Νίκη":m.res==="L"?"Ήττα":m.res==="D"?"Ισοπαλία":"";
       c.append(top,row,el("div","rs-m",[res,m.comp].filter(Boolean).join(" · ")));if(res)c.dataset.res=m.res;return c};
