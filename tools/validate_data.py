@@ -69,6 +69,31 @@ def check(rel, d):
             if len(w) > 40: w.append(f"{rel}: … (περισσότερες προειδοποιήσεις)"); return w
     return w
 
+def semantic(rel, d):
+    """(σφάλματα, προειδοποιήσεις) λογικής για το schedule/season: σκορ Ολυμπιακός ΠΡΩΤΑ, res σύμφωνο με το σκορ, διπλότυπα, παλιοί αγώνες χωρίς σκορ."""
+    import re, datetime
+    if key_for(rel) != "schedule/season": return [], []
+    e, w, seen = [], [], {}
+    today = datetime.date.today().isoformat()
+    for i, m in enumerate(d.get("matches") or []):
+        if not isinstance(m, dict): continue
+        tag = f"{rel}: {m.get('d')} {m.get('opp')} ({m.get('sport')})"
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", str(m.get("d", ""))): e.append(f"{tag}: άκυρη ημερομηνία"); continue
+        k = (m.get("d"), m.get("opp"), m.get("sport"), m.get("comp"))
+        if k in seen: w.append(f"{tag}: διπλότυπη εγγραφή")
+        seen[k] = 1
+        sc = m.get("score")
+        if sc:
+            mm = re.match(r"^(\d+)-(\d+)$", str(sc))
+            if not mm: e.append(f"{tag}: άκυρο σκορ '{sc}'"); continue
+            o, x = int(mm.group(1)), int(mm.group(2)); calc = "W" if o > x else "L" if o < x else "D"
+            if m.get("res") != calc: e.append(f"{tag}: res='{m.get('res')}' αλλά σκορ {sc} (Ολυμπιακός πρώτα) δίνει {calc}")
+            if m.get("sport") in ("basketball",) and calc == "D": e.append(f"{tag}: ισοπαλία στο μπάσκετ")
+            if m["d"] > today: e.append(f"{tag}: σκορ σε μελλοντικό αγώνα")
+        elif m["d"] < today and not m.get("note"): w.append(f"{tag}: παρελθοντικός αγώνας χωρίς σκορ")
+        if not sc and m.get("res"): w.append(f"{tag}: res χωρίς σκορ")
+    return e, w
+
 def main(data):
     errs, warns = [], []
     for f in sorted(glob.glob(os.path.join(data, "**", "*.json"), recursive=True)):
@@ -76,7 +101,8 @@ def main(data):
         try: d = json.load(open(f, encoding="utf8"))
         except Exception as e: errs.append(f"{rel}: άκυρο JSON ({e})"); continue
         if not isinstance(d, dict): errs.append(f"{rel}: η ρίζα δεν είναι αντικείμενο"); continue
-        if rel != "index.json": warns += check(rel, d)
+        if rel != "index.json":
+            warns += check(rel, d); se, sw = semantic(rel, d); errs += se; warns += sw
     ip = os.path.join(data, "index.json")
     if os.path.exists(ip):
         try:

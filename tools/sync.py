@@ -22,9 +22,10 @@ if not dry:
         print("Για απλό έλεγχο εξαγωγής χρησιμοποίησε --dry-run.")
         sys.exit(2)
 try:
-    from validate_data import check  # προειδοποιήσεις δομής: ενημερωτικές, δεν μπλοκάρουν τίποτα
+    from validate_data import check, semantic  # προειδοποιήσεις δομής: ενημερωτικές, δεν μπλοκάρουν τίποτα
 except Exception:
     check = lambda rel, d: []
+    semantic = lambda rel, d: ([], [])
 data = os.path.join(root, "data")
 n = 0
 for part in parts:
@@ -37,6 +38,11 @@ for part in parts:
             print("skip (κενό):", f); continue
         for w in check(part + "/" + os.path.basename(f), d)[:10]:
             print("ΠΡΟΕΙΔΟΠΟΙΗΣΗ:", w)
+        se, sw = semantic(part + "/" + os.path.basename(f), d)
+        for w in sw[:10]: print("ΠΡΟΕΙΔΟΠΟΙΗΣΗ:", w)
+        if se:
+            for x in se[:10]: print("ΜΠΛΟΚΑΡΙΣΜΑ (λάθος σκορ/res· το αρχείο ΔΕΝ ανέβηκε, διόρθωσε τη βάση):", x)
+            continue
         dst = os.path.join(data, part, os.path.basename(f))
         if dry:
             n += 1; continue
