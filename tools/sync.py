@@ -73,7 +73,7 @@ def non_data_changes():
 g("add", "-A", "data")
 if g("diff", "--cached", "--quiet", "--", "data").returncode == 0:
     print("τίποτα νέο για commit"); sys.exit(0)
-g("-c", "user.name=Thrylos Bot", "-c", "user.email=bot@thrylos.local", "commit", "-qm",
+g("-c", "user.name=Thrylos Bot", "-c", "user.email=noreply@anthropic.com", "commit", "-qm",
   "data " + time.strftime("%Y-%m-%d %H:%M", time.gmtime()) + "Z (" + ",".join(parts) + ")", "--", "data")
 for i in range(5):
     bad = non_data_changes()
