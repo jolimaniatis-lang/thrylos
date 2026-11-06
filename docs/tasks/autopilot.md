@@ -11,12 +11,13 @@
 1. bash `TZ=Europe/Athens date +%H` → ώρα Η (Ελλάδα). Clone/pull του repo: `git clone --depth 1 https://github.com/jolimaniatis-lang/thrylos /home/claude/thrylos` (αν υπάρχει, `git -C ... pull`).
 2. ΠΑΝΤΑ: ακολούθησε `docs/tasks/update.md` (ΒΗΜΑΤΑ 1–6 του, εκτός από όσα ορίζει παρακάτω ως αλλαγή).
 3. LIVE TRACKERS ΜΟΝΟ ΓΙΑ ΠΟΛΟ: από το ΒΗΜΑ 5 του update.md φτιάξε tracker ΜΟΝΟ για αγώνες sport "polo" (σήμερα/αύριο, χωρίς score, με γνωστή ώρα). Για ποδόσφαιρο, μπάσκετ, βόλεϊ, χάντμπολ ΜΗΝ φτιάχνεις tracker (τα καλύπτει το GitHub Action)· αν όμως ο αγώνας τελείωσε και λείπει score/res στο schedule/season, συμπλήρωσέ το από πηγή (ΜΕΤΑ ΑΠΟ ΚΑΘΕ ΑΓΩΝΑ του update.md). Για ποδόσφαιρο/μπάσκετ ανδρών δες πρώτα `curl` SportScore όπως περιγράφει το update.md.
-4. Αν Η είναι 9 ή 10 (η πρώτη εκτέλεση της ημέρας μετά τις 9): ΕΠΙΠΛΕΟΝ ακολούθησε `docs/tasks/news.md` (ημερήσια έκδοση, πρόγραμμα, αντίπαλοι, ρόστερ).
+4. Αν Η είναι 9 ή 10, Ή αν η έκδοση της ημέρας στη βάση λείπει ή έχει λιγότερα από 8 items (π.χ. μόνο πρόγραμμα/headline): ΕΠΙΠΛΕΟΝ ακολούθησε `docs/tasks/news.md` (ημερήσια έκδοση, πρόγραμμα, αντίπαλοι, ρόστερ).
 5. Αν Η είναι 8 ή 18: ΕΠΙΠΛΕΟΝ ακολούθησε `docs/tasks/betting.md` (στοίχημα, βαθμολογίες, σκόρερ, ειδοποιήσεις με email).
 6. ΣΥΓΧΡΟΝΙΣΜΟΣ ΣΤΟ GITHUB (υποχρεωτικό, δεν υπάρχει πια ξεχωριστό task συγχρονισμού): add_repo (owner jolimaniatis-lang, repo thrylos, access push) αν χρειάζεται, `rm -rf /tmp/exp`, ArtifactData "list" με out_dir "/tmp/exp" (query {"limit":100}) για editions, rosters, schedule, live (παράλληλα) και `python3 /home/claude/thrylos/tools/sync.py /tmp/exp`. Κάν' το ΚΑΙ στη μέση της εκτέλεσης αν έχουν περάσει ~30′ από την αρχή, για να μη μένουν οι αλλαγές μόνο στη βάση. Αν το push αποτύχει: `git pull --rebase` και ξανά μία φορά. ΜΗΝ ξαναγράφεις το ιστορικό του main (κανένα force push, rebase ή amend σε commits του bot).
 7. ΚΑΘΑΡΙΣΜΟΣ: σβήσε (list_triggers include_completed=true + delete_trigger) τα τελειωμένα one-shot tasks με όνομα «Live – …» (ended_reason run_once_fired).
 
 ## Αυτοέλεγχος (κάθε εκτέλεση, 1 λεπτό)
+- ΝΕΑ: η έκδοση της σημερινής ημερομηνίας πρέπει να υπάρχει στο data/editions και να έχει items (≥8 μετά τις 10:00). Αν το WebSearch επιστρέφει παλιά αποτελέσματα, χρησιμοποίησε mode extended και ερωτήματα με την ημερομηνία (π.χ. «Ολυμπιακός 6 Νοεμβρίου 2026»), και άνοιγε άρθρα με WebFetch· δες ημερομηνία στο URL. Μην αφήνεις ποτέ μόνο stub χωρίς items.
 - `python3 tools/validate_data.py` → αν βγάλει ΣΦΑΛΜΑ (π.χ. res που δεν ταιριάζει στο σκορ· το σκορ γράφεται πάντα Ολυμπιακός ΠΡΩΤΑ), διόρθωσέ το στη ΒΑΣΗ πριν το sync. Το sync.py αρνείται να ανεβάσει το schedule/season αν έχει τέτοιο λάθος.
 - Έλεγξε ότι το data/live/now.json δεν έχει στοιχεία παλαιότερα από χθες και ότι κανένας αγώνας με d < σήμερα δεν μένει χωρίς score (εκτός αναβολής).
 
