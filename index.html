@@ -1252,7 +1252,7 @@ function liveCardOf(m){
     const c=el("section","lv");const h=el("div","lv-h");h.append(ic(m.sport,m.comp),el("span",null,m.comp||""));
     const nodata=startedNoData(m);const cf=isLiveConfirmed(m),stale=((m.status==="live"||m.status==="ht")&&!cf)||nodata;const lab=nodata?"ΞΕΚΙΝΗΣΕ":stale?"ΕΚΚΡΕΜΕΙ ΕΠΙΒΕΒΑΙΩΣΗ":{live:"LIVE",ht:"ΗΜΙΧΡΟΝΟ",ft:"ΤΕΛΙΚΟ",pre:"ΣΕ ΛΙΓΟ"}[m.status]||m.status;h.append(el("span","st-badge"+(cf&&m.status==="live"?" live":"")+(stale?" stale":""),lab));c.append(h);
     const oly=el("div","team");oly.append(olyBadge(m.sport),el("b",null,"Ολυμπιακός"));
-    const ini=(m.opp||"").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();const op=el("div","team");op.append(el("div","badge",ini),el("b",null,m.opp));
+    const ini=(m.opp||"").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();const op=el("div","team");{const lg=TLOGO.get(m.opp,m.sport);let bd2;if(lg){bd2=el("div","badge img"+(m.sport==="basketball"?" sq":""));const im=el("img");im.src="assets/teams/"+lg+".png";im.alt="";bd2.append(im)}else bd2=el("div","badge",ini);op.append(bd2)}op.append(el("b",null,m.opp));
     const sc=el("div","sc");const pre=m.status==="pre";
     const nos=pre||nodata,a=nos?"":scoreTxt(m.olyScore),b=nos?"":scoreTxt(m.oppScore);
     const L=m.home?[oly,a,b,op]:[op,b,a,oly];if(nos)sc.append(el("span","vs0","VS"));else sc.append(L[1],el("span",null,":"),L[2]);
