@@ -58,7 +58,13 @@ for old in eds[60:]:
     os.remove(os.path.join(data, "editions", old + ".json"))
 eds = eds[:60]
 ros = sorted(os.path.basename(f)[:-5] for f in glob.glob(data + "/rosters/*.json"))
-idx = json.dumps({"editions": eds, "rosters": ros}, ensure_ascii=False, separators=(",", ":"))
+# v: σύντομο hash ανά αρχείο — η εφαρμογή ξανακατεβάζει μόνο ό,τι άλλαξε (το live/ δεν μπαίνει: διαβάζεται πάντα φρέσκο)
+import hashlib
+ver = {}
+for part in ("editions", "rosters", "schedule"):
+    for f in sorted(glob.glob(os.path.join(data, part, "*.json"))):
+        ver[part + "/" + os.path.basename(f)[:-5]] = hashlib.md5(open(f, "rb").read()).hexdigest()[:8]
+idx = json.dumps({"editions": eds, "rosters": ros, "v": ver}, ensure_ascii=False, separators=(",", ":"))
 ip = os.path.join(data, "index.json")
 if not os.path.exists(ip) or open(ip).read() != idx:
     open(ip, "w").write(idx); n += 1

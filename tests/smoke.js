@@ -19,9 +19,9 @@ for(const [w,h] of SIZES){console.log('== '+w+'px');const ctx=await b.newContext
  for(const g of MENU_VIEWS){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(300);ok(await p.evaluate(()=>!document.getElementById('more').hidden&&!!document.querySelector('.mm-i')),'το μενού δεν άνοιξε');
   await p.click('.mm-i[data-go="'+g+'"]');await p.waitForTimeout(500);const st=await p.evaluate(v=>{const e=document.getElementById(v);return !!e&&!e.hidden&&e.innerText.trim().length},g);ok(st>0,'μενού→'+g+' άδεια/κρυμμένη');
   ok(await p.evaluate(()=>document.querySelector('.bar button[data-v="more"]').getAttribute('aria-current')==='page'),'το «Κι άλλα» δεν είναι ενεργό στο '+g);await ovf('menu→'+g)}
- for(const k of MT){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===11,'το μενού πρέπει να έχει 11 ενότητες (10 + Ομάδες)');
+ for(const k of MT){await p.click('.bar button[data-v="more"]');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===14,'το μενού πρέπει να έχει 14 ενότητες');
   await p.click('.mm-i[data-go="'+k+'"]');await p.waitForTimeout(350);ok(await p.evaluate(()=>!document.getElementById('more').hidden&&!!document.querySelector('.mm-back')),'περιεχόμενο '+k+' / κουμπί πίσω');ok(await p.evaluate(()=>document.getElementById('more').innerText.length>20),'άδειο '+k);ok(await p.evaluate(k=>localStorage.getItem('thr_m')===k,k),'thr_m '+k);await ovf('more '+k)}
- await p.click('.mm-back');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===11,'το «‹ Κι άλλα» δεν επέστρεψε στο μενού');
+ await p.click('.mm-back');await p.waitForTimeout(250);ok(await p.locator('.mm-i').count()===14,'το «‹ Κι άλλα» δεν επέστρεψε στο μενού');
  // roster + player sheet
  await p.click('.bar button[data-v="roster"]');await p.waitForTimeout(400);const pl=p.locator('#roster .pl').first();
  if(await pl.count()){await pl.click();await p.waitForTimeout(300);ok(await p.locator('.sheet').count()===1,'φύλλο παίκτη');await ovf('player sheet');await p.keyboard.press('Escape');ok(await p.locator('.sheet').count()===0,'το φύλλο δεν έκλεισε')}else ok(false,'ρόστερ χωρίς παίκτες');

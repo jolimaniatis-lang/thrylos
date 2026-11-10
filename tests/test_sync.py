@@ -30,7 +30,9 @@ class SyncTest(unittest.TestCase):
         wj(self.seed + "/data/live/now.json", {"matches": [], "updatedAt": "old"})
         eds = ["2026-10-29", "2026-10-28", "2026-10-27"]
         for e in eds: wj(self.seed + "/data/editions/%s.json" % e, {"date": e, "items": []})
-        wj(self.seed + "/data/index.json", {"editions": eds, "rosters": []})
+        import hashlib  # το index έχει και hash ανά αρχείο (v), όπως το γράφει το sync.py
+        ver = {"editions/" + e: hashlib.md5(open(self.seed + "/data/editions/%s.json" % e, "rb").read()).hexdigest()[:8] for e in sorted(eds)}
+        open(self.seed + "/data/index.json", "w").write(json.dumps({"editions": eds, "rosters": [], "v": ver}, ensure_ascii=False, separators=(",", ":")))
         git(self.seed, "add", "-A"); git(self.seed, "commit", "-qm", "seed"); git(self.seed, "remote", "add", "origin", self.remote); git(self.seed, "push", "-q", "origin", "main")
         subprocess.run(["git", "clone", "-q", "--depth", "1", "file://" + self.remote, self.work], check=True, env=ENV)  # όπως ο scheduled task
         wj(self.exp + "/live/now.json", {"matches": [], "updatedAt": "new"})
