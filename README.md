@@ -13,6 +13,8 @@
 | `sw.js` | Service worker (network-first, offline fallback, cache `thr-vN`) |
 | `manifest.webmanifest`, `icons/`, `assets/` | PWA manifest, εικονίδια, εμβλήματα/λογότυπα |
 | `data/` | Δεδομένα JSON (δομή: [`docs/DATA.md`](docs/DATA.md)) |
+| `tools/finals.py`, `tools/news_rss.py`, `tools/standings_gh.py` | GitHub Actions χωρίς Claude: μόνιμα τελικά σκορ, τίτλοι ειδήσεων RSS, βαθμολογίες (βλ. `docs/AUTOPILOT.md`) |
+| `tools/mkindex.py` | Ξαναφτιάχνει το `data/index.json` (με hash ανά αρχείο) μετά από χειροκίνητη αλλαγή |
 | `tools/sync.py` | Αντιγραφή εξαγωγής δεδομένων στο `data/` + commit/push στο `main` |
 | `tools/validate_data.py` | Έλεγχος δομής των `data/*.json` |
 | `tools/css_audit.py` | Μόνο ανάγνωση: εντοπισμός CSS selectors με πολλαπλούς ορισμούς |

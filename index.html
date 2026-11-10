@@ -1761,6 +1761,8 @@ let chatTimer=null,chatBuilt=false;
 const sbH=(x)=>Object.assign({apikey:SB.key,Authorization:"Bearer "+SB.key},x||{});
 const sbRpc=(fn,args)=>fetch(SB.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:sbH({"Content-Type":"application/json"}),body:JSON.stringify(args)});
 const lsGet=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
+/* μηνύματα: πρώτα με τον κωδικό πρόσκλησης (RPC list_messages, βλ. docs/supabase-chat-lockdown.sql)· αν η συνάρτηση δεν έχει στηθεί ακόμη στη βάση (404), ο παλιός τρόπος */
+const sbMsgs=async(code,lim)=>{const r=await sbRpc("list_messages",{c:code,lim});if(r.status!==404)return r;return fetch(SB.url+"/rest/v1/messages?select=id,created_at,name,body,media_url,media_type&order=id.desc&limit="+lim,{headers:sbH(),cache:"no-store"})};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 function renderChat(){
   chatBuilt=true;const box=$("#chat");box.replaceChildren();clearInterval(chatTimer);
@@ -1823,7 +1825,7 @@ function renderChat(){
       if(m.body)d.append(el("p",null,m.body));
       row.append(av,d);list.append(row);pv=m});
     if(near||force)window.scrollTo({top:document.body.scrollHeight})};
-  const load=async(force)=>{try{const r=await fetch(SB.url+"/rest/v1/messages?select=id,created_at,name,body,media_url,media_type&order=id.desc&limit=80",{headers:sbH(),cache:"no-store"});if(!r.ok)return;draw((await r.json()).reverse(),force)}catch(e){}};
+  const load=async(force)=>{try{const r=await sbMsgs(code,80);if(!r.ok)return;draw((await r.json()).reverse(),force)}catch(e){}};
   load(true);chatTimer=setInterval(()=>{if(document.visibilityState==="visible"&&view==="chat")load()},3000);
 }
 
@@ -1849,7 +1851,7 @@ function crest(name,cls,sport){name=String(name||"?");const oly=/ολυμπια�
   addEventListener("touchmove",e=>{if(y0==null)return;pull=e.touches[0].clientY-y0;if(pull>70){ind.classList.add("on");ind.textContent="Άφησε για ανανέωση"}else{ind.classList.toggle("on",pull>30);ind.textContent="↓ Τράβα για ανανέωση"}},{passive:true});
   addEventListener("touchend",()=>{if(y0!=null&&pull>70){ind.textContent="Ανανέωση…";location.reload()}else ind.classList.remove("on");y0=null},{passive:true})})();
 async function chatBadge(){try{if(view==="chat"||!lsGet("thr_code")||document.visibilityState!=="visible")return;
-  const r=await fetch(SB.url+"/rest/v1/messages?select=id&order=id.desc&limit=1",{headers:sbH(),cache:"no-store"});if(!r.ok)return;const a=await r.json();const id=a[0]?a[0].id:0;
+  const r=await sbMsgs(lsGet("thr_code"),1);if(!r.ok)return;const a=await r.json();const id=a[0]?a[0].id:0;
   const b=document.querySelector('.bar button[data-v="more"]');if(!b)return;let dot=b.querySelector(".badge");
   if(id>(+lsGet("thr_seen")||0)){if(!dot){dot=el("span","badge");b.append(dot)}}else if(dot)dot.remove()}catch(e){}}
 setInterval(chatBadge,20000);setTimeout(chatBadge,3000);
