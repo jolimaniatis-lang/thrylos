@@ -17,6 +17,14 @@ def _git(*a):
     return subprocess.run(["git", "-C", root, *a], capture_output=True, text=True)
 if not dry:
     br = _git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+    if br == "HEAD":
+        # Αποσπασμένο HEAD: έτσι βρίσκουν το repo οι προγραμματισμένες συνεδρίες (έτοιμο checkout, με παλιό τοπικό main).
+        # Πήγαινε στο τρέχον main του GitHub αντί να αρνηθείς — αυτό άφησε την εφαρμογή χωρίς δεδομένα 8–10/11/2026.
+        if _git("fetch", "-q", "origin", "main").returncode == 0 and _git("checkout", "-q", "-B", "main", "origin/main").returncode == 0:
+            br = "main"; print("αποσπασμένο HEAD → main (origin/main)")
+    elif br == "main":
+        # παλιό τοπικό main: φέρε το στο τρέχον (μόνο fast-forward· αν δεν γίνεται, το αναλαμβάνει η επανάληψη του push)
+        if _git("fetch", "-q", "origin", "main").returncode == 0: _git("merge", "-q", "--ff-only", "origin/main")
     if br != "main":
         print("ΑΡΝΗΣΗ: το sync.py τρέχει μόνο στο branch 'main' (τώρα: '%s'). Δεν γράφτηκε τίποτα, δεν έγινε push." % br)
         print("Για απλό έλεγχο εξαγωγής χρησιμοποίησε --dry-run.")

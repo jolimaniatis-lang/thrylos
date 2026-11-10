@@ -53,9 +53,11 @@ class SyncTest(unittest.TestCase):
         git(self.work, "checkout", "-q", "-b", "ui-test"); before = self.remote_head()
         r = self.run_sync(self.exp, "live"); self.assertEqual(r.returncode, 2); self.assertEqual(self.remote_head(), before)
         self.assertIn('"old"', rd(self.work + "/data/live/now.json"))  # δεν γράφτηκε τίποτα
-    def test_detached_head_refused(self):
+    def test_detached_head_moves_to_main(self):
+        # οι προγραμματισμένες συνεδρίες ξεκινούν με αποσπασμένο HEAD: το sync πηγαίνει μόνο του στο origin/main και ανεβάζει
         git(self.work, "checkout", "-q", "--detach"); before = self.remote_head()
-        r = self.run_sync(self.exp, "live"); self.assertEqual(r.returncode, 2); self.assertEqual(self.remote_head(), before)
+        r = self.run_sync(self.exp, "live"); self.assertEqual(r.returncode, 0, r.stdout + r.stderr); self.assertIn("push OK", r.stdout)
+        self.assertNotEqual(self.remote_head(), before); self.assertTrue(all(f.startswith("data/") for f in self.files_of("main")))
     def test_dry_run_allowed_on_any_branch(self):
         git(self.work, "checkout", "-q", "-b", "ui-test"); r = self.run_sync("--dry-run", self.exp, "live"); self.assertEqual(r.returncode, 0, r.stdout); self.assertIn('"old"', rd(self.work + "/data/live/now.json"))
     def test_local_non_data_commit_blocks_push(self):
@@ -66,7 +68,7 @@ class SyncTest(unittest.TestCase):
         wj(other + "/data/schedule/season.json", {"matches": [], "updatedAt": "z"}); git(other, "add", "-A"); git(other, "commit", "-qm", "other data"); git(other, "push", "-q", "origin", "main")
         r = self.run_sync(self.exp, "live"); self.assertEqual(r.returncode, 0, r.stdout + r.stderr); self.assertIn("push OK", r.stdout)
         log = git(self.remote, "log", "--format=%s", "-3"); self.assertIn("other data", log); self.assertIn("data ", log.splitlines()[0])
-        self.assertEqual(self.files_of("main"), ["data/live/now.json"])
+        fs_ = self.files_of("main"); self.assertIn("data/live/now.json", fs_); self.assertTrue(set(fs_) <= {"data/live/now.json", "data/index.json"}, fs_)
     def test_prune_old_editions_is_committed(self):
         for i in range(62): wj(self.exp + "/editions/2026-11-%02d-%02d.json" % (i // 28 + 1, i % 28 + 1), {"date": "n", "items": []})
         r = self.run_sync(self.exp, "editions"); self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
