@@ -33,7 +33,8 @@ if catchup:
         season = json.load(open("data/schedule/season.json", encoding="utf8"))["matches"]
         back = max(1, min(7, int(os.environ.get("FINALS_DAYS", "1") or 1)))  # πόσες μέρες πίσω (προεπιλογή: χθες)
         days = [now.date() - datetime.timedelta(days=i) for i in range(back, -1, -1)]
-        todo = [m for m in season if m.get("d") in {d.isoformat() for d in days} and not m.get("score") and not m.get("res")
+        force = os.environ.get("FINALS_ALL") == "1"  # μόνο για δοκιμή: γράψε και όσους έχουν ήδη σκορ στο ημερολόγιο
+        todo = [m for m in season if m.get("d") in {d.isoformat() for d in days} and (force or (not m.get("score") and not m.get("res")))
                 and (m["d"], m["opp"], m.get("sport", "")) not in fin and m.get("sport") != "polo"]
         if todo:
             def get(path, **q):
@@ -51,8 +52,12 @@ if catchup:
                 if "μπάσκετ" in c: return {2}
                 if "ποδόσφαιρο" in c: return {1}
                 return None
-            j = get("games/allscores/", startDate=days[0].strftime("%d/%m/%Y"), endDate=days[-1].strftime("%d/%m/%Y"), showOdds="false")
-            games = [g for g in j.get("games", []) if g.get("statusGroup") == 4 and (is_oly(g["homeCompetitor"]) or is_oly(g["awayCompetitor"]))]
+            games = []
+            for day in sorted({m["d"] for m in todo}):  # μία κλήση ανά ημέρα (η πηγή δεν δίνει όλους τους αγώνες σε εύρος ημερών)
+                y, mo, dd = day.split("-"); ds = "%s/%s/%s" % (dd, mo, y)
+                j = get("games/allscores/", startDate=ds, endDate=ds, showOdds="false")
+                games += [g for g in j.get("games", []) if g.get("statusGroup") == 4 and (is_oly(g["homeCompetitor"]) or is_oly(g["awayCompetitor"]))]
+            print("catchup: αγώνες χωρίς σκορ %d · τελικά στην πηγή %d" % (len(todo), len(games)))
             for m in todo:
                 ws = want(m)
                 if ws is None or not re.match(r"^\d{1,2}:\d{2}$", m.get("t") or ""): continue

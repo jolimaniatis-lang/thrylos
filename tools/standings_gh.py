@@ -37,6 +37,8 @@ GR = {"Olympiacos": "Ολυμπιακός", "Olympiakos": "Ολυμπιακός"
       "Baskonia Vitoria": "Μπασκόνια", "Monaco": "Μονακό", "As Karditsas": "Καρδίτσα", "Kolossos Rhodes": "Κολοσσός Ρόδου", "Peristeri": "Περιστέρι", "Iraklis": "Ηρακλής",
       "Maroussi Honda": "Μαρούσι", "Mykonos": "Μύκονος", "Promitheas Patras": "Προμηθέας Πάτρας", "Panionios Betsson": "Πανιώνιος", "Πανιώνιος Betsson": "Πανιώνιος", "Thira": "Θήρα",
       "Zaon Kifisias": "ΖΑΟΝ Κηφισιάς", "Markopoulos": "Μαρκόπουλο", "OFA Apollonios": "Απολλώνιος", "Παναθηναϊκός Α.Ο.": "Παναθηναϊκός", "Π.Α.Ο.Κ.": "ΠΑΟΚ", "Ο.Φ.Η": "ΟΦΗ",
+      "Kifisia": "Κηφισιά", "Kalamata": "Καλαμάτα", "Volos NFC": "Βόλος", "St. Gilloise": "Ουνιόν Σεν Ζιλουάζ", "Torreense": "Τορεένσε", "Celje": "Τσέλιε", "Viktoria Plzen": "Βικτόρια Πλζεν",
+      "FC Ararat-Armenia": "Αραράτ-Αρμενία", "ASP Thetis": "Θέτις",
       "Α.Ο.Φλοίσβος": "Φλοίσβος", "Α.Ο.Φοίνικας Σύρου": "Φοίνικας Σύρου", "Α.Ο.Π. Κηφισιάς": "Κηφισιά", "Α.Ο.Καλαμάτα": "Καλαμάτα", "Α.Σ.Άρης": "Άρης"}
 n = lambda v: int(v) if isinstance(v, (int, float)) and float(v).is_integer() else v
 def table(key, cid, sport, title, kind):

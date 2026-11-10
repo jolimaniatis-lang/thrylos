@@ -24,6 +24,7 @@ jobs:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NTFY_TOPIC: thrylos-live-7180ddbbfd
           FINALS_DAYS: ${{ github.event_name == 'schedule' && '1' || '3' }}
+          FINALS_ALL: ${{ github.event_name == 'push' && '1' || '0' }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p /tmp/out && cd /tmp/out && git init -q && git config user.name "Thrylos Live" && git config user.email "live@users.noreply.github.com"
