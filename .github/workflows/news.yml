@@ -7,13 +7,16 @@ on:
     branches: [news-action]
 permissions:
   contents: write
+  actions: write
+# Το cron του GitHub καθυστερεί/παραλείπει εκτελέσεις· γι' αυτό η εργασία κάνει μόνη της βρόχο ανά 15′ για ~5,5 ώρες
+# και στο τέλος ξαναξεκινά τον εαυτό της. Κάθε νέα εκκίνηση (cron/χειροκίνητη) αντικαθιστά τον βρόχο που τρέχει.
 concurrency:
   group: news-feed
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   feed:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,6 +24,7 @@ jobs:
       - name: Feed
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p /tmp/out && cd /tmp/out && git init -q && git config user.name "Thrylos News" && git config user.email "news@users.noreply.github.com"
           git remote add origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
@@ -28,10 +32,17 @@ jobs:
             git show FETCH_HEAD:news.json > news.json 2>/dev/null || rm -f news.json
             git show FETCH_HEAD:standings.json > standings.json 2>/dev/null || rm -f standings.json
           fi
-          before="$(cat news.json standings.json 2>/dev/null | sha1sum)"
-          cd "$GITHUB_WORKSPACE"
-          python3 tools/news_rss.py /tmp/out/news.json || true
-          if [ ! -s /tmp/out/standings.json ] || [ "$(date +%M)" -lt 15 ] || [ "$GITHUB_EVENT_NAME" != "schedule" ]; then python3 tools/standings_gh.py /tmp/out/standings.json || true; fi
-          cd /tmp/out
-          if [ "$before" = "$(cat news.json standings.json 2>/dev/null | sha1sum)" ]; then echo "καμία αλλαγή"; exit 0; fi
-          git add -A && git commit -q -m "news" && git push -q -f origin HEAD:refs/heads/news-data
+          n=0
+          while [ $n -lt 22 ]; do
+            cd /tmp/out; before="$(cat news.json standings.json 2>/dev/null | sha1sum)"
+            cd "$GITHUB_WORKSPACE"
+            python3 tools/news_rss.py /tmp/out/news.json || true
+            if [ ! -s /tmp/out/standings.json ] || [ $((n % 4)) -eq 0 ]; then python3 tools/standings_gh.py /tmp/out/standings.json || true; fi
+            cd /tmp/out
+            if [ "$before" != "$(cat news.json standings.json 2>/dev/null | sha1sum)" ]; then
+              git add -A && { git commit -q --amend -m "news" 2>/dev/null || git commit -q -m "news"; } && git push -q -f origin HEAD:refs/heads/news-data || true
+            else echo "καμία αλλαγή"; fi
+            n=$((n+1)); [ "$GITHUB_REF_NAME" = "news-action" ] && break
+            sleep 900
+          done
+          [ "$GITHUB_REF_NAME" = "main" ] && gh workflow run news.yml --repo "$GITHUB_REPOSITORY" --ref main || true

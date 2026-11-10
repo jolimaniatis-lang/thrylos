@@ -80,6 +80,6 @@ if ok < 3 or len(items) < 5:
     print("πολύ λίγα αποτελέσματα· το news.json δεν αλλάζει"); sys.exit(0)
 try: old = json.load(open(sys.argv[1], encoding="utf8")).get("items")
 except Exception: old = None
-if old != items:
-    json.dump({"updatedAt": now.isoformat(timespec="seconds"), "items": items}, open(sys.argv[1], "w", encoding="utf8"), ensure_ascii=False)
-    print("news.json ενημερώθηκε")
+# γράφεται πάντα, ώστε το updatedAt να δείχνει τον τελευταίο ΕΛΕΓΧΟ (η εφαρμογή γράφει «έλεγχος πριν Χ′»)
+json.dump({"updatedAt": now.isoformat(timespec="seconds"), "items": items}, open(sys.argv[1], "w", encoding="utf8"), ensure_ascii=False)
+print("news.json: " + ("νέοι τίτλοι" if old != items else "ίδιοι τίτλοι"))
