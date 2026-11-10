@@ -23,12 +23,20 @@ jobs:
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NTFY_TOPIC: thrylos-live-7180ddbbfd
+          FINALS_DAYS: ${{ github.event_name == 'schedule' && '1' || '3' }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p /tmp/out && cd /tmp/out && git init -q && git config user.name "Thrylos Live" && git config user.email "live@users.noreply.github.com"
           git remote add origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           (cd /tmp/out && git fetch -q --depth=1 origin live-data && git show FETCH_HEAD:auto.json > /tmp/out/auto.json) 2>/dev/null || true
+          (cd /tmp/out && git show FETCH_HEAD:finals.json > /tmp/out/finals.json) 2>/dev/null || rm -f /tmp/out/finals.json
+          [ -s /tmp/out/auto.json ] || rm -f /tmp/out/auto.json
           cd "$GITHUB_WORKSPACE"
+          publish() { (cd /tmp/out && git add -A && { git commit -q --amend -m "live" 2>/dev/null || git commit -q -m "live"; } && git push -q -f origin HEAD:refs/heads/live-data); }
+          # μόνιμα τελικά σκορ: ό,τι τελείωσε (και δεν έχει σκορ στο ημερολόγιο) γράφεται στο finals.json
+          fb="$(sha1sum /tmp/out/finals.json 2>/dev/null)"
+          python3 tools/finals.py /tmp/out/finals.json /tmp/out/auto.json --catchup || true
+          if [ "$fb" != "$(sha1sum /tmp/out/finals.json 2>/dev/null)" ] && [ -s /tmp/out/auto.json ]; then publish || true; fi
           end=$((SECONDS+1560)); chain=1
           while [ $SECONDS -lt $end ]; do
             cp /tmp/out/auto.json /tmp/prev.json 2>/dev/null || true
@@ -37,7 +45,8 @@ jobs:
               echo "nothing to track"; chain=0; break
             fi
             python3 tools/notify.py /tmp/prev.json /tmp/out/auto.json "$NTFY_TOPIC" || true
-            (cd /tmp/out && git add -A && git commit -q --amend -m "live" 2>/dev/null || (cd /tmp/out && git commit -q -m "live"); cd /tmp/out && git push -q -f origin HEAD:refs/heads/live-data)
+            python3 tools/finals.py /tmp/out/finals.json /tmp/out/auto.json || true
+            publish
             sleep 20
           done
           if [ "$chain" = 1 ]; then gh workflow run live.yml --repo "$GITHUB_REPOSITORY" --ref main || true; fi

@@ -1,0 +1,37 @@
+name: news-feed
+on:
+  schedule:
+    - cron: "4,19,34,49 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [news-action]
+permissions:
+  contents: write
+concurrency:
+  group: news-feed
+  cancel-in-progress: false
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Feed
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/out && cd /tmp/out && git init -q && git config user.name "Thrylos News" && git config user.email "news@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth=1 origin news-data 2>/dev/null; then
+            git show FETCH_HEAD:news.json > news.json 2>/dev/null || rm -f news.json
+            git show FETCH_HEAD:standings.json > standings.json 2>/dev/null || rm -f standings.json
+          fi
+          before="$(cat news.json standings.json 2>/dev/null | sha1sum)"
+          cd "$GITHUB_WORKSPACE"
+          python3 tools/news_rss.py /tmp/out/news.json || true
+          if [ ! -s /tmp/out/standings.json ] || [ "$(date +%M)" -lt 15 ] || [ "$GITHUB_EVENT_NAME" != "schedule" ]; then python3 tools/standings_gh.py /tmp/out/standings.json || true; fi
+          cd /tmp/out
+          if [ "$before" = "$(cat news.json standings.json 2>/dev/null | sha1sum)" ]; then echo "καμία αλλαγή"; exit 0; fi
+          git add -A && git commit -q -m "news" && git push -q -f origin HEAD:refs/heads/news-data
