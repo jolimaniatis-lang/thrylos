@@ -34,9 +34,9 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           publish() { (cd /tmp/out && git add -A && { git commit -q --amend -m "live" 2>/dev/null || git commit -q -m "live"; } && git push -q -f origin HEAD:refs/heads/live-data); }
           # μόνιμα τελικά σκορ: ό,τι τελείωσε (και δεν έχει σκορ στο ημερολόγιο) γράφεται στο finals.json
-          fb="$(sha1sum /tmp/out/finals.json 2>/dev/null)"
+          fb="$(sha1sum /tmp/out/finals.json 2>/dev/null || true)"
           python3 tools/finals.py /tmp/out/finals.json /tmp/out/auto.json --catchup || true
-          if [ "$fb" != "$(sha1sum /tmp/out/finals.json 2>/dev/null)" ] && [ -s /tmp/out/auto.json ]; then publish || true; fi
+          if [ "$fb" != "$(sha1sum /tmp/out/finals.json 2>/dev/null || true)" ] && [ -s /tmp/out/auto.json ]; then publish || true; fi
           end=$((SECONDS+1560)); chain=1
           while [ $SECONDS -lt $end ]; do
             cp /tmp/out/auto.json /tmp/prev.json 2>/dev/null || true

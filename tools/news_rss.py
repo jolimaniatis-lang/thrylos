@@ -51,7 +51,7 @@ def fetch(f):
     except Exception as e:
         print("feed ERR", url[:60], str(e)[:50]); return res
     for it in re.findall(r"<item[\s>].*?</item>", x, re.S):
-        title = clean(tag(it, "title")); link = clean(tag(it, "link")); src = name
+        title = clean(tag(it, "title")).split("|||")[0].strip(); link = clean(tag(it, "link")); src = name
         if not src:
             src = clean(tag(it, "source")) or "Google News"
             title = re.sub(r"\s+[-–|]\s+%s\s*$" % re.escape(src), "", title)

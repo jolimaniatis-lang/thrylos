@@ -29,6 +29,15 @@ try:
 except Exception as e:
     print("europa:", str(e)[:100])
 COLS = {"fb": ["Θ", "Ομάδα", "Αγ.", "Ν", "Ι", "Η", "Γκολ", "Βαθ."], "wl": ["Θ", "Ομάδα", "Αγ.", "Ν", "Η"], "wlp": ["Θ", "Ομάδα", "Αγ.", "Ν", "Η", "Βαθ."]}
+# όπου η πηγή δεν δίνει ελληνικό όνομα (μόνο βέβαιες αντιστοιχίες· ό,τι λείπει μένει όπως το δίνει η πηγή)
+GR = {"Olympiacos": "Ολυμπιακός", "Olympiakos": "Ολυμπιακός", "Panathinaikos": "Παναθηναϊκός", "PAOK": "ΠΑΟΚ", "AEK": "ΑΕΚ", "AEK Athens": "ΑΕΚ", "Aris": "Άρης", "AS Aris": "Άρης",
+      "Crvena Zvezda": "Ερυθρός Αστέρας", "Valencia": "Βαλένθια", "Fenerbahçe": "Φενέρμπαχτσε", "BC Dubai": "Ντουμπάι", "Barcelona": "Μπαρτσελόνα", "Real Madrid": "Ρεάλ Μαδρίτης",
+      "Hapoel Tel Aviv": "Χάποελ Τελ Αβίβ", "Zalgiris Kaunas": "Ζαλγκίρις Κάουνας", "KK Partizan": "Παρτιζάν", "Efes": "Αναντολού Εφές", "Besiktas": "Μπεσίκτας", "Paris": "Παρί",
+      "Bologna": "Βίρτους Μπολόνια", "ASVEL Villeurbanne": "Βιλερμπάν", "Bayern Munich": "Μπάγερν Μονάχου", "Maccabi Tel Aviv": "Μακάμπι Τελ Αβίβ", "Milano": "Αρμάνι Μιλάνο",
+      "Baskonia Vitoria": "Μπασκόνια", "Monaco": "Μονακό", "As Karditsas": "Καρδίτσα", "Kolossos Rhodes": "Κολοσσός Ρόδου", "Peristeri": "Περιστέρι", "Iraklis": "Ηρακλής",
+      "Maroussi Honda": "Μαρούσι", "Mykonos": "Μύκονος", "Promitheas Patras": "Προμηθέας Πάτρας", "Panionios Betsson": "Πανιώνιος", "Πανιώνιος Betsson": "Πανιώνιος", "Thira": "Θήρα",
+      "Zaon Kifisias": "ΖΑΟΝ Κηφισιάς", "Markopoulos": "Μαρκόπουλο", "OFA Apollonios": "Απολλώνιος", "Παναθηναϊκός Α.Ο.": "Παναθηναϊκός", "Π.Α.Ο.Κ.": "ΠΑΟΚ", "Ο.Φ.Η": "ΟΦΗ",
+      "Α.Ο.Φλοίσβος": "Φλοίσβος", "Α.Ο.Φοίνικας Σύρου": "Φοίνικας Σύρου", "Α.Ο.Π. Κηφισιάς": "Κηφισιά", "Α.Ο.Καλαμάτα": "Καλαμάτα", "Α.Σ.Άρης": "Άρης"}
 n = lambda v: int(v) if isinstance(v, (int, float)) and float(v).is_integer() else v
 def table(key, cid, sport, title, kind):
     j = get("standings/", competitions=cid)
@@ -39,6 +48,7 @@ def table(key, cid, sport, title, kind):
         c = r.get("competitor") or {}
         name = re.sub(r"\s*\((W|Γ)\)\s*$", "", c.get("shortName") or c.get("name") or "").strip()
         if not name: return None
+        name = GR.get(name, name)
         pos = r.get("position") or i + 1
         gp, w, l, d = n(r.get("gamePlayed")), n(r.get("gamesWon")), n(r.get("gamesLost")), n(r.get("gamesEven"))
         if kind == "fb": out.append([pos, name, gp, w, d, l, "%s-%s" % (n(r.get("for")), n(r.get("against"))), n(r.get("points"))])

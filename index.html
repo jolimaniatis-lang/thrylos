@@ -904,6 +904,36 @@ body{background:radial-gradient(60% 28% at 8% 38%,color-mix(in srgb,var(--red) 1
 .lv,.tbl,.rec,.amx,.vs,.cmp,.slip,.r-sum,.lead{box-shadow:0 1px 1px rgba(40,15,20,.04),0 10px 24px -14px rgba(40,15,20,.22)}
 .mm-ic img{width:28px;height:28px;object-fit:contain;display:block}
 .sc .vs0{font-size:.6em;letter-spacing:.14em;opacity:.7}.clock.nd{font-family:var(--body);font-size:13.5px;font-weight:600;color:var(--muted);text-align:center;padding:0 16px 14px;line-height:1.4}
+
+/* ===== v7 ===== */
+.updated.old .dot{background:#F0A93A;box-shadow:0 0 0 3px rgba(240,169,58,.28);animation:none}
+.stale-b{display:flex;flex-direction:column;gap:2px;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--warn) 14%,var(--card));border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);font-size:13px;line-height:1.4}
+.stale-b b{font-size:14px}.stale-b span{color:var(--muted)}
+#app>.stale-b,#app>.rss,#app>.today{column-span:all}
+.rss,.today{margin-top:22px}.rss[hidden],.today[hidden]{display:none}
+.rss-up{font-size:12px;color:var(--muted);font-weight:600}
+.rss-l,.td-l{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.rss-i{display:block;padding:12px 14px;min-height:44px;color:inherit;text-decoration:none;border-top:1px solid var(--line)}
+.rss-i:first-child,.td-i:first-child{border-top:0}.rss-i:active{background:var(--soft)}
+.rss-i b{display:block;font-size:14px;font-weight:700;line-height:1.35}.rss-i small{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
+.rss .foot{margin-top:8px}
+.td-i{display:grid;grid-template-columns:44px 1fr;gap:2px 10px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.td-i i{grid-row:1/3;font-style:normal;font-family:var(--display);font-weight:900;font-size:17px;color:var(--red-t);line-height:1.3}
+.td-i b{font-size:14px;font-weight:600;line-height:1.4}.td-i small{grid-column:2;font-size:12px;color:var(--muted)}
+.lc-r1{display:flex;align-items:center;gap:8px}.lc-r1 .lc-f{flex:1;min-width:0}
+.lc-tg{flex:none;position:relative;font:700 13px var(--body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer}
+.lc-tg::after{content:"";position:absolute;inset:-6px 0}.lc-tg[aria-expanded="true"]{border-color:var(--red);color:var(--red-t)}
+.lc-more{display:flex;flex-direction:column;gap:8px}.lc-more[hidden]{display:none}
+a.qk-b{display:block;text-decoration:none}
+/* σημεία αφής */
+.date-btn select{inset:-7px -2px;width:calc(100% + 4px);height:calc(100% + 14px)}
+.dots{gap:0}.dots button{padding:19px 9px;margin:-12px -4px}
+.kchip{position:relative}.kchip::after{content:"";position:absolute;inset:-6px 0}
+.grp-h>.ic+h2{flex:1;text-align:left}
+/* χαμηλή κεφαλίδα σε όλες τις καρτέλες εκτός από τα Νέα */
+body[data-view]:not([data-view="news"]) .hero .wrap{padding-bottom:16px;gap:8px}
+body[data-view]:not([data-view="news"]) .hero .updated{display:none}
+body[data-view]:not([data-view="news"]) .hero .headline{font-size:14px;opacity:.85}
 </style>
 </head><body>
 
@@ -1041,7 +1071,7 @@ function renderRoster(){
         if(p.status){const cls=p.status==="out"?"out":p.status==="doubt"?"doubt":"away";nm.append(el("span","st "+cls,p.statusText||({out:"Εκτός",doubt:"Αμφίβολος",away:"Εκτός λίστας"})[p.status]||p.status))}
         m.append(nm,el("div","pl-meta",[p.pos,p.nat,p.age?p.age+" ετών":"",p.height?p.height+" εκ.":""].filter(Boolean).join(" · ")));
         if(p.statusNote)m.append(el("div","pl-meta","⚠ "+p.statusNote));
-        const st=Object.entries(p.stats||{});if(st.length){const sb=el("div","stats");st.forEach(([k,v])=>{const s=el("span");s.append(k+" ",el("b",null,String(v)));sb.append(s)});m.append(sb)}
+        const st=Object.entries(p.stats||{}).filter(([k,v])=>!(/τερματοφ/i.test(p.pos||"")&&/^γκολ$/i.test(k)&&!+v));if(st.length){const sb=el("div","stats");st.forEach(([k,v])=>{const s=el("span");s.append(k+" ",el("b",null,String(v)));sb.append(s)});m.append(sb)}
         const chev=el("span","pl-chev","›");row.append(m,chev);G.append(row)});list.append(G)});
     if(!total)list.append(el("div","none","Κανένας παίκτης δεν ταιριάζει στην αναζήτηση."))};
   inp.addEventListener("input",()=>{rq=inp.value;draw()});draw();
@@ -1113,7 +1143,7 @@ function renderVs(){
   if(o.angle){const sl=el("div","slip");const sh=el("div","slip-h");sh.append(el("span",null,"Για το στοίχημα"));const p=el("div");p.style.padding="12px 16px";p.textContent=o.angle;
     sl.append(sh,p,el("div","slip-f","Ενδεικτική ανάλυση, όχι σίγουρη επιλογή. Παίξε μόνο ό,τι αντέχεις να χάσεις."));box.append(sl)}
   if((o.sources||[]).length){const d=el("div","chips");o.sources.forEach(x=>{const a=el("a",null,x.title);a.href=x.url;a.target="_blank";a.rel="noopener";d.append(a)});box.append(d)}
-  if(opps.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+opps.updatedAt));
+  if(opps.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+updTxt(opps.updatedAt)));
 }
 const EVI={goal:"●",yellow:"",red:"",sub:"⇄",var:"V",period:"‖",info:"i",foul:"!",timeout:"T",penalty:"P",exclusion:"E"};
 function ago(iso){const t=Date.parse(iso);if(!t)return"";const m=Math.round((Date.now()-t)/60000);return m<1?"μόλις τώρα":m<60?"πριν "+m+"′":"πριν "+Math.floor(m/60)+" ώρ."}
@@ -1128,6 +1158,51 @@ async function autoPoll(){if(AUTO.busy||document.visibilityState!=="visible")ret
     const j=await r.json();const t=Date.parse(j.updatedAt);if(!isNaN(t)&&Array.isArray(j.matches)){const prev=JSON.stringify(AUTO.m);AUTO.m=j.matches;AUTO.t=t;if(prev!==JSON.stringify(AUTO.m)){if(view==="live")render();else if(view==="news")renderNext()}}}catch(e){}
   AUTO.busy=false}
 setInterval(autoPoll,20000);setTimeout(autoPoll,1200);
+/* v7: δεδομένα που γράφουν μόνα τους τα GitHub Actions (χωρίς Claude): μόνιμα τελικά σκορ, τίτλοι ειδήσεων από RSS, βαθμολογίες */
+const RAWB="https://raw.githubusercontent.com/jolimaniatis-lang/thrylos/";
+const GH={fin:{},news:null,stand:null};
+async function ghJson(p){const r=await fetch(RAWB+p+"?t="+Math.floor(Date.now()/60000),{cache:"no-store"});if(!r.ok)throw new Error(r.status);return r.json()}
+/* αγώνας του ημερολογίου χωρίς σκορ + τελικό από την πηγή του live = σκορ (Ολυμπιακός πρώτα, όπως στο ημερολόγιο) */
+function applyFinals(){const ms=season&&season.matches;if(!Array.isArray(ms))return false;let ch=false;
+  ms.forEach(m=>{if(m.score||m.res)return;const f=GH.fin[m.d+"|"+nrm(m.opp||"")+"|"+m.sport];if(!f)return;m.score=f.o+"-"+f.p;m.res=f.o>f.p?"W":f.o<f.p?"L":"D";if(f.per&&!m.note)m.note="Περίοδοι: "+f.per;m.autoFin=1;ch=true});return ch}
+async function ghPoll(){if(document.visibilityState!=="visible")return;
+  try{const j=await ghJson("live-data/finals.json");const o={};(j.finals||[]).forEach(f=>{if(f&&f.d&&Number.isFinite(f.o)&&Number.isFinite(f.p))o[f.d+"|"+nrm(f.opp||"")+"|"+f.sport]=f});GH.fin=o;if(applyFinals()&&(view==="games"||view==="news"||view==="live"))render()}catch(e){}
+  try{const j=await ghJson("news-data/news.json");if(Array.isArray(j.items)){const its=j.items.filter(i=>i&&i.title&&/^https?:\/\//.test(i.url||""));const sig=its.length+"|"+((its[0]||{}).url||"");const ch=!GH.news||GH.news.sig!==sig;GH.news={items:its,t:Date.parse(j.updatedAt)||0,sig};if(ch&&view==="news")renderFeed()}}catch(e){}
+  try{const j=await ghJson("news-data/standings.json");if(Array.isArray(j.tables)){const ch=!GH.stand||GH.stand.u!==j.updatedAt;GH.stand={tables:j.tables,u:j.updatedAt};if(ch&&view==="more"&&!mmenu&&mtab==="standings")render()}}catch(e){}}
+setInterval(ghPoll,180000);setTimeout(ghPoll,1500);
+addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(ghPoll,300)});
+const STK=t=>{const x=String(t&&t.title||"").toLowerCase();return /super league/.test(x)?"sl":/europa league/.test(x)?"uel":/euroleague/.test(x)?"el":/basket league/.test(x)?"gbl":/βόλεϊ ανδρών/.test(x)?"vm":/βόλεϊ γυναικών/.test(x)?"vw":null};
+/* βαθμολογίες: ο αυτόματος πίνακας (έως 4 ημερών) αντικαθιστά τον αντίστοιχο χειροκίνητο */
+function standTables(base){base=(base||[]).slice();if(!GH.stand)return base;
+  GH.stand.tables.forEach(t=>{if(!t||!Array.isArray(t.rows)||t.rows.length<8||!Array.isArray(t.columns))return;const age=Date.now()-Date.parse(t.asOf);if(!(age<4*864e5))return;const i=base.findIndex(b=>STK(b)===t.key);if(i>=0)base[i]=t;else base.push(t)});return base}
+let rssN=6;
+function renderFeed(){const s=document.getElementById("rss");if(!s)return;s.replaceChildren();const N=GH.news;
+  const its=N?N.items.filter(i=>filter==="all"||SP(i.sport)===filter):[];if(!its.length){s.hidden=true;return}s.hidden=false;
+  const h=el("div","sec-h");h.append(el("h2",null,"Τελευταία νέα"));if(N.t)h.append(el("span","rss-up","έλεγχος "+ago(new Date(N.t).toISOString())));s.append(h);
+  const ul=el("div","rss-l");its.slice(0,rssN).forEach(i=>{const a=el("a","rss-i");a.href=i.url;a.target="_blank";a.rel="noopener";a.append(el("b",null,i.title),el("small",null,[i.src,ago(i.t)].filter(Boolean).join(" · ")));ul.append(a)});s.append(ul);
+  if(its.length>rssN){const b=el("button","moreb","Περισσότεροι τίτλοι ("+(its.length-rssN)+")");b.type="button";b.onclick=()=>{rssN+=12;renderFeed()};s.append(b)}
+  s.append(el("p","foot","Τίτλοι από τα RSS των αθλητικών sites, κάθε 15′ · ανοίγουν στην πηγή"))}
+/* Σαν σήμερα: γενέθλια από τα ρόστερ και γεγονότα από την Ιστορία (μόνο όσα έχουν ρητή ημερομηνία) */
+const MON4=["ιαν","φεβ","μαρ","απρ","μαι","ιουν","ιουλ","αυγ","σεπ","οκτ","νοε","δεκ"];
+function monIdx(w){const f=nrm(w);for(let i=0;i<12;i++)if(f.startsWith(MON4[i]))return i;return -1}
+function dayMon(txt){let m=String(txt||"").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);if(m)return [+m[1],+m[2]-1,+m[3]];m=String(txt||"").match(/(\d{1,2})\s+([^\s\d.,]+)\.?\s*(\d{4})?/);if(!m)return null;const mi=monIdx(m[2]);return mi<0?null:[+m[1],mi,m[3]?+m[3]:null]}
+const RLBL={football:"ποδόσφαιρο","football-women":"ποδόσφαιρο γυναικών",basketball:"μπάσκετ","basketball-women":"μπάσκετ γυναικών","polo-men":"πόλο ανδρών","polo-women":"πόλο γυναικών","volleyball-men":"βόλεϊ ανδρών","volleyball-women":"βόλεϊ γυναικών","handball-men":"χάντμπολ ανδρών","handball-women":"χάντμπολ γυναικών"};
+function renderToday(){const s=document.getElementById("today");if(!s)return;s.replaceChildren();const n=new Date(),D=n.getDate(),M=n.getMonth(),Y=n.getFullYear();const rows=[];
+  Object.keys(rosters||{}).sort().forEach(k=>((rosters[k]||{}).groups||[]).forEach(g=>(g.players||[]).forEach(p=>{const b=dayMon(p.bio&&p.bio.born);if(b&&b[0]===D&&b[1]===M&&b[2])rows.push(["🎂",p.name+" · γίνεται "+(Y-b[2]),RLBL[k]||""])})));
+  ((X.history&&X.history.sections)||[]).forEach(sec=>(sec.items||[]).forEach(it=>{if(!/^\d{4}$/.test(String(it.y||"")))return;const re=/(\d{1,2})\s+(Ιανουαρίου|Φεβρουαρίου|Μαρτίου|Απριλίου|Μαΐου|Ιουνίου|Ιουλίου|Αυγούστου|Σεπτεμβρίου|Οκτωβρίου|Νοεμβρίου|Δεκεμβρίου)/g;let m;while(m=re.exec(it.t||"")){if(+m[1]===D&&monIdx(m[2])===M){rows.push([it.y,it.t,(Y-+it.y)+" χρόνια πριν"]);break}}}));
+  if(!rows.length){s.hidden=true;return}s.hidden=false;const h=el("div","sec-h");h.append(el("h2",null,"Σαν σήμερα"),el("span","rss-up",n.toLocaleDateString("el-GR",{day:"numeric",month:"long"})));s.append(h);
+  const c=el("div","td-l");rows.slice(0,6).forEach(([a,t,x])=>{const r=el("div","td-i");r.append(el("i",null,a),el("b",null,t));if(x)r.append(el("small",null,x));c.append(r)});s.append(c)}
+/* ώρα ενημέρωσης σε ενιαία μορφή (HH:MM, DD/MM/YYYY HH:MM ή ISO) και ένδειξη παλιών δεδομένων */
+function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function ymdOff(n){const d=new Date();d.setDate(d.getDate()+n);return ymd(d)}
+function parseUpd(u,date){if(!u)return null;u=String(u).trim();let m;
+  if((m=u.match(/^(\d{1,2}):(\d{2})$/)))return date?new Date(date+"T"+m[1].padStart(2,"0")+":"+m[2]+":00"):null;
+  if((m=u.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/)))return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:12,m[5]?+m[5]:0);
+  const t=Date.parse(u);return isNaN(t)?null:new Date(t)}
+function updTxt(u,date){const d=parseUpd(u,date);if(!d||isNaN(d))return String(u);const hasT=!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(u).trim());
+  const tm=hasT?d.toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit",hour12:false}):"";if(ymd(d)===todayStr())return tm||"σήμερα";return fmtDate(ymd(d))+(tm?" "+tm:"")}
+function isStale(d){return !!d&&!isNaN(d)&&Date.now()-d.getTime()>8*36e5}
+const MHEAD={teams:"Οι ομάδες του Ολυμπιακού",standings:"Βαθμολογίες",scorers:"Σκόρερ & στατιστικά",discipline:"Τιμωρίες & κάρτες",rumors:"Μεταγραφές · φήμες και επίσημες κινήσεις",quotes:"Δηλώσεις",amateur:"Ερασιτέχνης Ολυμπιακός",archive:"Αρχείο & αναζήτηση ειδήσεων",history:"Ιστορία του συλλόγου",legends:"Οι θρύλοι του Ολυμπιακού",gallery:"Φωτογραφίες",tickets:"Εισιτήρια",club:"Ο σύλλογος",media:"Media"};
 ["visibilitychange","pageshow","online","focus"].forEach(ev=>addEventListener(ev,()=>{if(document.visibilityState==="visible")setTimeout(autoPoll,150)}));
 function mergeAuto(base){if(!AUTO.m||!AUTO.t||Date.now()-AUTO.t>10*60e3)return base;const out=base.slice();const key=m=>m.d+"|"+nrm(m.opp||"")+"|"+m.sport;
   AUTO.m.forEach(a=>{const i=out.findIndex(m=>key(m)===key(a));const up={olyScore:a.olyScore,oppScore:a.oppScore,status:a.status,clock:a.clock,elSrc:AUTO.t};if(a.periods)up.periods=a.periods;
@@ -1304,7 +1379,7 @@ function mkMatchRow(it,lc){
   const bd=el("span","st-badge"+(it.bucket==="live"?" live":""),it.bucket==="done"?(it.olyS==null||it.oppS==null?"":"ΤΕΛΙΚΟ"):it.bucket==="live"?"LIVE":it.bucket==="stale"?"ΕΚΚΡΕΜΕΙ":"ΠΡΟΣΕΧΩΣ");
   r.append(when,mid);if(bd.textContent)r.append(bd);r.append(...[]);;r.onclick=()=>openMatch(it,lc||liveCardOf);return r}
 /* Φάση 2: Live Center */
-let lcS="all",lcSp="all",lcC="all",lcG="all";
+let lcS="all",lcSp="all",lcC="all",lcG="all",lcOpen=false;
 const WDS=["Κυρ","Δευ","Τρί","Τετ","Πέμ","Παρ","Σάβ"];
 function compKey(c,sport){const parts=String(c||"").split(" · ").map(x=>x.trim());
   if(parts.length>1&&/^(Βόλεϊ|Πόλο|Χάντμπολ|Μπάσκετ γυναικών)/.test(parts[0]))return parts[0]+" · "+parts[1].replace(/\s*\d+[ηο]ς?\s*(αγων|αγωνιστική|όμιλος).*$/i,"").trim();
@@ -1360,7 +1435,9 @@ function renderLive(){
   const fSp=chips("Άθλημα",sps.map(([k,l])=>[k,l,k==="all"?null:all.filter(x=>lcNorm(x)===k).length]),lcSp,k=>lcSp=k);fSp.dataset.f="sport";
   const fG=chips("Ομάδα",[["all","Ανδρών & γυναικών"],["m","Ανδρών"],["w","Γυναικών"]],lcG,k=>lcG=k);fG.dataset.f="gender";
   const fC=chips("Διοργάνωση",[["all","Όλες οι διοργανώσεις"],...comps.map(c=>[c,c])],lcC,k=>lcC=k);fC.dataset.f="comp";
-  const fw=el("div","lc-filters");fw.append(fS,fSp,fG,fC);box.append(fw);
+  const fw=el("div","lc-filters");const nAct=(lcSp!=="all")+(lcG!=="all")+(lcC!=="all");const more=el("div","lc-more");more.hidden=!lcOpen;more.append(fSp,fG,fC);
+  const tg=el("button","lc-tg","Φίλτρα"+(nAct?" · "+nAct:""));tg.type="button";tg.setAttribute("aria-expanded",String(lcOpen));tg.onclick=()=>{lcOpen=!lcOpen;more.hidden=!lcOpen;tg.setAttribute("aria-expanded",String(lcOpen))};
+  const r1=el("div","lc-r1");r1.append(fS,tg);fw.append(r1,more);box.append(fw);
   if(!nLive&&!nPend&&(lcS==="all"||lcS==="live")){const e=el("div","lc-empty");const ph=el("img","lc-ph");ph.src="assets/photos/live.jpg";ph.alt="";ph.loading="lazy";e.append(ph,el("b",null,"Δεν παίζει κάποιος αγώνας αυτή τη στιγμή"),el("p",null,"Δες παρακάτω τα προσεχή και τα πρόσφατα αποτελέσματα· όταν ξεκινήσει αγώνας εμφανίζεται εδώ αυτόματα."));box.append(e)}
   if(!list.length){const e=el("div","none","Κανένας αγώνας με αυτά τα φίλτρα.");const rb=el("button","moreb","Καθαρισμός φίλτρων");rb.type="button";rb.onclick=()=>{lcS=lcSp=lcC=lcG="all";renderLive()};box.append(e,rb)}
   if(hidU){const nt=el("div","un-note");nt.append(hidU+(hidU===1?" αγώνας δεν περιλαμβάνεται":" αγώνες δεν περιλαμβάνονται")+" (δεν έχει επιβεβαιωθεί η ομάδα). ");const bb=el("button","moreb","Δες όλους");bb.type="button";bb.onclick=()=>{lcG="all";renderLive()};nt.append(bb);box.append(nt)}
@@ -1402,6 +1479,7 @@ function openMatch(it,liveCard){
   const b1=el("button","qk-b","Βαθμολογία διοργάνωσης");b1.type="button";b1.onclick=()=>{close();mmenu=false;mtab="standings";try{localStorage.setItem("thr_m",mtab)}catch(_){}setView("more")};
   const b2=el("button","qk-b","Πρόγραμμα αθλήματος");b2.type="button";b2.onclick=()=>{close();gfilter=SP(it.sport);gmode=it.bucket==="done"?"past":"next";setView("games")};
   nav.append(b1,b2);
+  if(it.bucket==="done"&&it.d&&it.d>=ymdOff(-60)&&it.olyS!=null){const a=el("a","qk-b","▶ Highlights στο YouTube");a.href="https://www.youtube.com/results?search_query="+encodeURIComponent("Ολυμπιακός "+oppN+" highlights "+(SPORT[it.sport]||"")+" "+it.d.slice(0,4));a.target="_blank";a.rel="noopener";nav.append(a)}
   if(it.bucket!=="done"&&it.d){const b3=el("button","qk-b","Προσθήκη στο ημερολόγιο");b3.type="button";b3.onclick=()=>dlICS(it);nav.append(b3)}
   const hb=h2hBox(it);if(hb)body.append(hb);
   body.append(nav);
@@ -1435,7 +1513,7 @@ function openPlayer(p,sport){
   const facts=[["Αριθμός",p.no],["Θέση",p.pos],["Ηλικία",p.age],["Γέννηση",[b.born,b.birthplace].filter(Boolean).join(", ")],["Εθνικότητα",p.nat],["Ύψος",p.height?p.height+" εκ.":""],["Πόδι / χέρι",b.foot],["Συμβόλαιο έως",b.contract],["Αξία",b.value],["Στην ομάδα από",b.joined],["Εθνική ομάδα",b.national]].filter(([,v])=>v!=null&&v!=="");
   const fb=el("div","facts");facts.forEach(([k,v])=>{const d=el("div");d.append(el("small",null,k),el("b",null,String(v)));fb.append(d)});body.append(fb);
   const g1=[],g2=[],g3=[];const _ap=body.append.bind(body);let cur=g1;const real=body.append.bind(body);body.append=(...n)=>{cur.push(...n)};
-  const st=Object.entries(p.stats||{});if(st.length){const k=el("div","box");k.append(el("h4",null,"Φετινή σεζόν"));const sb=el("div","stats");st.forEach(([a,v])=>{const s=el("span");s.append(a+" ",el("b",null,String(v)));sb.append(s)});k.append(sb);body.append(k)}
+  const st=Object.entries(p.stats||{}).filter(([k,v])=>!(/τερματοφ/i.test(p.pos||"")&&/^γκολ$/i.test(k)&&!+v));if(st.length){const k=el("div","box");k.append(el("h4",null,"Φετινή σεζόν"));const sb=el("div","stats");st.forEach(([a,v])=>{const s=el("span");s.append(a+" ",el("b",null,String(v)));sb.append(s)});k.append(sb);body.append(k)}
   const sts=Array.isArray(b.statTables)?b.statTables:(b.statTable?[b.statTable]:[]);
   sts.forEach(tb=>{if(!(tb.rows||[]).length)return;const k=el("div","box");k.append(el("h4",null,tb.title||"Στατιστικά"));const w=el("div","tw");const t=el("table","career");
     const keep=(tb.columns||[]).map((h,ci)=>ci===0||tb.rows.some(r=>r[ci]!=null&&r[ci]!==""));
@@ -1494,7 +1572,7 @@ function teamItems(id,all){return (all||allItems()).filter(x=>x.team===id)}
 function teamNext(its){const lv=its.filter(x=>x.bucket==="live");if(lv.length)return lv[0];
   return its.filter(x=>x.bucket==="next"||x.bucket==="stale").sort((a,b)=>(a.d+(a.t||"")).localeCompare(b.d+(b.t||"")))[0]||null}
 function teamLast(its){return its.filter(x=>x.bucket==="done").sort((a,b)=>(b.d+(b.t||"")).localeCompare(a.d+(a.t||"")))[0]||null}
-function teamTables(id,key){const d=X[key];return ((d&&d.tables)||[]).filter(t=>classifyTeam(t.sport,t.title).id===id)}
+function teamTables(id,key){const d=X[key];return (key==="standings"?standTables(d&&d.tables):((d&&d.tables)||[])).filter(t=>classifyTeam(t.sport,t.title).id===id)}
 function rosterOf(t){const r=t.roster&&rosters[t.roster];if(!r)return null;const n=(r.groups||[]).reduce((a,g)=>a+(g.players||[]).length,0);return n?{r,n}:null}
 const fmtShortDT=it=>{const dt=new Date(it.d+"T12:00:00");return WDS[dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1)+(it.t?" "+it.t:"")};
 const vsText=it=>it.home?"Ολυμπιακός – "+it.opp:it.opp+" – Ολυμπιακός";
@@ -1574,21 +1652,21 @@ function renderAmateurHub(box){
     const L=el("div","tm-list");un.forEach(x=>L.append(mkMatchRow(x)));d.append(L)}
   box.append(d)}
 const SPN={football:"Ποδόσφαιρο",basketball:"Μπάσκετ",polo:"Πόλο",amateur:"Ερασιτέχνης"};
-function srcLink(it){if(!it||!it.url)return null;const a=el("a","hs-src","Πηγή: "+(it.source||"επίσημο site")+" ›");a.href=it.url;a.target="_blank";a.rel="noopener";return a}
+function hsSrc(it){if(!it||!it.url)return null;const a=el("a","hs-src","Πηγή: "+(it.source||"επίσημο site")+" ›");a.href=it.url;a.target="_blank";a.rel="noopener";return a}
 function renderHistory(box){const d=X.history;if(!d||!(d.sections||[]).length){box.append(emptyBox(["Η ιστορία φορτώνει","Το χρονολόγιο και τα τρόπαια του συλλόγου εμφανίζονται εδώ."]));return}
   if(d.note)box.append(el("p","r-note",d.note));
   d.sections.forEach(sec=>{const c=el("section","hs-sec");c.append(el("h3","hs-h",sec.title));const l=el("ol","hs-l");
-    (sec.items||[]).forEach(it=>{const li=el("li");li.append(el("b","hs-y",it.y),el("span","hs-t",it.t));l.append(li)});c.append(l);const a=srcLink(sec);if(a)c.append(a);box.append(c)})}
+    (sec.items||[]).forEach(it=>{const li=el("li");li.append(el("b","hs-y",it.y),el("span","hs-t",it.t));l.append(li)});c.append(l);const a=hsSrc(sec);if(a)c.append(a);box.append(c)})}
 function renderInfo(box,key){const d=X[key];if(!d||!(d.sections||[]).length){box.append(emptyBox(["Το περιεχόμενο φορτώνει","Τα στοιχεία από τα επίσημα sites εμφανίζονται εδώ."]));return}
   if(d.note)box.append(el("p","r-note",d.note));
   d.sections.forEach(sec=>{const c=el("section","hs-sec");c.append(el("h3","hs-h",sec.title));const l=el("ul","hs-l hs-i");
     (sec.items||[]).forEach(it=>{const li=el("li");if(it.k)li.append(el("b","hs-y",it.k));
       if(it.url){const a=el("a","hs-t",it.t);a.href=it.url;a.target="_blank";a.rel="noopener";li.append(a)}else li.append(el("span","hs-t",it.t));l.append(li)});
-    c.append(l);const a=srcLink(sec);if(a)c.append(a);box.append(c)})}
+    c.append(l);const a=hsSrc(sec);if(a)c.append(a);box.append(c)})}
 function renderLegends(box){const d=X.legends;if(!d||!(d.items||[]).length){box.append(emptyBox(["Οι θρύλοι φορτώνουν","Οι μεγάλες μορφές του Ολυμπιακού εμφανίζονται εδώ."]));return}
   if(d.note)box.append(el("p","r-note",d.note));
   const g=el("div","lg-g");d.items.forEach(it=>{const c=el("article","lg-c");const h=el("div","lg-h");h.append(el("h3",null,it.name),el("span","lg-sp",SPN[it.sport]||""));
-    c.append(h,el("div","lg-m",[it.role,it.years].filter(Boolean).join(" · ")),el("p","lg-t",it.text));const a=srcLink(it);if(a)c.append(a);g.append(c)});box.append(g)}
+    c.append(h,el("div","lg-m",[it.role,it.years].filter(Boolean).join(" · ")),el("p","lg-t",it.text));const a=hsSrc(it);if(a)c.append(a);g.append(c)});box.append(g)}
 const GAL=16;
 function openPhoto(i,url){const o=el("div","lb");o.setAttribute("role","dialog");o.setAttribute("aria-label","Φωτογραφία");
   const im=el("img");im.alt="";const n=String(i).padStart(2,"0");im.src=url||"assets/gallery/"+n+".jpg";im.referrerPolicy="no-referrer";
@@ -1620,7 +1698,7 @@ function renderMore(){const box=$("#more");box.replaceChildren();
   if(mtab==="amateur"){renderAmateurHub(box);return}
   if(mtab==="scorers"){const ss=seasonStats();if(ss)box.append(ss)}
   const d=X[mtab];if(!d){if(!box.children.length)box.append(emptyBox(MEMPTY[mtab]));return}
-  if(mtab==="standings"||mtab==="scorers"){const ts=d.tables||[];if(!ts.length){box.append(emptyBox(MEMPTY[mtab]));return}ts.forEach(t=>box.append(tableCard(t)))}
+  if(mtab==="standings"||mtab==="scorers"){const ts=mtab==="standings"?standTables(d.tables):(d.tables||[]);if(!ts.length){box.append(emptyBox(MEMPTY[mtab]));return}ts.forEach(t=>box.append(tableCard(t)))}
   else if(mtab==="discipline"){const its=d.items||[];if(!its.length){box.append(emptyBox(MEMPTY[mtab]));return}
     DSC.forEach(([k,label,col])=>{const l=its.filter(x=>x.type===k);if(!l.length)return;const s=el("section");const h=el("h3","grp-h",label);h.append(el("span","st "+col,String(l.length)));s.append(h);
       const f=el("div","feed");l.forEach(x=>{const c=el("article","card");const top=el("div","card-top");top.append(ic(x.sport,x.text),el("b",null,x.name));if(x.until)top.append(el("span","pill",x.until));c.append(top);if(x.text)c.append(el("p",null,x.text));f.append(c)});s.append(f);box.append(s)})}
@@ -1635,14 +1713,14 @@ function renderMore(){const box=$("#more");box.replaceChildren();
     const f=el("div","feed");ts.forEach(x=>{const c=el("article","card");const top=el("div","card-top");top.append(ic("amateur",x.sport),el("span","card-sport",x.sport||""));if(x.pos)top.append(el("span","pill",x.pos));c.append(top,el("h3",null,x.title||x.comp||""));
       if(x.comp&&x.title)c.append(el("p","who",x.comp));[["Τελευταίο",x.last],["Επόμενο",x.next]].forEach(([l,v])=>{if(v){const p=el("p");p.append(el("b",null,l+": "),v);c.append(p)}});if(x.note)c.append(el("p",null,x.note));
       const ft=el("div","card-foot");ft.append(srcLink(x.source,x.url));c.append(ft);f.append(c)});box.append(f)}
-  const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+d.updatedAt))}
+  const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+updTxt(d.updatedAt)))}
 function renderArchive(box){const inp=el("input","srch");inp.type="search";inp.placeholder="Αναζήτηση στο αρχείο (όνομα, ομάδα, θέμα)";inp.value=aq;inp.setAttribute("aria-label","Αναζήτηση");
   const out=el("div","feed");box.append(inp,out);
-  const draw=()=>{out.replaceChildren();const q=aq.trim().toLowerCase();let n=0;
-    editions.forEach(e=>{const hits=q?(e.items||[]).filter(i=>((i.title||"")+" "+(i.body||"")).toLowerCase().includes(q)):[];
-      if(q&&!hits.length&&!(e.headline||"").toLowerCase().includes(q))return;n++;
+  const draw=()=>{out.replaceChildren();const q=nrm(aq.trim());let n=0;
+    editions.forEach(e=>{const hits=q?(e.items||[]).filter(i=>nrm((i.title||"")+" "+(i.body||"")+" "+(Array.isArray(i.full)?i.full.join(" "):"")+" "+(i.source||"")).includes(q)):[];
+      if(q&&!hits.length&&!nrm(e.headline||"").includes(q))return;n++;
       const b=el("button","arc");b.type="button";b.append(el("b",null,fmtDate(e.date)),el("span",null,e.headline||"Έκδοση "+e.date));
-      if(q&&hits.length)b.append(el("small",null,hits.slice(0,3).map(h=>"• "+h.title).join("\n")));else if(!q)b.append(el("small",null,(e.items||[]).length+" θέματα"));
+      if(q&&hits.length)b.append(el("small",null,hits.slice(0,4).map(h=>"• "+h.title).join("\n")+(hits.length>4?"\n+"+(hits.length-4)+" ακόμη":"")));else if(!q)b.append(el("small",null,(e.items||[]).length+" θέματα"));
       b.querySelector("small")&&(b.querySelector("small").style.whiteSpace="pre-line");
       b.onclick=()=>{cur=e;setView("news")};out.append(b)});
     if(!n)out.append(el("div","none",editions.length?"Δεν βρέθηκε τίποτα.":"Το αρχείο γεμίζει κάθε πρωί."))};
@@ -1668,7 +1746,7 @@ function renderBet(){const box=$("#bet");box.replaceChildren();const d=X.betting
     if(det.childNodes.length){const n=(m.markets||[]).length;const tg=el("button","bm-tg","Δες εκτιμήσεις"+(n?" ("+n+")":"")+" ▾");tg.type="button";tg.setAttribute("aria-expanded","false");tg.onclick=()=>{det.hidden=!det.hidden;tg.setAttribute("aria-expanded",det.hidden?"false":"true");tg.textContent=det.hidden?"Δες εκτιμήσεις"+(n?" ("+n+")":"")+" ▾":"Κλείσιμο ▴"};c.append(tg,det)}
     box.append(c)});
   const sl=el("div","slip-f");sl.style.borderRadius="14px";sl.textContent="Ενδεικτικές εκτιμήσεις από δημόσια στοιχεία, όχι σίγουρες επιλογές. Η ένδειξη δίπλα σε κάθε αγορά (Υψηλή, Μέτρια, Χαμηλή) δείχνει πόσο εμπιστεύομαι την εκτίμηση. Παίξε μόνο ό,τι αντέχεις να χάσεις.";box.append(sl);
-  const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+d.updatedAt))}
+  const ch=chipsOf(d.sources);if(ch)box.append(ch);if(d.updatedAt)box.append(el("p","foot","Ενημερώθηκε "+updTxt(d.updatedAt)))}
 
 /* ---- live chat (Supabase REST) ---- */
 const SB={url:"https://tgvuaskxikvkzcmdnvit.supabase.co",key:"sb_publishable_qG86S1ce3cNWswHLEmvv-g_sxpIf8_H"};
@@ -1769,7 +1847,7 @@ async function chatBadge(){try{if(view==="chat"||!lsGet("thr_code")||document.vi
   if(id>(+lsGet("thr_seen")||0)){if(!dot){dot=el("span","badge");b.append(dot)}}else if(dot)dot.remove()}catch(e){}}
 setInterval(chatBadge,20000);setTimeout(chatBadge,3000);
 
-function setView(v){view=v;
+function setView(v){view=v;document.body.dataset.view=v;
   document.querySelectorAll(".bar button").forEach(b=>{if(b.dataset.v===v||(b.dataset.v==="more"&&(v==="vs"||v==="bet"||v==="chat")))b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   $("#app").hidden=v!=="news";$("#roster").hidden=v!=="roster";$("#games").hidden=v!=="games";$("#vs").hidden=v!=="vs";$("#live").hidden=v!=="live";$("#bet").hidden=v!=="bet";$("#more").hidden=v!=="more";$("#chat").hidden=v!=="chat";chatBuilt=false;if(v==="chat"){const bb=document.querySelector('.bar button[data-v="more"] .badge');if(bb)bb.remove()}
   render();
@@ -1813,7 +1891,7 @@ function render(){
   if(view==="live"){$("#next").hidden=true;$("#headline").textContent="Live score";$("#tabs").replaceChildren();renderLive();return}
   if(view==="bet"){$("#next").hidden=true;$("#headline").textContent="Στοίχημα · εκτιμήσεις επόμενων αγώνων";renderTabs();renderBet();return}
   if(view==="more"&&mmenu){$("#next").hidden=true;$("#headline").textContent="Όλες οι υπόλοιπες ενότητες";$("#tabs").replaceChildren();renderMoreMenu();return}
-  if(view==="more"){$("#next").hidden=true;$("#headline").textContent="Βαθμολογίες, στατιστικά, τιμωρίες και αρχείο";renderTabs();renderMore();const bk=el("button","mm-back","‹ Κι άλλα");bk.type="button";bk.onclick=()=>{mmenu=true;render();window.scrollTo({top:0})};$("#more").prepend(bk);return}
+  if(view==="more"){$("#next").hidden=true;$("#headline").textContent=MHEAD[mtab]||"Βαθμολογίες, στατιστικά, τιμωρίες και αρχείο";renderTabs();renderMore();const bk=el("button","mm-back","‹ Κι άλλα");bk.type="button";bk.onclick=()=>{mmenu=true;render();window.scrollTo({top:0})};$("#more").prepend(bk);return}
   if(view==="vs"){$("#next").hidden=true;$("#headline").textContent="Σύγκριση με τους επόμενους αντιπάλους";renderTabs();renderVs();return}
   if(view==="games"){$("#next").hidden=true;$("#headline").textContent="Ημερολόγιο αγώνων 2026-27";renderTabs();renderGames();return}
   if(view==="roster"){$("#next").hidden=true;$("#headline").textContent="Ρόστερ & στοιχεία παικτών";renderTabs();renderRoster();return}
@@ -1824,11 +1902,12 @@ function render(){
   if(!cur){const e=el("div","empty");e.append(el("b",null,"Η πρώτη έκδοση έρχεται"),el("p",null,"Κάθε πρωί στις 10:00 εμφανίζονται εδώ όλα τα νέα του Ολυμπιακού."));app.append(e);return}
   $("#edDate").textContent=fmtDate(cur.date);
   $("#headline").textContent=cur.headline||"Τα νέα του Ολυμπιακού";
-  const up=$("#updated");if(cur.updatedAt){up.hidden=false;up.lastChild.textContent="Ενημερώθηκε "+cur.updatedAt}else up.hidden=true;
+  const up=$("#updated");if(cur.updatedAt){const sd=parseUpd(cur.updatedAt,cur.date),old=isStale(sd);up.hidden=false;up.classList.toggle("old",old);up.lastChild.textContent="Ενημερώθηκε "+updTxt(cur.updatedAt,cur.date)+(old?" · παλιά δεδομένα":"")}else up.hidden=true;
 
+  if(cur===editions[0]&&cur.date<todayStr()&&(cur.date<ymdOff(-1)||new Date().getHours()>=11)){const sb=el("div","stale-b");sb.setAttribute("role","status");sb.append(el("b",null,"Τα νέα είναι από "+fmtDate(cur.date)),el("span",null,"Η σημερινή έκδοση δεν έχει φτάσει ακόμη. Οι τίτλοι «Τελευταία νέα» και τα σκορ ενημερώνονται κανονικά."));app.append(sb)}
   const hl=(cur.headline||"").split(/(?<=[.!;])\s+/).map(x=>x.trim()).filter(x=>x.length>3).slice(0,5);
   $("#headline").hidden=true;
-  if(hl.length){const bf=el("section","brief");bf.style.marginTop="0";const bh=el("div","brief-h");bh.append(el("h2",null,"Τα βασικά σήμερα"));bf.append(bh);const u=el("ul");hl.forEach(x=>u.append(el("li",null,x)));bf.append(u);app.append(bf);
+  if(hl.length){const bf=el("section","brief");bf.style.marginTop="0";const bh=el("div","brief-h");bh.append(el("h2",null,cur.date===todayStr()?"Τα βασικά σήμερα":"Τα βασικά · "+fmtDate(cur.date)));bf.append(bh);const u=el("ul");hl.forEach(x=>u.append(el("li",null,x)));bf.append(u);app.append(bf);
     if(hl.length>1){let bi=0;const dts=el("div","dots");const lis=[...u.children];
       const go=k=>{bi=(k+lis.length)%lis.length;lis.forEach((li,q)=>{li.classList.toggle("on",q===bi);li.setAttribute("aria-hidden",q===bi?"false":"true")});[...dts.children].forEach((d,q)=>d.setAttribute("aria-current",q===bi?"true":"false"))};
       lis.forEach((_,k)=>{const d=el("button");d.type="button";d.setAttribute("aria-label","Θέμα "+(k+1)+" από "+lis.length);d.append(el("i"));d.onclick=()=>{go(k);restart()};dts.append(d)});
@@ -1836,6 +1915,7 @@ function render(){
       const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;const restart=()=>{clearInterval(briefT);if(!reduce)briefT=setInterval(()=>{if(!document.hidden)go(bi+1)},5500)};restart();
       swipe(u,()=>{go(bi+1);restart()},()=>{go(bi-1);restart()})}}
   else clearInterval(briefT);
+  if(cur===editions[0]){const rs=el("section","rss");rs.id="rss";rs.hidden=true;app.append(rs);renderFeed();const td=el("section","today");td.id="today";td.hidden=true;app.append(td);renderToday()}
 
   const its0=(cur.items||[]).filter(ok);
   const lead=filter==="all"?(its0.find(i=>i.body||i.full)||its0[0]):null;
@@ -1900,6 +1980,7 @@ function render(){
     const q=el("section");const hq=el("div","grp-h");hq.append(el("h2",null,"Γρήγορη πρόσβαση"));const qg=el("div","qk");
     [["Βαθμολογίες","standings"],["Σκόρερ","scorers"],["Τιμωρίες","discipline"],["Μεταγραφές","rumors"]].forEach(([l,k])=>{const b=el("button","qk-b",l);b.type="button";b.onclick=()=>{mmenu=false;mtab=k;try{localStorage.setItem("thr_m",mtab)}catch(_){}setView("more")};qg.append(b)});
     [["Ημερολόγιο αγώνων","games"],["Ρόστερ","roster"]].forEach(([l,k])=>{const b=el("button","qk-b",l);b.type="button";b.onclick=()=>setView(k);qg.append(b)});
+    {const b=el("button","qk-b","🔎 Αναζήτηση ειδήσεων");b.type="button";b.onclick=()=>{mmenu=false;mtab="archive";try{localStorage.setItem("thr_m",mtab)}catch(_){}setView("more");setTimeout(()=>{const i=document.querySelector("#more .srch");if(i)i.focus()},80)};qg.append(b)}
     {const b=el("button","qk-b","🔔 Ειδοποιήσεις");b.type="button";b.onclick=openNotify;qg.append(b)}
     {const b=el("button","qk-b","Οι 10 ομάδες");b.type="button";b.onclick=()=>{teamSel=null;mmenu=false;mtab="teams";try{localStorage.setItem("thr_m",mtab)}catch(_){}setView("more")};qg.append(b)}
     q.append(hq,qg);app.append(q)}
@@ -1916,7 +1997,7 @@ function render(){
   app.append(el("p","foot","Νέα έκδοση κάθε πρωί στις 10:00"));
   {const p=el("p","foot","Ορισμένα σκορ ποδοσφαίρου/μπάσκετ: ");const a=el("a",null,"Powered by SportScore");a.href="https://sportscore.com";a.target="_blank";a.rel="noopener";p.append(a);app.append(p)}
 }
-function fillSelect(){const s=$("#edition");s.replaceChildren();editions.slice(0,14).forEach((e,i)=>{const o=el("option",null,(i===0?"Σήμερα · ":"")+fmtDate(e.date));o.value=e.date;s.append(o)});if(cur)s.value=cur.date}
+function fillSelect(){const s=$("#edition");s.replaceChildren();editions.slice(0,14).forEach((e,i)=>{const o=el("option",null,(e.date===todayStr()?"Σήμερα · ":"")+fmtDate(e.date));o.value=e.date;s.append(o)});if(cur)s.value=cur.date}
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;
   if(b.dataset.o){vsel=b.dataset.o;render();return}
   if(b.dataset.mt){mtab=b.dataset.mt;if(mtab==="teams")teamSel=null;try{localStorage.setItem("thr_m",mtab)}catch(_){}render();window.scrollTo({top:0});return}
@@ -1939,17 +2020,20 @@ setView(view);fixCaps();
   function poll(fn,ms){let last=null,busy=false;const run=async()=>{if(busy)return;busy=true;try{const t=await fn(last);if(t!==undefined)last=t}catch(e){}busy=false};run();subs.push(run);setInterval(()=>{if(document.visibilityState==="visible")run()},ms||45000);return run}
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")subs.forEach(f=>f())});
   let ip=null,ipT=0;
-  const getIdx=()=>{if(ip&&Date.now()-ipT<3000)return ip;ipT=Date.now();ip=j("index").then(t=>{const o=JSON.parse(t);if(!o||typeof o!=="object"||Array.isArray(o))throw new Error("bad index");idx=o;return t});ip.catch(()=>{ip=null});return ip};
+  const cache={};
+  /* κατεβάζει ένα αρχείο μόνο αν άλλαξε: με index.v (hash ανά αρχείο) ή, χωρίς αυτό, με χρόνο ζωής ttl· κάθε 15′ γίνεται πλήρης έλεγχος για ασφάλεια */
+  const jv=async(p,ttl)=>{const v=idx&&idx.v?idx.v[p]:undefined,c=cache[p],age=c?Date.now()-c.at:1/0;if(c&&(v!==undefined?(c.v===v&&age<15*60e3):age<(ttl||0)))return c.t;const t=await j(p);cache[p]={t,v,at:Date.now()};return t};
+  const getIdx=()=>{if(ip&&Date.now()-ipT<20000)return ip;ipT=Date.now();ip=j("index").then(t=>{const o=JSON.parse(t);if(!o||typeof o!=="object"||Array.isArray(o))throw new Error("bad index");idx=o;return t});ip.catch(()=>{ip=null});return ip};
   const docSnap=(id,o)=>({id,exists:o!=null,data:()=>o});
   return{
     collection(name){const q={lim:1000};const api={
       orderBy(){return api},limit(n){q.lim=n;return api},
       onSnapshot(cb,eb){poll(async last=>{
         const it=await getIdx();const ids=(it&&idx[name]||[]).slice(0,q.lim);
-        const txts=await Promise.all(ids.map(i=>j(name+"/"+i)));const all=ids.join(",")+"|"+txts.join("");
+        const txts=await Promise.all(ids.map((i,k)=>jv(name+"/"+i,name==="editions"&&k<2?0:600e3)));const all=ids.join(",")+"|"+txts.join("");
         if(all===last)return;
         cb({docs:ids.map((id,k)=>docSnap(id,JSON.parse(txts[k])))});return all});}};return api},
-    doc(path){return{onSnapshot(cb,eb){poll(async last=>{let t;try{t=await j(path)}catch(e){if(e.status!==404||last===null||last==="")return;t=""}
+    doc(path){return{onSnapshot(cb,eb){poll(async last=>{let t;try{if(path==="live/now")t=await j(path);else{try{await getIdx()}catch(_){}t=await jv(path,path==="schedule/season"?0:180e3)}}catch(e){if(e.status!==404||last===null||last==="")return;t=""}
       if(t===last)return;cb(t===""?docSnap(path,null):docSnap(path,JSON.parse(t)));return t},path==="live/now"?15000:45000)}}}
   }})();
 
@@ -1961,9 +2045,9 @@ setView(view);fixCaps();
   },()=>{});
   db.doc("live/now").onSnapshot(s=>{live=s.exists===false?null:(s.data()||null);if(view==="live")render();else if(view==="news")renderNext()},()=>{});
   db.doc("schedule/opponents").onSnapshot(s=>{opps=s.exists===false?null:(s.data()||null);if(view==="vs")render()},()=>{});
-  db.doc("schedule/season").onSnapshot(s=>{season=s.exists===false?null:(s.data()||null);if(season&&Array.isArray(season.matches))seasonKeep=season;if(view==="games"||view==="news"||view==="live"||(view==="more"&&!mmenu&&(mtab==="teams"||mtab==="amateur")))render()},()=>{});
-  XD.forEach(k=>db.doc("schedule/"+k).onSnapshot(sn=>{X[k]=sn.exists===false?null:(sn.data()||null);if(view==="bet"&&k==="betting"||view==="more")render()},()=>{}));
-  db.collection("rosters").onSnapshot(snap=>{rosters={};snap.docs.forEach(d=>{const x=d.data();if(x)rosters[d.id]=x});if(view==="roster")render();else if(view!=="live"&&view!=="chat")renderTabs()},()=>{});
+  db.doc("schedule/season").onSnapshot(s=>{season=s.exists===false?null:(s.data()||null);if(season&&Array.isArray(season.matches)){seasonKeep=season;applyFinals()}if(view==="games"||view==="news"||view==="live"||(view==="more"&&!mmenu&&(mtab==="teams"||mtab==="amateur")))render()},()=>{});
+  XD.forEach(k=>db.doc("schedule/"+k).onSnapshot(sn=>{X[k]=sn.exists===false?null:(sn.data()||null);if(k==="history"&&view==="news")renderToday();if(view==="bet"&&k==="betting"||view==="more")render()},()=>{}));
+  db.collection("rosters").onSnapshot(snap=>{rosters={};snap.docs.forEach(d=>{const x=d.data();if(x)rosters[d.id]=x});if(view==="roster")render();else if(view!=="live"&&view!=="chat")renderTabs();if(view==="news")renderToday()},()=>{});
 })();
 
 // Αριθμοί που «μετράνε» προς τα πάνω (σύνοψη ρόστερ, στατιστικά στα παράθυρα)· μόνο ακέραιοι, χωρίς reduced-motion
