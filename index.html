@@ -258,11 +258,12 @@ button:active,.tab:active,.gm:active{transform:scale(.97)}
 .switch .wrap{padding-block:12px}
 .seg{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .seg::-webkit-scrollbar{display:none}
-.tab{flex:none;display:flex;align-items:center;gap:6px;font:700 14px var(--body);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;transition:background .15s,color .15s}
+.tab{flex:none;display:flex;align-items:center;gap:6px;font:700 14px var(--body);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:9px 14px;min-height:38px;cursor:pointer;transition:background .15s,color .15s}
 .tab .n{font-size:12px;color:var(--muted);background:var(--pill);border-radius:999px;padding:0 6px;min-width:18px;text-align:center}
 .tab[aria-pressed="true"]{border-color:var(--red)}
 .tab[aria-pressed="true"] .n{background:rgba(255,255,255,.22);color:#fff}
 .tab:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+button,a,.tab,[role=button],.lc-row{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 main .wrap{padding-block:6px 48px;display:flex;flex-direction:column;gap:28px}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 12px}
@@ -918,7 +919,7 @@ body[data-view]:not([data-view="news"]) .hero .headline{font-size:14px;opacity:.
   <div class="wrap">
     <div class="top">
       <div class="logo">
-        <div class="crest g7" aria-hidden="true"><img src="assets/gate7.jpg" alt=""></div>
+        <div class="crest g7" aria-hidden="true"><img src="assets/gate7.jpg" alt="" width="192" height="192"></div>
         <div class="word"><div class="w1"><b>ΘΡΥΛΟΣ</b><i>DAILY</i></div><span>ΟΛΥΜΠΙΑΚΟΣ · ΟΛΑ ΤΑ ΤΜΗΜΑΤΑ</span></div>
       </div>
       <div class="top-r"><button type="button" class="hub-btn" id="themeBtn" aria-label="Θέμα" style="padding:0"></button>
@@ -957,12 +958,12 @@ body[data-view]:not([data-view="news"]) .hero .headline{font-size:14px;opacity:.
 
 <script>
 const ICON={
- football:'<img src="assets/ball-football.png" alt="" decoding="async">',
- basketball:'<img src="assets/ball-basketball.png" alt="" decoding="async">',
- polo:'<img src="assets/ball-polo.png" alt="" decoding="async">',
- handball:'<img src="assets/ball-handball.png" alt="" decoding="async">',
- volleyball:'<img src="assets/ball-volleyball.png" alt="" decoding="async">',
- amateur:'<img src="assets/ball-amateur.png" alt="" decoding="async">'
+ football:'<img src="assets/ball-football.png" alt="" width="96" height="96" decoding="async">',
+ basketball:'<img src="assets/ball-basketball.png" alt="" width="96" height="96" decoding="async">',
+ polo:'<img src="assets/ball-polo.png" alt="" width="96" height="96" decoding="async">',
+ handball:'<img src="assets/ball-handball.png" alt="" width="96" height="96" decoding="async">',
+ volleyball:'<img src="assets/ball-volleyball.png" alt="" width="96" height="96" decoding="async">',
+ amateur:'<img src="assets/ball-amateur.png" alt="" width="96" height="96" decoding="async">'
 };
 const SPORT={football:"Ποδόσφαιρο",basketball:"Μπάσκετ",polo:"Πόλο",amateur:"Ερασιτέχνης"};
 const KIND={match:"Αγώνας",injury:"Τραυματισμός",transfer:"Μεταγραφή",quote:"Δήλωση",odds:"Προγνωστικά",club:"Ομάδα",off:"Εκτός γηπέδου"};
@@ -1003,7 +1004,7 @@ const MI={teams:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
  discipline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="7" y="3.5" width="10" height="17" rx="2"/></svg>',
  rumors:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 12h13M13 7l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  quotes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2H11l-5 4v-4H5a2 2 0 01-2-2V7a2 2 0 012-2z" stroke-linejoin="round"/></svg>',
- amateur:'<img src="assets/ball-amateur.png" alt="" decoding="async">',
+ amateur:'<img src="assets/ball-amateur.png" alt="" width="96" height="96" decoding="async">',
  history:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  legends:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" stroke-linejoin="round"/></svg>',
  gallery:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4 18l5-5 3 3 3-3 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
