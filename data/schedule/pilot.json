@@ -1,1 +1,1 @@
-{"blocked":"","done":[],"fixesDone":false,"startedAt":"2026-11-15T23:08:00+02:00","step":"ξεκίνησε"}
+{"blocked":"","done":["23:08 πρώτος συγχρονισμός OK (push)","23:09 έρευνα (6 αναζητήσεις + 4 fetch, σκορ SportScore): όλα ήδη καλυμμένα στην έκδοση/season","23:09 τελικός έλεγχος: GitHub = βάση (updatedAt 22:20)"],"finishedAt":"2026-11-15T23:10:00+02:00","fixesDone":false,"pushed":true,"result":"Καμία αλλαγή","startedAt":"2026-11-15T23:08:00+02:00","step":"τέλος"}
