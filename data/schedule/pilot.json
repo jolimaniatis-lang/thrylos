@@ -1,1 +1,1 @@
-{"blocked":"","done":[],"fixesDone":false,"startedAt":"2026-11-16T12:08:00+02:00","step":"ξεκίνησε"}
+{"blocked":"","done":["12:10 πρώτος συγχρονισμός OK (push)","12:14 έρευνα (10 αναζητήσεις/fetch): τίποτα νεότερο από 11:25"],"finishedAt":"2026-11-16T12:16:00+02:00","fixesDone":false,"pushed":true,"result":"καμία αλλαγή πέρα από updatedAt (23 items)","startedAt":"2026-11-16T12:08:00+02:00","step":"τελικός συγχρονισμός"}
